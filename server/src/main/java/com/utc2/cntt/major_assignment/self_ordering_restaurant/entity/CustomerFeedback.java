@@ -21,11 +21,11 @@ public class CustomerFeedback {
     private int feedbackId;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_ID", nullable = false, foreignKey = @ForeignKey(name = "fk_feedback_customer"))
+    @JoinColumn(name = "Customer_ID", nullable = false)
     private Customers customer;
 
     @ManyToOne
-    @JoinColumn(name = "Order_ID", nullable = false, foreignKey = @ForeignKey(name = "fk_feedback_order"))
+    @JoinColumn(name = "Order_ID", nullable = false)
     private Orders order;
 
     @Column(name = "Rating", nullable = false)
@@ -33,7 +33,7 @@ public class CustomerFeedback {
     @Max(5)
     private int rating; // Giá trị từ 1 đến 5
 
-    @Column(name = "Comment", columnDefinition = "TEXT")
+    @Column(name = "Comment")
     private String comment;
 
     @Column(name = "FeedbackDate", nullable = false, updatable = false)

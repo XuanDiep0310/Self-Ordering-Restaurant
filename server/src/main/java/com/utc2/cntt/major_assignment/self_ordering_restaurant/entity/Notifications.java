@@ -30,13 +30,13 @@ public class Notifications {
     @Column(name = "ExpiryDate")
     private LocalDateTime expiryDate;
 
-    @Column(name = "CreateAt", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "CreateAt")
     private LocalDateTime createdAt;
 
     @Column(name = "IsRead")
     private boolean isRead = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Type", columnDefinition = "ENUM('OrderStatus', 'TableRequest', 'System')")
+    @Column(name = "Type")
     private NotificationType type;
 }

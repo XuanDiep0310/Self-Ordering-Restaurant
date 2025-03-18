@@ -21,15 +21,15 @@ public class Orders {
     private int orderId;
 
     @ManyToOne
-    @JoinColumn(name = "Staff_ID", foreignKey = @ForeignKey(name = "fk_order_staff"))
+    @JoinColumn(name = "Staff_ID")
     private Staff staff;
 
     @ManyToOne
-    @JoinColumn(name = "TableNumber", foreignKey = @ForeignKey(name = "fk_order_table"))
+    @JoinColumn(name = "TableNumber")
     private Tables table;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_ID", foreignKey = @ForeignKey(name = "fk_order_customer"))
+    @JoinColumn(name = "Customer_ID")
     private Customers customer;
 
     @Column(name = "OrderDate")
@@ -52,13 +52,13 @@ public class Orders {
     @Column(name = "PaymentStatus", nullable = false)
     private PaymentOrderStatus paymentStatus = PaymentOrderStatus.Unpaid;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order")
     private Set<Payments> listPayment;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order")
     private Set<OrderItems> listOrderItem;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order")
     private Set<CustomerFeedback> listFeedback;
 
 }

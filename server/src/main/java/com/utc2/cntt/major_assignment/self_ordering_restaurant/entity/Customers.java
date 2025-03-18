@@ -24,19 +24,19 @@ public class Customers {
     @Column(name = "Fullname", nullable = false)
     private String fullname;
 
-    @Column(name = "JoinDate", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "JoinDate")
     private LocalDateTime joinDate;
 
-    @Column(name = "Points", nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(name = "Points", nullable = false)
     private int points;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer")
     private Set<Orders> listOrder;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer")
     private Set<Payments> listPayment;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer")
     private Set<CustomerFeedback> listFeedback;
 
 }

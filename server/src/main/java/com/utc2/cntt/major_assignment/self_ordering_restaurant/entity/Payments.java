@@ -20,11 +20,11 @@ public class Payments {
     private int paymentId;
 
     @ManyToOne
-    @JoinColumn(name = "Order_ID", nullable = false, foreignKey = @ForeignKey(name = "fk_payment_order"))
+    @JoinColumn(name = "Order_ID", nullable = false)
     private Orders order;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_ID", foreignKey = @ForeignKey(name = "fk_payment_customer"))
+    @JoinColumn(name = "Customer_ID")
     private Customers customer;
 
     @Column(name = "Amount", nullable = false)
@@ -34,7 +34,7 @@ public class Payments {
     @Column(name = "PaymentMethod")
     private PaymentMethod paymentMethod;
 
-    @Column(name = "PaymentDate", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "PaymentDate")
     private LocalDateTime paymentDate;
 
     @Column(name = "TransactionID", unique = true)

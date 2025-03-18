@@ -17,12 +17,12 @@ public class DishIngredient {
 
     @ManyToOne
     @MapsId("dishId") // Map với khóa chính của KeyDishIngredient
-    @JoinColumn(name = "Dish_ID", foreignKey = @ForeignKey(name = "fk_dishingredient_dish"))
+    @JoinColumn(name = "Dish_ID")
     private Dishes dish;
 
     @ManyToOne
     @MapsId("ingredientId") // Map với khóa chính của KeyDishIngredient
-    @JoinColumn(name = "Ingredient_ID", foreignKey = @ForeignKey(name = "fk_dishingredient_ingredient"))
+    @JoinColumn(name = "Ingredient_ID")
     private Ingredients ingredient;
 
     @Column(name = "Quantity", precision = 10, scale = 2, nullable = false)

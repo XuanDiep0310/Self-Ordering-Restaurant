@@ -39,10 +39,10 @@ public class Users {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", columnDefinition = "ENUM('Active', 'Inactive', 'Pending') DEFAULT 'Active'")
+    @Column(name = "Status")
     private UserStatus status = UserStatus.Active;
 
-    @Column(name = "CreateAt", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "CreateAt")
     private LocalDateTime createAt = LocalDateTime.now();
 
     @Column(name = "LastLogin")
@@ -51,10 +51,10 @@ public class Users {
     @OneToMany(mappedBy = "user")
     private Set<Notifications> listNotification;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user")
     private Staff staff;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user")
     private Customers customer;
 
 }

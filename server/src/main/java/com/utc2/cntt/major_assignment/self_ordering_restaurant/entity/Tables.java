@@ -30,6 +30,6 @@ public class Tables {
     @Column(name = "QRCode")
     private String qrCode;
 
-    @OneToMany(mappedBy = "table", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "table")
     private Set<Orders> listOrder;
 }

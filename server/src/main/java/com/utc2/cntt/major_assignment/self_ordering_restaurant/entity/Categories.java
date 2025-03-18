@@ -30,6 +30,6 @@ public class Categories {
     @Column(name = "Status", nullable = false)
     private CategoryStatus status = CategoryStatus.Active;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category")
     private Set<Dishes> listDish;
 }

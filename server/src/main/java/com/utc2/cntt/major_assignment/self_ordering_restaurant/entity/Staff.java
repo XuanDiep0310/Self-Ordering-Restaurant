@@ -36,12 +36,12 @@ public class Staff {
     private LocalDate hireDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", columnDefinition = "ENUM('Active', 'Inactive')")
+    @Column(name = "Status")
     private StaffStatus status;
 
-    @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "staff")
     private Set<StaffShifts> listStaffShift;
 
-    @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "staff")
     private Set<Orders> listOrder;
 }

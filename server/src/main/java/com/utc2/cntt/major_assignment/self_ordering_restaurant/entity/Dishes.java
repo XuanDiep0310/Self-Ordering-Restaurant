@@ -20,13 +20,13 @@ public class Dishes {
     private int dishId;
 
     @ManyToOne
-    @JoinColumn(name = "Category_ID", foreignKey = @ForeignKey(name = "fk_dish_category"))
+    @JoinColumn(name = "Category_ID")
     private Categories category;
 
     @Column(name = "Name", nullable = false)
     private String name;
 
-    @Column(name = "Description", columnDefinition = "TEXT")
+    @Column(name = "Description")
     private String description;
 
     @Column(name = "Price", nullable = false)
@@ -50,10 +50,10 @@ public class Dishes {
         this.updatedAt = LocalDateTime.now();
     }
 
-    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "dish")
     private Set<OrderItems> listOrderItem;
 
-    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "dish")
     private Set<DishIngredient> listDishIngredient;
 
 }

@@ -19,11 +19,11 @@ public class Inventory {
     private int inventoryId;
 
     @ManyToOne
-    @JoinColumn(name = "IngredientID", foreignKey = @ForeignKey(name = "fk_inventory_ingredient"))
+    @JoinColumn(name = "IngredientID")
     private Ingredients ingredient;
 
     @ManyToOne
-    @JoinColumn(name = "Supplier_ID", foreignKey = @ForeignKey(name = "fk_inventory_supplier"))
+    @JoinColumn(name = "Supplier_ID")
     private Suppliers supplier;
 
     @Column(name = "Quantity", precision = 10, scale = 2)

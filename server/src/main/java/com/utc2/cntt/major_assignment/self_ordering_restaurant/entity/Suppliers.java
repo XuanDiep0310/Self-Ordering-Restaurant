@@ -28,12 +28,12 @@ public class Suppliers {
     @Column(name = "Email", unique = true)
     private String email;
 
-    @Column(name = "Address", columnDefinition = "TEXT")
+    @Column(name = "Address")
     private String address;
 
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "supplier")
     private Set<Ingredients> listIngredient;
 
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "supplier")
     private Set<Inventory> listInventory;
 }

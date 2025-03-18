@@ -18,12 +18,12 @@ public class OrderItems {
 
     @ManyToOne
     @MapsId("orderId") // Mapping với Order_ID trong composite key
-    @JoinColumn(name = "Order_ID", foreignKey = @ForeignKey(name = "fk_orderitem_order"))
+    @JoinColumn(name = "Order_ID")
     private Orders order;
 
     @ManyToOne
     @MapsId("dishId") // Mapping với Dish_ID trong composite key
-    @JoinColumn(name = "Dish_ID", foreignKey = @ForeignKey(name = "fk_orderitem_dish"))
+    @JoinColumn(name = "Dish_ID")
     private Dishes dish;
 
     @Column(name = "Quantity", nullable = false)
@@ -32,7 +32,7 @@ public class OrderItems {
     @Column(name = "UnitPrice", nullable = false)
     private BigDecimal unitPrice = BigDecimal.ZERO;
 
-    @Column(name = "Notes", columnDefinition = "TEXT")
+    @Column(name = "Notes")
     private String notes;
 
     @Enumerated(EnumType.STRING)

@@ -19,13 +19,13 @@ public class Ingredients {
     private int ingredientId;
 
     @ManyToOne
-    @JoinColumn(name = "Supplier_ID", foreignKey = @ForeignKey(name = "fk_ingredient_supplier"))
+    @JoinColumn(name = "Supplier_ID")
     private Suppliers supplier;
 
     @Column(name = "Name", nullable = false)
     private String name;
 
-    @Column(name = "Description", columnDefinition = "TEXT")
+    @Column(name = "Description")
     private String description;
 
     @Column(name = "Unit")
@@ -41,10 +41,10 @@ public class Ingredients {
     @Column(name = "MinimumQuantity", nullable = false)
     private int minimumQuantity = 1;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "ingredient")
     private Set<DishIngredient> listDishIngredient;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "ingredient")
     private Set<Inventory> listInventory;
 
 }
