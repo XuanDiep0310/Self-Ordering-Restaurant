@@ -17,7 +17,7 @@ public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Payment_ID")
-    private int paymentId;
+    private Integer paymentId;
 
     @ManyToOne
     @JoinColumn(name = "Order_ID", nullable = false)

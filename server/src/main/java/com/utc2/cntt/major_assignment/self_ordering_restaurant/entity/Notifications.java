@@ -15,7 +15,7 @@ public class Notifications {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Notification_ID")
-    private int notificationId;
+    private Integer notificationId;
 
     @ManyToOne
     @JoinColumn(name = "User_ID")

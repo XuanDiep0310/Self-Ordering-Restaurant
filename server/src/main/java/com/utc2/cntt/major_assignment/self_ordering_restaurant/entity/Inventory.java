@@ -16,7 +16,7 @@ public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "InventoryID")
-    private int inventoryId;
+    private Integer inventoryId;
 
     @ManyToOne
     @JoinColumn(name = "IngredientID")

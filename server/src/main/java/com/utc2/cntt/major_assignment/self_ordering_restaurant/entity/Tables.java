@@ -2,7 +2,9 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.entity;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.TableStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
@@ -11,11 +13,13 @@ import java.util.Set;
 @Table(name = "Tables")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Tables {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TableNumber")
-    private int tableNumber;
+    private Integer tableNumber;
 
     @Column(name = "Capacity", nullable = false)
     private int capacity;

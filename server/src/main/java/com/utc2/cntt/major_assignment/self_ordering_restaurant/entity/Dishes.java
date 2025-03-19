@@ -17,7 +17,7 @@ public class Dishes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Dish_ID")
-    private int dishId;
+    private Integer dishId;
 
     @ManyToOne
     @JoinColumn(name = "Category_ID")
