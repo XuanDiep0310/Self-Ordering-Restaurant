@@ -1,12 +1,11 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.TableDTO;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.UpdateTableStatusDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.TableResponseDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.TableRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Tables;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.TableRepository;
 import jakarta.transaction.Transactional;
-import org.hibernate.PropertyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +18,17 @@ public class TableService {
     private TableRepository tableRepository;
 
     @Transactional
-    public List<TableDTO> getAllTables() {
+    public List<TableResponseDTO> getAllTables() {
         List<Tables> tables = tableRepository.findAll();
         return tables.stream()
-                .map(table -> new TableDTO(table.getTableNumber(), table.getCapacity(), table.getStatus()))
+                .map(table -> new TableResponseDTO(table.getTableNumber(), table.getCapacity(), table.getStatus()))
                 .collect(Collectors.toList());
     }
 
-    public void updateTableStatus(Integer tableNumber, UpdateTableStatusDTO updateTableStatusDTO) {
+    public void updateTableStatus(Integer tableNumber, TableRequestDTO tableRequestDTO) {
         Tables table = tableRepository.findById(tableNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + tableNumber));
-        table.setStatus(updateTableStatusDTO.getStatus());
+        table.setStatus(tableRequestDTO.getStatus());
         tableRepository.save(table);
     }
 }

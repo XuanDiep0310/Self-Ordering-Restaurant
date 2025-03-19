@@ -1,4 +1,4 @@
-package com.utc2.cntt.major_assignment.self_ordering_restaurant.dto;
+package com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.TableStatus;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TableDTO {
-    private Integer tableNumber;
-    private int capacity;
+public class TableRequestDTO {
     private TableStatus status;
 }
