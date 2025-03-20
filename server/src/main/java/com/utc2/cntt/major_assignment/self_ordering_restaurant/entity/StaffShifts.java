@@ -14,8 +14,8 @@ import java.time.LocalDate;
 public class StaffShifts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
+    @Column(name = "StaffShift_ID")
+    private Integer staffShiftId;
 
     @ManyToOne
     @JoinColumn(name = "Staff_ID", nullable = false)
