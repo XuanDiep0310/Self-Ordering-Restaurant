@@ -14,6 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KeyOrderItem implements Serializable {
-    private int orderId;
-    private int dishId;
+    private Integer orderId;
+    private Integer dishId;
 }

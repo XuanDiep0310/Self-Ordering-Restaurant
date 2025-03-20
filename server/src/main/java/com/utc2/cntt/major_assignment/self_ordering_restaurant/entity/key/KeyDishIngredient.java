@@ -13,6 +13,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KeyDishIngredient implements Serializable {
-    private int dishId;
-    private int ingredientId;
+    private Integer dishId;
+    private Integer ingredientId;
 }

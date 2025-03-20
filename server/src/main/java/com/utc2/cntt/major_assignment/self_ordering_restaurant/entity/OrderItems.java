@@ -37,7 +37,7 @@ public class OrderItems {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Status", nullable = false)
-    private OrderItemStatus status;
+    private OrderItemStatus status = OrderItemStatus.Ordered;
 
     @Column(name = "SubTotal", insertable = false, updatable = false)
     private BigDecimal subTotal; // Được tính tự động bởi database

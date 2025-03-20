@@ -4,6 +4,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.DishR
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.DishResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Categories;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Dishes;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.CategoryRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.DishRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class DishService {
 
     public void addDish(DishRequestDTO dishRequestDTO) {
         Categories category = categoryRepository.findById(dishRequestDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + dishRequestDTO.getCategoryId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dishRequestDTO.getCategoryId()));
 
         Dishes dish = new Dishes();
         dish.setName(dishRequestDTO.getName());
