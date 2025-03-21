@@ -18,7 +18,7 @@ public class Customers {
     private Integer customerId;
 
     @OneToOne
-    @JoinColumn(name = "User_ID", nullable = false)
+    @JoinColumn(name = "User_ID", unique = true, nullable = false)
     private Users user;
 
     @Column(name = "Fullname", nullable = false)
@@ -28,15 +28,5 @@ public class Customers {
     private LocalDateTime joinDate;
 
     @Column(name = "Points", nullable = false)
-    private int points;
-
-    @OneToMany(mappedBy = "customer")
-    private Set<Orders> listOrder;
-
-    @OneToMany(mappedBy = "customer")
-    private Set<Payments> listPayment;
-
-    @OneToMany(mappedBy = "customer")
-    private Set<CustomerFeedback> listFeedback;
-
+    private int points = 0;
 }

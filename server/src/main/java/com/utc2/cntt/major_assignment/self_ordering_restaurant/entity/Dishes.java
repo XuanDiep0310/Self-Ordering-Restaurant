@@ -49,11 +49,4 @@ public class Dishes {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-    @OneToMany(mappedBy = "dish")
-    private Set<OrderItems> listOrderItem;
-
-    @OneToMany(mappedBy = "dish")
-    private Set<DishIngredient> listDishIngredient;
-
 }

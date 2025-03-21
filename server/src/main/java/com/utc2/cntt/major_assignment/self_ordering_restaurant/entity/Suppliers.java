@@ -30,10 +30,4 @@ public class Suppliers {
 
     @Column(name = "Address")
     private String address;
-
-    @OneToMany(mappedBy = "supplier")
-    private Set<Ingredients> listIngredient;
-
-    @OneToMany(mappedBy = "supplier")
-    private Set<Inventory> listInventory;
 }

@@ -38,10 +38,4 @@ public class Staff {
     @Enumerated(EnumType.STRING)
     @Column(name = "Status")
     private StaffStatus status;
-
-    @OneToMany(mappedBy = "staff")
-    private Set<StaffShifts> listStaffShift;
-
-    @OneToMany(mappedBy = "staff")
-    private Set<Orders> listOrder;
 }

@@ -47,14 +47,4 @@ public class Users {
 
     @Column(name = "LastLogin")
     private LocalDateTime lastLogin;
-
-    @OneToMany(mappedBy = "user")
-    private Set<Notifications> listNotification;
-
-    @OneToOne(mappedBy = "user")
-    private Staff staff;
-
-    @OneToOne(mappedBy = "user")
-    private Customers customer;
-
 }

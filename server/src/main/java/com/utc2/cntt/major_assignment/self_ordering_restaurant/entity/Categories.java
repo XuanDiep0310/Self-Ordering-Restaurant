@@ -29,7 +29,4 @@ public class Categories {
     @Enumerated(EnumType.STRING)
     @Column(name = "Status", nullable = false)
     private CategoryStatus status = CategoryStatus.Active;
-
-    @OneToMany(mappedBy = "category")
-    private Set<Dishes> listDish;
 }

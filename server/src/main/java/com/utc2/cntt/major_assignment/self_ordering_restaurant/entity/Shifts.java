@@ -25,7 +25,4 @@ public class Shifts {
 
     @Column(name = "EndTime", nullable = false)
     private LocalTime endTime;
-
-    @OneToMany(mappedBy = "shift")
-    private Set<StaffShifts> listStaffShift;
 }

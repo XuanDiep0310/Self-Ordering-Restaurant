@@ -51,14 +51,4 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     @Column(name = "PaymentStatus", nullable = false)
     private PaymentOrderStatus paymentStatus = PaymentOrderStatus.Unpaid;
-
-    @OneToMany(mappedBy = "order")
-    private Set<Payments> listPayment;
-
-    @OneToMany(mappedBy = "order")
-    private Set<OrderItems> listOrderItem;
-
-    @OneToMany(mappedBy = "order")
-    private Set<CustomerFeedback> listFeedback;
-
 }

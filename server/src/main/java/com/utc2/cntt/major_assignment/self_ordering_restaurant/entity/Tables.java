@@ -33,7 +33,4 @@ public class Tables {
 
     @Column(name = "QRCode")
     private String qrCode;
-
-    @OneToMany(mappedBy = "table")
-    private Set<Orders> listOrder;
 }

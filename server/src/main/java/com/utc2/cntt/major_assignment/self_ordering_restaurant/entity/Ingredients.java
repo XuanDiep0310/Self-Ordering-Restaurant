@@ -40,11 +40,4 @@ public class Ingredients {
 
     @Column(name = "MinimumQuantity", nullable = false)
     private int minimumQuantity = 1;
-
-    @OneToMany(mappedBy = "ingredient")
-    private Set<DishIngredient> listDishIngredient;
-
-    @OneToMany(mappedBy = "ingredient")
-    private Set<Inventory> listInventory;
-
 }
