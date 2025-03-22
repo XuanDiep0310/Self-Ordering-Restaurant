@@ -19,7 +19,7 @@ public class SupplierService {
     public List<SupplierResponseDTO> getAllSuppliers() {
         return supplierRepository.findAll().stream()
                 .map(supplier -> new SupplierResponseDTO(
-                        supplier.getSupplyId(), supplier.getName(), supplier.getContactPerson(),
+                        supplier.getSupplierId(), supplier.getName(), supplier.getContactPerson(),
                         supplier.getPhone(), supplier.getEmail(), supplier.getAddress()))
                 .collect(Collectors.toList());
     }
@@ -28,7 +28,7 @@ public class SupplierService {
         Suppliers supplier = supplierRepository.findById(supplierId)
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id: " + supplierId));
         return new SupplierResponseDTO(
-                supplier.getSupplyId(), supplier.getName(), supplier.getContactPerson(),
+                supplier.getSupplierId(), supplier.getName(), supplier.getContactPerson(),
                 supplier.getPhone(), supplier.getEmail(), supplier.getAddress());
     }
 
@@ -42,7 +42,7 @@ public class SupplierService {
 
         supplierRepository.save(supplier);
         return new SupplierResponseDTO(
-                supplier.getSupplyId(), supplier.getName(), supplier.getContactPerson(),
+                supplier.getSupplierId(), supplier.getName(), supplier.getContactPerson(),
                 supplier.getPhone(), supplier.getEmail(), supplier.getAddress());
     }
 
@@ -58,7 +58,7 @@ public class SupplierService {
 
         supplierRepository.save(supplier);
         return new SupplierResponseDTO(
-                supplier.getSupplyId(), supplier.getName(), supplier.getContactPerson(),
+                supplier.getSupplierId(), supplier.getName(), supplier.getContactPerson(),
                 supplier.getPhone(), supplier.getEmail(), supplier.getAddress());
     }
 
