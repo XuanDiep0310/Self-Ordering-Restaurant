@@ -16,26 +16,26 @@ import java.util.Set;
 public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Staff_ID")
+    @Column(name = "staff_id")
     private Integer staffId;
 
     @OneToOne
-    @JoinColumn(name = "User_ID", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private Users user;
 
-    @Column(name = "Fullname", nullable = false)
+    @Column(name = "fullname", nullable = false)
     private String fullname;
 
-    @Column(name = "Position")
+    @Column(name = "position")
     private String position;
 
-    @Column(name = "Salary", precision = 10, scale = 2)
-    private BigDecimal salary;
+    @Column(name = "salary")
+    private Long salary;
 
-    @Column(name = "HireDate")
+    @Column(name = "hire_date")
     private LocalDate hireDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status")
+    @Column(name = "status")
     private StaffStatus status;
 }

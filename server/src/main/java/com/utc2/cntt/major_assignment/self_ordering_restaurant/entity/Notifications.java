@@ -8,35 +8,35 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Notifications")
+@Table(name = "notifications")
 @Getter
 @Setter
 public class Notifications {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Notification_ID")
+    @Column(name = "notification_id")
     private Integer notificationId;
 
     @ManyToOne
-    @JoinColumn(name = "User_ID")
+    @JoinColumn(name = "user_id")
     private Users user;
 
-    @Column(name = "Title")
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "Content")
+    @Column(name = "content")
     private String content;
 
-    @Column(name = "ExpiryDate")
+    @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
 
-    @Column(name = "CreateAt")
+    @Column(name = "create_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "IsRead")
+    @Column(name = "is_read")
     private boolean isRead = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Type")
+    @Column(name = "type")
     private NotificationType type;
 }

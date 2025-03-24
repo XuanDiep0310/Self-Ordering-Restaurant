@@ -6,12 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Inventory",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"IngredientID", "Supplier_ID"}))
+@Table(name = "inventory",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"ingredient_id", "supplier_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,24 +18,24 @@ import java.time.LocalDateTime;
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "InventoryID")
+    @Column(name = "inventory_id")
     private Integer inventoryId;
 
     @ManyToOne
-    @JoinColumn(name = "IngredientID")
+    @JoinColumn(name = "ingredient_id")
     private Ingredients ingredient;
 
     @ManyToOne
-    @JoinColumn(name = "Supplier_ID")
+    @JoinColumn(name = "supplier_id")
     private Suppliers supplier;
 
-    @Column(name = "Quantity", precision = 10, scale = 2)
-    private BigDecimal quantity;
+    @Column(name = "quantity")
+    private Long quantity;
 
-    @Column(name = "Unit")
+    @Column(name = "unit")
     private String unit;
 
-    @Column(name = "LastUpdated", nullable = false, updatable = true)
+    @Column(name = "last_updated", nullable = false, updatable = true)
     private LocalDateTime lastUpdated;
 
     @PreUpdate

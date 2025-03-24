@@ -11,37 +11,37 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "CustomerFeedback")
+@Table(name = "customer_feedback")
 @Getter
 @Setter
 public class CustomerFeedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Feedback_ID")
+    @Column(name = "deedback_id")
     private Integer feedbackId;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_ID", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customers customer;
 
     @ManyToOne
-    @JoinColumn(name = "Order_ID", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
-    @Column(name = "Rating", nullable = false)
+    @Column(name = "rating", nullable = false)
     @Min(1)
     @Max(5)
     private int rating; // Giá trị từ 1 đến 5
 
-    @Column(name = "Comment")
+    @Column(name = "comment")
     private String comment;
 
-    @Column(name = "FeedbackDate", nullable = false, updatable = false)
+    @Column(name = "feedback_date", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime feedbackDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false)
     private FeedbackStatus status;
 
     public void setRating(Integer rating) {

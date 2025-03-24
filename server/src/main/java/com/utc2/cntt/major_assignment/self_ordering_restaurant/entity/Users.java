@@ -16,35 +16,35 @@ import java.util.Set;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "User_ID")
+    @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "Username", unique = true, nullable = false)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "Password")
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "GoogleID", unique = true)
+    @Column(name = "google_id", unique = true)
     private String googleId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "UserType", nullable = false)
+    @Column(name = "user_type", nullable = false)
     private UserType userType;
 
-    @Column(name = "Email", unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "Phone")
+    @Column(name = "phone")
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status")
+    @Column(name = "status")
     private UserStatus status = UserStatus.Active;
 
-    @Column(name = "CreateAt")
+    @Column(name = "create_at")
     private LocalDateTime createAt = LocalDateTime.now();
 
-    @Column(name = "LastLogin")
+    @Column(name = "last_login")
     private LocalDateTime lastLogin;
 }

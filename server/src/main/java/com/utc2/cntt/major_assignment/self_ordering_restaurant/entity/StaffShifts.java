@@ -8,27 +8,27 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "StaffShifts")
+@Table(name = "staff_shifts")
 @Getter
 @Setter
 public class StaffShifts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "StaffShift_ID")
+    @Column(name = "staff_shift_id")
     private Integer staffShiftId;
 
     @ManyToOne
-    @JoinColumn(name = "Staff_ID", nullable = false)
+    @JoinColumn(name = "staff_id", nullable = false)
     private Staff staff;
 
     @ManyToOne
-    @JoinColumn(name = "Shift_ID", nullable = false)
+    @JoinColumn(name = "shift_id", nullable = false)
     private Shifts shift;
 
-    @Column(name = "Date", nullable = false)
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false)
     private ShiftStatus status;
 }

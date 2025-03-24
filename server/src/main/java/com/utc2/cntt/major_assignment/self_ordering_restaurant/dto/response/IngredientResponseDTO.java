@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +16,7 @@ public class IngredientResponseDTO {
     private String name;
     private String description;
     private String unit;
-    private BigDecimal costPerUnit;
+    private Long costPerUnit;
     private IngredientStatus status;
     private int minimumQuantity;
 }

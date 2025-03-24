@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,7 +15,7 @@ public class InventoryResponseDTO {
     private Integer inventoryId;
     private String ingredientName;
     private String supplierName;
-    private BigDecimal quantity;
+    private Long quantity;
     private String unit;
     private LocalDateTime lastUpdated;
 }

@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,6 +12,6 @@ import java.math.BigDecimal;
 public class InventoryRequestDTO {
     private Integer ingredientId;
     private Integer supplierId;
-    private BigDecimal quantity;
+    private Long quantity;
     private String unit;
 }

@@ -7,42 +7,41 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
-@Table(name = "Dishes")
+@Table(name = "dishes")
 @Getter
 @Setter
 public class Dishes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Dish_ID")
+    @Column(name = "dish_id")
     private Integer dishId;
 
     @ManyToOne
-    @JoinColumn(name = "Category_ID")
+    @JoinColumn(name = "category_id")
     private Categories category;
 
-    @Column(name = "Name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "Description")
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "Price", nullable = false)
-    private BigDecimal price;
+    @Column(name = "price", nullable = false)
+    private Long price;
 
-    @Column(name = "Image")
+    @Column(name = "image")
     private String image;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false)
     private DishStatus status = DishStatus.Available;
 
-    @Column(name = "CreatedAt", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "UpdatedAt")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @PreUpdate

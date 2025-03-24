@@ -6,14 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DishRequestDTO {
     private String name;
-    private BigDecimal price;
+    private Long price;
     private Integer categoryId;
     private DishStatus status = DishStatus.Available;
 }

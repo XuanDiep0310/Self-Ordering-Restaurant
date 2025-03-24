@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "DishIngredient")
+@Table(name = "dish_ingredient")
 @Getter
 @Setter
 public class DishIngredient {
@@ -17,14 +17,14 @@ public class DishIngredient {
 
     @ManyToOne
     @MapsId("dishId") // Map với khóa chính của KeyDishIngredient
-    @JoinColumn(name = "Dish_ID")
+    @JoinColumn(name = "dish_id")
     private Dishes dish;
 
     @ManyToOne
     @MapsId("ingredientId") // Map với khóa chính của KeyDishIngredient
-    @JoinColumn(name = "Ingredient_ID")
+    @JoinColumn(name = "ingredient_id")
     private Ingredients ingredient;
 
-    @Column(name = "Quantity", precision = 10, scale = 2, nullable = false)
+    @Column(name = "quantity", precision = 10, scale = 2, nullable = false)
     private BigDecimal quantity;
 }

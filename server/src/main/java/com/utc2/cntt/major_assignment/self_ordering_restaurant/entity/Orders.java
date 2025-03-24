@@ -11,44 +11,44 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "Orders")
+@Table(name = "orders")
 @Getter
 @Setter
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Order_ID")
+    @Column(name = "order_id")
     private Integer orderId;
 
     @ManyToOne
-    @JoinColumn(name = "Staff_ID")
+    @JoinColumn(name = "staff_id")
     private Staff staff;
 
     @ManyToOne
-    @JoinColumn(name = "TableNumber")
+    @JoinColumn(name = "table_number")
     private Tables table;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_ID")
+    @JoinColumn(name = "customer_id")
     private Customers customer;
 
-    @Column(name = "OrderDate")
+    @Column(name = "order_date")
     private LocalDateTime orderDate = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false)
     private OrderStatus status = OrderStatus.Pending;
 
-    @Column(name = "TotalAmount", nullable = false)
-    private BigDecimal totalAmount = BigDecimal.ZERO;
+    @Column(name = "total_amount", nullable = false)
+    private Long totalAmount = 0L;
 
-    @Column(name = "Discount")
-    private BigDecimal discount = BigDecimal.ZERO;
+    @Column(name = "discount")
+    private Long discount = 0L;
 
-    @Column(name = "Notes")
+    @Column(name = "notes")
     private String notes;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "PaymentStatus", nullable = false)
+    @Column(name = "payment_status", nullable = false)
     private PaymentOrderStatus paymentStatus = PaymentOrderStatus.Unpaid;
 }

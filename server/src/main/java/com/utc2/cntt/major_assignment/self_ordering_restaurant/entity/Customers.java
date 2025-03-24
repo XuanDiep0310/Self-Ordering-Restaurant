@@ -5,28 +5,27 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
-@Table(name = "Customers")
+@Table(name = "customers")
 @Getter
 @Setter
 public class Customers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Customer_ID")
+    @Column(name = "customer_id")
     private Integer customerId;
 
     @OneToOne
-    @JoinColumn(name = "User_ID", unique = true, nullable = false)
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
     private Users user;
 
-    @Column(name = "Fullname", nullable = false)
+    @Column(name = "fullname", nullable = false)
     private String fullname;
 
-    @Column(name = "JoinDate")
+    @Column(name = "join_date")
     private LocalDateTime joinDate;
 
-    @Column(name = "Points", nullable = false)
+    @Column(name = "points", nullable = false)
     private int points = 0;
 }

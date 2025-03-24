@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.Set;
 
 @Entity
-@Table(name = "Tables")
+@Table(name = "tables")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,19 +18,19 @@ import java.util.Set;
 public class Tables {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TableNumber")
+    @Column(name = "table_number")
     private Integer tableNumber;
 
-    @Column(name = "Capacity", nullable = false)
+    @Column(name = "capacity", nullable = false)
     private int capacity;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false)
     private TableStatus status = TableStatus.Available;
 
-    @Column(name = "Location")
+    @Column(name = "location")
     private String location;
 
-    @Column(name = "QRCode")
+    @Column(name = "qrcode")
     private String qrCode;
 }

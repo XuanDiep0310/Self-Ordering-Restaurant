@@ -9,35 +9,35 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
-@Table(name = "Ingredients")
+@Table(name = "ingredients")
 @Getter
 @Setter
 public class Ingredients {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Ingredient_ID")
+    @Column(name = "ingredient_id")
     private Integer ingredientId;
 
     @ManyToOne
-    @JoinColumn(name = "Supplier_ID")
+    @JoinColumn(name = "supplier_id")
     private Suppliers supplier;
 
-    @Column(name = "Name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "Description")
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "Unit")
+    @Column(name = "unit")
     private String unit;
 
-    @Column(name = "CostPerUnit", precision = 10, scale = 2)
-    private BigDecimal costPerUnit;
+    @Column(name = "cost_per_unit")
+    private Long costPerUnit;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false)
     private IngredientStatus status = IngredientStatus.Available;
 
-    @Column(name = "MinimumQuantity", nullable = false)
+    @Column(name = "minimum_quantity", nullable = false)
     private int minimumQuantity = 1;
 }

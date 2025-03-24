@@ -7,27 +7,27 @@ import lombok.Setter;
 import java.util.Set;
 
 @Entity
-@Table(name = "Suppliers")
+@Table(name = "suppliers")
 @Getter
 @Setter
 public class Suppliers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Supplier_ID")
+    @Column(name = "supplier_id")
     private Integer supplierId;
 
-    @Column(name = "Name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "ContactPerson")
+    @Column(name = "contact_person")
     private String contactPerson;
 
-    @Column(name = "Phone")
+    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "Email", unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "Address")
+    @Column(name = "address")
     private String address;
 }

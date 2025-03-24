@@ -10,37 +10,37 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Payments")
+@Table(name = "payments")
 @Getter
 @Setter
 public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Payment_ID")
+    @Column(name = "payment_id")
     private Integer paymentId;
 
     @ManyToOne
-    @JoinColumn(name = "Order_ID", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_ID")
+    @JoinColumn(name = "customer_id")
     private Customers customer;
 
-    @Column(name = "Amount", nullable = false)
-    private BigDecimal amount;
+    @Column(name = "amount", nullable = false)
+    private Long amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "PaymentMethod")
+    @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
-    @Column(name = "PaymentDate")
+    @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
-    @Column(name = "TransactionID", unique = true)
+    @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status")
+    @Column(name = "status")
     private PaymentStatus status;
 }

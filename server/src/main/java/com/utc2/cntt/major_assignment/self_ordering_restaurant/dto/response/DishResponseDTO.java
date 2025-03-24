@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,6 +13,6 @@ import java.math.BigDecimal;
 public class DishResponseDTO {
     private Integer dishId;
     private String name;
-    private BigDecimal price;
+    private Long price;
     private DishStatus status = DishStatus.Available;
 }
