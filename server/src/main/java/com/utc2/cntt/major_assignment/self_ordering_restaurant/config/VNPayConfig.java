@@ -11,10 +11,10 @@ import java.util.*;
 @Component
 public class VNPayConfig {
     static Logger log = org.slf4j.LoggerFactory.getLogger(VNPayConfig.class);
-    public static String vnp_TmnCode = "R0J7X6JP";
-    public static String vnp_HashSecret = "RYUEI7GL77N149GFVFA6Z5TIKG2T7VF5";
+    public static String vnp_TmnCode = "7UI2WCRU";
+    public static String vnp_HashSecret = "CZV5KWNPD9ZX58CRA528K59WZ2L5UJJK";
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_Returnurl = "http://localhost:8080/api/payment/vnpay_payment";
+    public static String vnp_ReturnUrl = "http://localhost:8080/api/payment/vnpay_payment";
     public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     //Util for VNPAY

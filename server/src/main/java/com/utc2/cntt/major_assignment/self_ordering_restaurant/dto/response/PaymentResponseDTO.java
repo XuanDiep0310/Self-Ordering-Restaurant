@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class PaymentResponseDTO {
     private String paymentUrl;
     private String message;
+    private String transactionStatus;
+    private String responseCode;
 }
