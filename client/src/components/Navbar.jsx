@@ -1,8 +1,4 @@
-import { useState } from "react";
-
-const Navbar = () => {
-  const [activeTab, setActiveTab] = useState("ĐƠN HÀNG");
-
+const Navbar = ({ activeTab, setActiveTab }) => {
   const tabs = ["ĐƠN HÀNG", "MÓN ĂN", "THÔNG BÁO"];
 
   return (
