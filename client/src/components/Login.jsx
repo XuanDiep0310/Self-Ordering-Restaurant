@@ -1,5 +1,5 @@
 import React from "react";
-import RestaurantBanner from "../assets/images/restaurant-banner.png";
+import RestaurantBanner from "../assets/images/restaurant-banner.jpg";
 import Logo from "../assets/images/logo.png";
 
 const Login = () => {
@@ -13,7 +13,7 @@ const Login = () => {
         />
       </div>
 
-      <div className="w-1/2 flex flex-col justify-center items-center bg-[#dbdbdb]">
+      <div className="w-1/2 flex flex-col justify-center items-center bg-[#124035]">
         <img src={Logo} alt="Logo" className="w-64 h-[45%]" />
 
         <div className="w-2/3 h-[55%]">
@@ -27,7 +27,7 @@ const Login = () => {
             placeholder="Password"
             className="w-full border border-gray-300 p-6 rounded mb-6 focus:outline-none focus:ring-2 focus:ring-gray-500 bg-[#fff]"
           />
-          <button className="w-full bg-[#464646] text-white p-6 rounded hover:bg-black/80 cursor-pointer">
+          <button className="w-full bg-[#737373] text-white p-6 rounded hover:bg-black/60 cursor-pointer">
             ĐĂNG NHẬP
           </button>
         </div>
