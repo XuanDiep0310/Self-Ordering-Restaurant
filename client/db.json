@@ -1,0 +1,129 @@
+{
+  "users": [
+    { "id": 1, "username": "admin1", "password": "$2a$10$xLuG5lHxkUwOEjPDsUyKB.eDXjDp8jKx9e3iuGw.CkJCfP4XVNGPS", "user_type": "Staff", "email": "admin@restaurant.com", "phone": "0987654321", "status": "Active" },
+    { "id": 2, "username": "staff1", "password": "$2a$10$5hMpJ0GEdJ6HftMDtZ9S2uVlwh43Hk8A.C9SPkDHCTkQQNj1neeJO", "user_type": "Staff", "email": "staff1@restaurant.com", "phone": "0987654322", "status": "Active" },
+    { "id": 3, "username": "staff2", "password": "$2a$10$8aRcGP4kDMIXc6UQNmyleOyxwK/8Xwu82y1l2b1YpI5gYhHMAcWB6", "user_type": "Staff", "email": "staff2@restaurant.com", "phone": "0987654323", "status": "Active" },
+    { "id": 4, "username": "customer1", "password": "$2a$10$yBqbPgJK9Z9VbwPKby9HF.AYXdNvILRzki8Sm8AJDhKrRmyHu7tAO", "user_type": "Customer", "email": "customer1@gmail.com", "phone": "0987123456", "status": "Active" },
+    { "id": 5, "username": "customer2", "password": "$2a$10$7CGP8MjLtYcR5Cj/XG.KSuYzGw3g4I5BWQEYnVexsMLK6PpRLqVGG", "user_type": "Customer", "email": "customer2@gmail.com", "phone": "0987123457", "status": "Active" },
+    { "id": 6, "username": "customer3", "password": null, "user_type": "Customer", "email": "customer3@gmail.com", "phone": "0987123458", "status": "Active" },
+    { "id": 7, "username": "googleuser", "google_id": "118090425294932695342", "user_type": "Customer", "email": "googleuser@gmail.com", "status": "Active" }
+  ],
+  "staff": [
+    { "id": 1, "user_id": 1, "fullname": "Admin User", "position": "Manager", "salary": 15000000, "hire_date": "2023-01-15", "status": "Active" },
+    { "id": 2, "user_id": 2, "fullname": "Staff One", "position": "Waiter", "salary": 8000000, "hire_date": "2023-02-10", "status": "Active" },
+    { "id": 3, "user_id": 3, "fullname": "Staff Two", "position": "Chef", "salary": 12000000, "hire_date": "2023-03-05", "status": "Active" }
+  ],
+  "customers": [
+    { "id": 1, "user_id": 4, "fullname": "Customer One", "points": 100 },
+    { "id": 2, "user_id": 5, "fullname": "Customer Two", "points": 50 },
+    { "id": 3, "user_id": 6, "fullname": "Customer Three", "points": 0 },
+    { "id": 4, "user_id": 7, "fullname": "Google User", "points": 25 }
+  ],
+  "shifts": [
+    { "id": 1, "name": "Morning", "start_time": "07:00:00", "end_time": "15:00:00" },
+    { "id": 2, "name": "Evening", "start_time": "15:00:00", "end_time": "23:00:00" },
+    { "id": 3, "name": "Night", "start_time": "23:00:00", "end_time": "07:00:00" }
+  ],
+  "staff_shifts": [
+    { "id": 1, "shift_id": 1, "staff_id": 1, "date": "2023-10-20", "status": "Assigned" },
+    { "id": 2, "shift_id": 2, "staff_id": 2, "date": "2023-10-20", "status": "Assigned" },
+    { "id": 3, "shift_id": 3, "staff_id": 3, "date": "2023-10-20", "status": "Assigned" },
+    { "id": 4, "shift_id": 1, "staff_id": 2, "date": "2023-10-21", "status": "Assigned" },
+    { "id": 5, "shift_id": 2, "staff_id": 3, "date": "2023-10-21", "status": "Assigned" }
+  ],
+  "tables": [
+    { "tableNumber": 1, "capacity": 2, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" },
+    { "tableNumber": 2, "capacity": 4, "status": "Occupied", "location": "Center", "qrcode": "https://qrexample.com/table2" },
+    { "tableNumber": 3, "capacity": 6, "status": "Occupied", "location": "Garden", "qrcode": "https://qrexample.com/table3" },
+    { "tableNumber": 4, "capacity": 8, "status": "Occupied", "location": "VIP Room", "qrcode": "https://qrexample.com/table4" },
+    { "tableNumber": 5, "capacity": 2, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 6, "capacity": 2, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 7, "capacity": 4, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 8, "capacity": 2, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 9, "capacity": 6, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 10, "capacity": 2, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 11, "capacity": 2, "status": "Occupied", "location": "Bar", "qrcode": "https://qrexample.com/table5" },
+    { "tableNumber": 12, "capacity": 8, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" },
+    { "tableNumber": 13, "capacity": 2, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" },
+    { "tableNumber": 14, "capacity": 4, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" },
+    { "tableNumber": 15, "capacity": 4, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" },
+    { "tableNumber": 16, "capacity": 2, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" },
+    { "tableNumber": 17, "capacity": 2, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" }
+  ],
+  "categories": [
+    { "id": 1, "name": "Appetizers", "description": "Start your meal right with our delicious appetizers", "image": "appetizers.jpg", "status": "Active" },
+    { "id": 2, "name": "Main Courses", "description": "Hearty and satisfying main dishes", "image": "maincourses.jpg", "status": "Active" },
+    { "id": 3, "name": "Desserts", "description": "Sweet treats to end your meal", "image": "desserts.jpg", "status": "Active" },
+    { "id": 4, "name": "Beverages", "description": "Refreshing drinks and beverages", "image": "beverages.jpg", "status": "Active" },
+    { "id": 5, "name": "Specials", "description": "Chef's special dishes of the day", "image": "specials.jpg", "status": "Active" }
+  ],
+  "dishes": [
+    { "id": 1, "category_id": 1, "name": "Spring Rolls", "description": "Fresh vegetables wrapped in rice paper", "price": 50000, "image": "springrolls.jpg", "status": "Available" },
+    { "id": 2, "category_id": 1, "name": "Garlic Bread", "description": "Crispy bread with garlic butter", "price": 40000, "image": "garlicbread.jpg", "status": "Available" },
+    { "id": 3, "category_id": 2, "name": "Beef Steak", "description": "Premium beef cooked to your preference", "price": 250000, "image": "beefsteak.jpg", "status": "Available" },
+    { "id": 4, "category_id": 2, "name": "Seafood Pasta", "description": "Linguine with mixed seafood in tomato sauce", "price": 180000, "image": "seafoodpasta.jpg", "status": "Available" },
+    { "id": 5, "category_id": 3, "name": "Chocolate Cake", "description": "Rich chocolate cake with ganache", "price": 75000, "image": "chocolatecake.jpg", "status": "Available" },
+    { "id": 6, "category_id": 3, "name": "Ice Cream", "description": "Selection of premium ice cream flavors", "price": 50000, "image": "icecream.jpg", "status": "Available" },
+    { "id": 7, "category_id": 4, "name": "Fresh Orange Juice", "description": "Freshly squeezed orange juice", "price": 45000, "image": "orangejuice.jpg", "status": "Available" },
+    { "id": 8, "category_id": 4, "name": "Iced Coffee", "description": "Vietnamese style iced coffee with condensed milk", "price": 40000, "image": "icedcoffee.jpg", "status": "Available" },
+    { "id": 9, "category_id": 5, "name": "Chef's Special Soup", "description": "Daily special soup made by our chef", "price": 80000, "image": "specialsoup.jpg", "status": "Available" }
+  ],
+  "orders": [
+    { "id": 1, "staff_id": 1, "table_number": 1, "customer_id": 1, "status": "Completed", "discount": 0, "notes": "No spicy food", "payment_status": "Paid" },
+    { "id": 2, "staff_id": 2, "table_number": 2, "customer_id": 2, "status": "Processing", "discount": 10000, "notes": "Birthday celebration", "payment_status": "Unpaid" },
+    { "id": 3, "staff_id": 3, "table_number": 3, "customer_id": 4, "status": "Pending", "discount": 0, "notes": null, "payment_status": "Unpaid" }
+  ],
+  "order_items": [
+    { "id": 1, "order_id": 1, "dish_id": 1, "quantity": 2, "unit_price": 50000, "notes": null, "status": "Served" },
+    { "id": 2, "order_id": 1, "dish_id": 3, "quantity": 1, "unit_price": 250000, "notes": "Medium rare", "status": "Served" },
+    { "id": 3, "order_id": 1, "dish_id": 7, "quantity": 2, "unit_price": 45000, "notes": null, "status": "Served" },
+    { "id": 4, "order_id": 2, "dish_id": 2, "quantity": 1, "unit_price": 40000, "notes": null, "status": "Processing" },
+    { "id": 5, "order_id": 2, "dish_id": 4, "quantity": 2, "unit_price": 180000, "notes": "Extra cheese", "status": "Ordered" },
+    { "id": 6, "order_id": 2, "dish_id": 5, "quantity": 1, "unit_price": 75000, "notes": null, "status": "Ordered" },
+    { "id": 7, "order_id": 3, "dish_id": 6, "quantity": 2, "unit_price": 50000, "notes": null, "status": "Ordered" },
+    { "id": 8, "order_id": 3, "dish_id": 8, "quantity": 3, "unit_price": 40000, "notes": null, "status": "Ordered" }
+  ],
+  "payments": [
+    { "id": 1, "order_id": 1, "customer_id": 1, "amount": 390000, "payment_method": "Cash", "status": "Success", "transaction_id": null },
+    { "id": 2, "order_id": 2, "customer_id": 2, "amount": 475000, "payment_method": "Card", "status": "Pending", "transaction_id": "TXN123456789" }
+  ],
+  "notifications": [
+    { "id": 1, "user_id": 4, "title": "Order Completed", "content": "Your order #1 has been completed", "type": "OrderStatus", "is_read": false, "createAt": "2025-03-30 11:47:12"},
+    { "id": 2, "user_id": 5, "title": "Order Processing", "content": "Your order #2 is being processed", "type": "OrderStatus", "is_read": false, "createAt": "2025-03-30 11:50:00" },
+    { "id": 3, "user_id": 2, "title": "Table Request", "content": "Table #2 has requested assistance", "type": "TableRequest", "is_read": true, "createAt": "2025-03-30 12:47:12" },
+    { "id": 4, "user_id": 3, "title": "Table Request", "content": "Table #3 has requested assistance", "type": "TableRequest", "is_read": false, "createAt": "2025-03-30 18:47:12" }
+  ],
+  "suppliers": [
+    { "id": 1, "name": "Fresh Produce Co.", "contact_person": "John Smith", "phone": "0912345678", "email": "contact@freshproduce.com", "address": "123 Farmer St, District 1" },
+    { "id": 2, "name": "Meat Suppliers Inc.", "contact_person": "Mary Johnson", "phone": "0923456789", "email": "orders@meatsuppliers.com", "address": "456 Butcher Ave, District 2" },
+    { "id": 3, "name": "Beverage Distributors", "contact_person": "David Lee", "phone": "0934567890", "email": "sales@beveragedist.com", "address": "789 Drink Blvd, District 3" }
+  ],
+  "ingredients": [
+    { "id": 1, "supplier_id": 1, "name": "Rice Paper", "description": "For spring rolls", "unit": "Pack", "cost_per_unit": 15000, "status": "Available", "minimum_quantity": 10 },
+    { "id": 2, "supplier_id": 1, "name": "Fresh Vegetables", "description": "Mixed vegetables", "unit": "Kg", "cost_per_unit": 20000, "status": "Available", "minimum_quantity": 5 },
+    { "id": 3, "supplier_id": 2, "name": "Beef", "description": "Premium steak cuts", "unit": "Kg", "cost_per_unit": 300000, "status": "Available", "minimum_quantity": 2 },
+    { "id": 4, "supplier_id": 2, "name": "Seafood Mix", "description": "Mix of shrimp, squid, and mussels", "unit": "Kg", "cost_per_unit": 250000, "status": "Available", "minimum_quantity": 3 },
+    { "id": 5, "supplier_id": 3, "name": "Orange", "description": "Fresh oranges for juice", "unit": "Kg", "cost_per_unit": 30000, "status": "Available", "minimum_quantity": 5 },
+    { "id": 6, "supplier_id": 3, "name": "Coffee Beans", "description": "Premium Vietnamese coffee beans", "unit": "Kg", "cost_per_unit": 200000, "status": "Available", "minimum_quantity": 2 }
+  ],
+  "dish_ingredients": [
+    { "id": 1, "dish_id": 1, "ingredient_id": 1, "quantity": 1 },
+    { "id": 2, "dish_id": 1, "ingredient_id": 2, "quantity": 0.5 },
+    { "id": 3, "dish_id": 3, "ingredient_id": 3, "quantity": 0.3 },
+    { "id": 4, "dish_id": 4, "ingredient_id": 4, "quantity": 0.25 },
+    { "id": 5, "dish_id": 7, "ingredient_id": 5, "quantity": 0.5 },
+    { "id": 6, "dish_id": 8, "ingredient_id": 6, "quantity": 0.05 }
+  ],
+  "inventory": [
+    { "id": 1, "ingredient_id": 1, "quantity": 50, "unit": "Pack", "supplier_id": 1 },
+    { "id": 2, "ingredient_id": 2, "quantity": 15, "unit": "Kg", "supplier_id": 1 },
+    { "id": 3, "ingredient_id": 3, "quantity": 10, "unit": "Kg", "supplier_id": 2 },
+    { "id": 4, "ingredient_id": 4, "quantity": 12, "unit": "Kg", "supplier_id": 2 },
+    { "id": 5, "ingredient_id": 5, "quantity": 20, "unit": "Kg", "supplier_id": 3 },
+    { "id": 6, "ingredient_id": 6, "quantity": 8, "unit": "Kg", "supplier_id": 3 }
+  ],
+  "customer_feedback": [
+    { "id": 1, "customer_id": 1, "order_id": 1, "rating": 5, "comment": "Excellent service and delicious food!", "status": "Reviewed" },
+    { "id": 2, "customer_id": 2, "order_id": 2, "rating": 4, "comment": "Good food but service was a bit slow", "status": "New" }
+  ]
+}
