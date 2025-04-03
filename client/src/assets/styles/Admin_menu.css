@@ -1,0 +1,193 @@
+.logo-image {
+    logo-image: url('../images/logo.png');
+    width: 100px; /* Điều chỉnh kích thước logo */
+    height: auto;
+    margin: 0 auto;
+}
+
+.sidebar {
+  height: 100vh; /* Chiều cao bằng chiều cao của màn hình */
+  overflow: hidden; /* Loại bỏ thanh cuộn */
+  display: flex;
+  flex-direction: column; /* Đảm bảo nội dung sắp xếp theo cột */
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+/* Header */
+.menu-header {
+  position: fixed; /* Gắn header lên đầu trang */
+  top: 0;
+  left: 0;
+  width: 20%; /* Giảm chiều dài còn 20% chiều ngang màn hình */
+  height: 60px; /* Chiều cao của header */
+  background-color: #004d40; /* Màu nền xanh đậm */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px; /* Khoảng cách bên trong */
+  color: white;
+  z-index: 1000; /* Đảm bảo header luôn ở trên cùng */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.menu-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+  flex: 1; /* Đẩy tiêu đề vào giữa */
+}
+
+/* Thanh hành động */
+.menu-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  background-color: white;
+  color: #004d40;
+  border: 2px solid #004d40;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #004d40;
+  color: white;
+}
+
+.add-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Combined Content Layout */
+.menu-content {
+  display: flex;
+  height: calc(100vh - 60px); /* Full height minus header */
+  margin-top: 60px;
+}
+
+/* Categories Section */
+.category-section {
+  width: 33%; /* 33% of the width */
+  background-color: #f4f4f4;
+  padding: 10px;
+  overflow-y: auto; /* Scroll if content overflows */
+  border-right: 1px solid #ddd;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  margin-right: 20px;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.category-item.active {
+  background-color: #006400;
+  color: #fff;
+}
+
+/* Menu Items Section */
+.menu-items-section {
+  width: 67%; /* 67% of the width */
+  padding: 10px;
+  overflow-y: auto; /* Scroll if content overflows */
+}
+
+.menu-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.menu-item-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.menu-item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.menu-item-price {
+  font-size: 14px;
+  color: #888;
+}
+
+.menu-item-actions button {
+  margin-left: 5px;
+}
+
