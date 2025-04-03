@@ -10,3 +10,12 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+jwt:
+  privateKey: 5IM62UKQWiA6rAujwhuwn1XaWE6oXEI6wKKPMcVun9c=
