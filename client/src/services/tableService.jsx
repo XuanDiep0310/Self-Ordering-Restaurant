@@ -10,7 +10,15 @@ export const getTableData = async () => {
     throw error; // Ném lỗi để xử lý ở nơi gọi hàm
   }
 };
-
+export const getTableByNumber = async (tableNumber) => {
+  try {
+    const response = await axiosInstance.get(`/tables/${tableNumber}`);
+    return response.data; // Trả về dữ liệu của bàn
+  } catch (error) {
+    console.error(`Error fetching table ${tableNumber} data:`, error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};
 // Hàm cập nhật trạng thái bàn
 export const updateTableStatus = async (tableId, status) => {
   try {

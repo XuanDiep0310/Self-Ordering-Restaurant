@@ -58,8 +58,8 @@
     { "id": 5, "name": "Specials", "description": "Chef's special dishes of the day", "image": "specials.jpg", "status": "Active" }
   ],
   "dishes": [
-    { "id": 1, "category_id": 1, "name": "Spring Rolls", "description": "Fresh vegetables wrapped in rice paper", "price": 50000, "image": "springrolls.jpg", "status": "Available" },
-    { "id": 2, "category_id": 1, "name": "Garlic Bread", "description": "Crispy bread with garlic butter", "price": 40000, "image": "garlicbread.jpg", "status": "Available" },
+    { "id": 1, "category_id": 1, "name": "Spring Rolls", "description": "Fresh vegetables wrapped in rice paper", "price": 50000, "image": "https://ourlittlenook.com/wp-content/uploads/2021/01/IMG_0243-2-1080x1062.jpg", "status": "Available" },
+    { "id": 2, "category_id": 1, "name": "Garlic Bread", "description": "Crispy bread with garlic butter", "price": 40000, "image": "https://homecookedharvest.com/wp-content/uploads/2022/06/Stuffed-Garlic-Bread-G.jpg", "status": "Available" },
     { "id": 3, "category_id": 2, "name": "Beef Steak", "description": "Premium beef cooked to your preference", "price": 250000, "image": "beefsteak.jpg", "status": "Available" },
     { "id": 4, "category_id": 2, "name": "Seafood Pasta", "description": "Linguine with mixed seafood in tomato sauce", "price": 180000, "image": "seafoodpasta.jpg", "status": "Available" },
     { "id": 5, "category_id": 3, "name": "Chocolate Cake", "description": "Rich chocolate cake with ganache", "price": 75000, "image": "chocolatecake.jpg", "status": "Available" },
