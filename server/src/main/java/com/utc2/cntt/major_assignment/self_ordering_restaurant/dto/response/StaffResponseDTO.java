@@ -12,5 +12,8 @@ import lombok.Setter;
 public class StaffResponseDTO {
     private Integer staffId;
     private String fullname;
+    private String email;
+    private String phone;
     private String position;
+    private String salary;
 }
