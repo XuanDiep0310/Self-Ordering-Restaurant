@@ -88,3 +88,25 @@ export const getPendingFoodItems = async () => {
     throw error;
   }
 };
+
+// Hàm lấy danh sách món ăn theo danh mục
+export const getFoodItemsByCategory = async (categoryId) => {
+  try {
+    const response = await axiosInstance.get(`/dishes?category_id=${categoryId}`);
+    return response.data; // Trả về danh sách món ăn
+  } catch (error) {
+    console.error("Error fetching food items by category:", error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};
+
+// Hàm lấy thông tin món ăn theo ID
+export const getFoodById = async (foodId) => {
+  try {
+    const response = await axiosInstance.get(`/dishes/${foodId}`);
+    return response.data; // Trả về thông tin chi tiết món ăn
+  } catch (error) {
+    console.error(`Error fetching food item with ID ${foodId}:`, error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};
