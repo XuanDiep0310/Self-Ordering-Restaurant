@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import OrderList from "../components/OrderList"; // Hiển thị danh sách bàn đang phục vụ
-import EmptyTableList from "../components/EmptyTableList"; // Hiển thị danh sách bàn trống
-import FoodList from "../components/FoodList";
-import NotificationList from "../components/NotificationList";
-import "../assets/styles/custom.css";
-import { getTableData } from "../services/tableService";
+import Navbar from "../../components/Navbar";
+import OrderList from "../../components/OrderList"; // Hiển thị danh sách bàn đang phục vụ
+import EmptyTableList from "../../components/EmptyTableList"; // Hiển thị danh sách bàn trống
+import FoodList from "../../components/FoodList";
+import NotificationList from "../../components/NotificationList";
+import "../../assets/styles/custom.css"; 
+import { getTableData } from "../../services/tableService";
 
 const StaffDashboard = () => {
   const [tables, setTables] = useState([]);
