@@ -18,11 +18,11 @@ const AdminDashboard = () => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     if (tab === "MENU") {
-      navigate("/menu"); // Navigate to lowercase 'menu'
+      navigate("/admin/menu"); // Navigate to lowercase 'menu'
     } else if (tab === "BÀN") {
-      navigate("/ban"); // Navigate to 'bàn'
+      navigate("/admin/tables"); // Navigate to 'bàn'
     } else if (tab === "NHÂN VIÊN") {
-      navigate("/employees");
+      navigate("/admin/employees");
     }
   };
 
