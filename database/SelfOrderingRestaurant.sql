@@ -9,7 +9,7 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NULL,
     google_id VARCHAR(50) UNIQUE NULL,
-    user_type ENUM ('Staff', 'Customer') NOT NULL,
+    user_type ENUM ('STAFF', 'CUSTOMER', 'ADMIN') NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(20) NULL,
     status ENUM('Active', 'Inactive', 'Pending') DEFAULT 'Active',
@@ -306,5 +306,142 @@ CREATE INDEX idx_orders_date ON orders(order_date);
 
 -- Tăng tốc tìm kiếm Payments theo Status
 CREATE INDEX idx_payments_status ON payments(status);
+
+-- Bảng doanh thu
+CREATE TABLE Revenue (
+    Revenue_ID INT AUTO_INCREMENT,
+    Date DATE NOT NULL,
+    
+    -- Doanh thu tổng hợp
+    TotalRevenue DECIMAL(12,2) DEFAULT 0,
+    TotalOrders INT DEFAULT 0,
+    TotalCustomers INT DEFAULT 0,
+    
+    -- Phân loại doanh thu theo danh mục
+    FoodRevenue DECIMAL(10,2) DEFAULT 0,
+    DrinkRevenue DECIMAL(10,2) DEFAULT 0,
+    OtherRevenue DECIMAL(10,2) DEFAULT 0,
+    
+    -- Phân tích chiết khấu và doanh thu thuần
+    TotalDiscount DECIMAL(10,2) DEFAULT 0,
+    NetRevenue DECIMAL(12,2) GENERATED ALWAYS AS (TotalRevenue - TotalDiscount) STORED,
+    
+    -- Thông tin bổ sung
+    AverageOrderValue DECIMAL(10,2) GENERATED ALWAYS AS (CASE WHEN TotalOrders > 0 THEN TotalRevenue/TotalOrders ELSE 0 END) STORED,
+    Staff_ID INT,
+    Notes TEXT,
+    
+    -- Thông tin thời gian
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (Revenue_ID),
+    UNIQUE (Date),
+    FOREIGN KEY (Staff_ID) REFERENCES staff(staff_id) ON DELETE SET NULL
+);
+
+-- Index để tăng tốc độ truy vấn theo ngày
+CREATE INDEX idx_revenue_date ON Revenue(Date);
+
+-- Thêm procedure để cập nhật bảng Revenue từ bảng Orders
+DELIMITER //
+CREATE PROCEDURE UpdateDailyRevenue(IN input_date DATE)
+BEGIN
+    -- Kiểm tra xem đã có dữ liệu cho ngày này chưa
+    IF EXISTS (SELECT 1 FROM Revenue WHERE Date = input_date) THEN
+        -- Cập nhật bản ghi hiện có
+        UPDATE Revenue r
+        SET 
+            TotalRevenue = (SELECT COALESCE(SUM(TotalAmount), 0) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
+            TotalOrders = (SELECT COUNT(*) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
+            TotalCustomers = (SELECT COUNT(DISTINCT Customer_ID) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
+            TotalDiscount = (SELECT COALESCE(SUM(Discount), 0) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
+            FoodRevenue = (
+                SELECT COALESCE(SUM(oi.sub_total), 0)
+                FROM orders o
+                JOIN order_items oi ON o.order_id = oi.order_id
+                JOIN dishes d ON oi.dish_id = d.dish_id
+                JOIN categories c ON d.category_id = c.category_id
+                WHERE DATE(o.order_date) = input_date
+                AND o.status = 'Completed'
+                AND c.name NOT LIKE '%drink%' AND c.name NOT LIKE '%beverage%'
+            ),
+            DrinkRevenue = (
+                SELECT COALESCE(SUM(oi.sub_total), 0)
+                FROM orders o
+                JOIN order_items oi ON o.order_id = oi.order_id
+                JOIN dishes d ON oi.dish_id = d.dish_id
+                JOIN categories c ON d.category_id = c.category_id
+                WHERE DATE(o.order_date) = input_date
+                AND o.status = 'Completed'
+                AND (c.name LIKE '%drink%' OR c.name LIKE '%beverage%')
+            ),
+            UpdatedAt = CURRENT_TIMESTAMP
+        WHERE Date = input_date;
+        
+        -- Cập nhật OtherRevenue
+        UPDATE Revenue
+        SET OtherRevenue = TotalRevenue - (FoodRevenue + DrinkRevenue)
+        WHERE Date = input_date;
+    ELSE
+        -- Tạo bản ghi mới nếu chưa tồn tại
+        INSERT INTO Revenue (
+            Date, 
+            TotalRevenue, 
+            TotalOrders, 
+            TotalCustomers, 
+            TotalDiscount,
+            FoodRevenue,
+            DrinkRevenue
+        )
+        SELECT 
+            input_date,
+            COALESCE(SUM(o.total_amount), 0) AS total_nevenue,
+            COUNT(*) AS total_orders,
+            COUNT(DISTINCT o.customer_id) AS TotalCustomers,
+            COALESCE(SUM(o.discount), 0) AS TotalDiscount,
+            (
+                SELECT COALESCE(SUM(oi.sub_total), 0)
+                FROM orders o2
+                JOIN order_items oi ON o2.order_id = oi.order_id
+                JOIN dishes d ON oi.dish_id = d.dish_id
+                JOIN categories c ON d.category_id = c.category_id
+                WHERE DATE(o2.order_date) = input_date
+                AND o2.status = 'Completed'
+                AND c.name NOT LIKE '%drink%' AND c.name NOT LIKE '%beverage%'
+            ) AS FoodRevenue,
+            (
+                SELECT COALESCE(SUM(oi.sub_total), 0)
+                FROM orders o2
+                JOIN order_items oi ON o2.order_id = oi.order_id
+                JOIN dishes d ON oi.dish_id = d.dish_id
+                JOIN categories c ON d.category_id = c.category_id
+                WHERE DATE(o2.order_date) = input_date
+                AND o2.status = 'Completed'
+                AND (c.name LIKE '%drink%' OR c.name LIKE '%beverage%')
+            ) AS DrinkRevenue
+        FROM orders o
+        WHERE DATE(o.order_date) = input_date
+        AND o.status = 'Completed';
+        
+        -- Cập nhật OtherRevenue cho bản ghi mới
+        UPDATE Revenue
+        SET OtherRevenue = TotalRevenue - (FoodRevenue + DrinkRevenue)
+        WHERE Date = input_date;
+    END IF;
+END;
+//
+DELIMITER ;
+
+-- Tạo lập lịch tự động cập nhật doanh thu hàng ngày
+DELIMITER //
+CREATE EVENT evt_daily_revenue_update
+ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL 23 HOUR + INTERVAL 59 MINUTE
+DO
+BEGIN
+    CALL UpdateDailyRevenue(CURRENT_DATE);
+END;
+//
+DELIMITER ;
 
 

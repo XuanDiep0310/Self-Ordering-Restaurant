@@ -47,8 +47,12 @@ export const deleteFoodItem = async (foodId) => {
 // Hàm lấy danh sách món cần làm
 export const getPendingFoodItems = async () => {
   try {
-    const response = await axiosInstance.get("/order_items");
-    const orderItems = response.data;
+    // Lấy danh sách order_items
+    const orderItemsResponse = await axiosInstance.get("/order_items");
+    if (!orderItemsResponse || !orderItemsResponse.data) {
+      throw new Error("Failed to fetch order items");
+    }
+    const orderItems = orderItemsResponse.data;
 
     // Lọc các món có trạng thái "Ordered" và tính tổng số lượng
     const pendingItems = orderItems
@@ -63,21 +67,46 @@ export const getPendingFoodItems = async () => {
         return acc;
       }, []);
 
-    // Lấy thông tin chi tiết món ăn từ bảng "dishes"
+    // Lấy danh sách dishes
     const dishesResponse = await axiosInstance.get("/dishes");
+    if (!dishesResponse || !dishesResponse.data) {
+      throw new Error("Failed to fetch dishes");
+    }
     const dishes = dishesResponse.data;
 
-    // Kết hợp thông tin món ăn với số lượng
+    // Kết hợp dữ liệu từ order_items và dishes
     return pendingItems.map((item) => {
       const dish = dishes.find((d) => d.id === item.dish_id);
       return {
         id: item.dish_id,
-        name: dish.name,
+        name: dish ? dish.name : "Unknown Dish", // Nếu không tìm thấy món, trả về "Unknown Dish"
         quantity: item.quantity,
       };
     });
   } catch (error) {
     console.error("Error fetching pending food items:", error);
     throw error;
+  }
+};
+
+// Hàm lấy danh sách món ăn theo danh mục
+export const getFoodItemsByCategory = async (categoryId) => {
+  try {
+    const response = await axiosInstance.get(`/dishes?category_id=${categoryId}`);
+    return response.data; // Trả về danh sách món ăn
+  } catch (error) {
+    console.error("Error fetching food items by category:", error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};
+
+// Hàm lấy thông tin món ăn theo ID
+export const getFoodById = async (foodId) => {
+  try {
+    const response = await axiosInstance.get(`/dishes/${foodId}`);
+    return response.data; // Trả về thông tin chi tiết món ăn
+  } catch (error) {
+    console.error(`Error fetching food item with ID ${foodId}:`, error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
   }
 };

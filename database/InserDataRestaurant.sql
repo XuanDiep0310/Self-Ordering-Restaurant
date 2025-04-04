@@ -3,16 +3,16 @@ USE SelfOrderingRestaurant;
 
 -- Users table data
 INSERT INTO users (username, password, user_type, email, phone, status) VALUES
-('admin1', '$2a$10$xLuG5lHxkUwOEjPDsUyKB.eDXjDp8jKx9e3iuGw.CkJCfP4XVNGPS', 'Staff', 'admin@restaurant.com', '0987654321', 'Active'),
-('staff1', '$2a$10$5hMpJ0GEdJ6HftMDtZ9S2uVlwh43Hk8A.C9SPkDHCTkQQNj1neeJO', 'Staff', 'staff1@restaurant.com', '0987654322', 'Active'),
-('staff2', '$2a$10$8aRcGP4kDMIXc6UQNmyleOyxwK/8Xwu82y1l2b1YpI5gYhHMAcWB6', 'Staff', 'staff2@restaurant.com', '0987654323', 'Active'),
-('customer1', '$2a$10$yBqbPgJK9Z9VbwPKby9HF.AYXdNvILRzki8Sm8AJDhKrRmyHu7tAO', 'Customer', 'customer1@gmail.com', '0987123456', 'Active'),
-('customer2', '$2a$10$7CGP8MjLtYcR5Cj/XG.KSuYzGw3g4I5BWQEYnVexsMLK6PpRLqVGG', 'Customer', 'customer2@gmail.com', '0987123457', 'Active'),
-('customer3', NULL, 'Customer', 'customer3@gmail.com', '0987123458', 'Active');
+('admin1', '$2a$12$eNSgp/54S.h3L9EfnQgDbOE2Ww.DW7kxXhcYsmtSp3xMBO5qcUs.6', 'ADMIN', 'admin@restaurant.com', '0987654321', 'Active'),
+('staff1', '$2a$12$eNSgp/54S.h3L9EfnQgDbOE2Ww.DW7kxXhcYsmtSp3xMBO5qcUs.6', 'STAFF', 'staff1@restaurant.com', '0987654322', 'Active'),
+('staff2', '$2a$12$eNSgp/54S.h3L9EfnQgDbOE2Ww.DW7kxXhcYsmtSp3xMBO5qcUs.6', 'STAFF', 'staff2@restaurant.com', '0987654323', 'Active'),
+('customer1', '$2a$12$eNSgp/54S.h3L9EfnQgDbOE2Ww.DW7kxXhcYsmtSp3xMBO5qcUs.6', 'CUSTOMER', 'customer1@gmail.com', '0987123456', 'Active'),
+('customer2', '$2a$12$eNSgp/54S.h3L9EfnQgDbOE2Ww.DW7kxXhcYsmtSp3xMBO5qcUs.6', 'CUSTOMER', 'customer2@gmail.com', '0987123457', 'Active'),
+('customer3', NULL, 'CUSTOMER', 'customer3@gmail.com', '0987123458', 'Active');
 
 -- Insert Google user
 INSERT INTO users (username, google_id, user_type, email, status) VALUES
-('googleuser', '118090425294932695342', 'Customer', 'googleuser@gmail.com', 'Active');
+('googleuser', '118090425294932695342', 'CUSTOMER', 'googleuser@gmail.com', 'Active');
 
 -- Staff table data
 INSERT INTO staff (user_id, fullname, position, salary, hire_date, status) VALUES
