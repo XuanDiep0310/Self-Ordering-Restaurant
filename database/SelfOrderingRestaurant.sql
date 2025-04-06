@@ -18,20 +18,6 @@ CREATE TABLE users (
     PRIMARY KEY (user_id)
 );
 
--- Notifications table
-CREATE TABLE notifications (
-    notification_id INT AUTO_INCREMENT,
-    user_id INT,
-    title VARCHAR(255),
-    content TEXT,
-    expiry_date DATETIME NULL,
-    create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_read BOOLEAN DEFAULT FALSE,
-    type ENUM('OrderStatus', 'TableRequest', 'System'),
-    PRIMARY KEY (notification_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-
 -- Staff table
 CREATE TABLE staff (
     staff_id INT AUTO_INCREMENT,
@@ -84,6 +70,20 @@ CREATE TABLE tables (
     status ENUM('Available', 'Occupied') DEFAULT 'Available',
     location VARCHAR(50),
     qrcode VARCHAR(255)
+);
+
+-- Notifications table
+CREATE TABLE notifications (
+    notification_id INT AUTO_INCREMENT,
+    table_number INT,
+    title VARCHAR(255),
+    content TEXT,
+    expiry_date DATETIME NULL,
+    create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    type ENUM('OrderStatus', 'TableRequest', 'System'),
+    PRIMARY KEY (notification_id),
+    FOREIGN KEY (table_number) REFERENCES tables(table_number) ON DELETE CASCADE
 );
 
 -- Orders table
