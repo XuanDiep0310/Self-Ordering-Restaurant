@@ -51,11 +51,11 @@
     { "tableNumber": 17, "capacity": 2, "status": "Available", "location": "Window", "qrcode": "https://qrexample.com/table1" }
   ],
   "categories": [
-    { "id": 1, "name": "Appetizers", "description": "Start your meal right with our delicious appetizers", "image": "appetizers.jpg", "status": "Active" },
-    { "id": 2, "name": "Main Courses", "description": "Hearty and satisfying main dishes", "image": "maincourses.jpg", "status": "Active" },
-    { "id": 3, "name": "Desserts", "description": "Sweet treats to end your meal", "image": "desserts.jpg", "status": "Active" },
-    { "id": 4, "name": "Beverages", "description": "Refreshing drinks and beverages", "image": "beverages.jpg", "status": "Active" },
-    { "id": 5, "name": "Specials", "description": "Chef's special dishes of the day", "image": "specials.jpg", "status": "Active" }
+    { "id": 1, "name": "Khai vị", "description": "Start your meal right with our delicious appetizers", "image": "appetizers.jpg", "status": "Active" },
+    { "id": 2, "name": "Món chính", "description": "Hearty and satisfying main dishes", "image": "maincourses.jpg", "status": "Active" },
+    { "id": 3, "name": "Tráng miệng", "description": "Sweet treats to end your meal", "image": "desserts.jpg", "status": "Active" },
+    { "id": 4, "name": "Thức uống", "description": "Refreshing drinks and beverages", "image": "beverages.jpg", "status": "Active" },
+    { "id": 5, "name": "Đặc sản", "description": "Chef's special dishes of the day", "image": "specials.jpg", "status": "Active" }
   ],
   "dishes": [
     { "id": 1, "category_id": 1, "name": "Spring Rolls", "description": "Fresh vegetables wrapped in rice paper", "price": 50000, "image": "https://ourlittlenook.com/wp-content/uploads/2021/01/IMG_0243-2-1080x1062.jpg", "status": "Available" },
