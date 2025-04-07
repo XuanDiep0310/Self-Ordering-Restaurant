@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { createOrder } from "../../services/orderService"; // Import hàm tạo đơn hàng
 
 const CartPage = () => {
     const navigate = useNavigate();
+    const location = useLocation(); // Lấy thông tin từ URL hoặc state
     const [cart, setCart] = useState([]);
     const [total, setTotal] = useState(0);
-    const [showConfirmClear, setShowConfirmClear] = useState(false); // Hiển thị hộp thoại xác nhận xóa giỏ
-    const [showOrderSuccess, setShowOrderSuccess] = useState(false); // Hiển thị hộp thoại gọi món thành công
+    const [showConfirmClear, setShowConfirmClear] = useState(false); // Trạng thái hiển thị hộp thoại xác nhận xóa giỏ
+    const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+
+    // Lấy tableId từ state được truyền từ HomePage
+    const tableId = location.state?.tableId;
 
     useEffect(() => {
         // Lấy giỏ hàng từ localStorage
@@ -15,57 +20,57 @@ const CartPage = () => {
         setTotal(storedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
     }, []);
 
-    const handleQuantityChange = (id, type) => {
-        const updatedCart = cart.map((item) => {
-            if (item.id === id) {
-                if (type === "increase") {
-                    item.quantity += 1;
-                } else if (type === "decrease" && item.quantity > 1) {
-                    item.quantity -= 1;
-                }
-            }
-            return item;
-        });
-
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-        setTotal(updatedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
-    };
-
-    const handleRemoveItem = (id) => {
-        const updatedCart = cart.filter((item) => item.id !== id);
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-        setTotal(updatedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
-    };
-
+    
     const handleClearCart = () => {
+        // Xóa giỏ hàng
         setCart([]);
         localStorage.removeItem("cart");
         setTotal(0);
-        setShowConfirmClear(false); // Ẩn hộp thoại xác nhận
+        setShowConfirmClear(false); // Đóng hộp thoại xác nhận
     };
 
-    const handleOrder = () => {
-        // Hiển thị hộp thoại gọi món thành công
-        setShowOrderSuccess(true);
+    const handleOrder = async () => {
+        if (cart.length === 0) {
+            alert("Giỏ hàng trống. Vui lòng thêm món trước khi gọi món!");
+            return;
+        }
 
-        // Xóa giỏ hàng sau khi gọi món
-        setCart([]);
-        localStorage.removeItem("cart");
-        setTotal(0);
+        try {
+            const orderData = {
+                table_number: tableId, // ID bàn
+                items: cart.map((item) => ({
+                    dish_id: item.id,
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                })),
+                total_price: total,
+                status: "Ordered", // Trạng thái đơn hàng
+                order_date: new Date().toISOString(), // Ngày giờ hiện tại
+            };
 
-        // Ẩn hộp thoại sau 2 giây
-        setTimeout(() => {
-            setShowOrderSuccess(false);
-            navigate("/"); // Chuyển hướng về trang menu
-        }, 2000);
+            await createOrder(orderData);
+
+            setShowOrderSuccess(true);
+
+            // Xóa giỏ hàng sau khi gọi món
+            setCart([]);
+            localStorage.removeItem("cart");
+            setTotal(0);
+
+            setTimeout(() => {
+                setShowOrderSuccess(false);
+                navigate(`/table/${tableId}`); // Quay lại trang HomePage
+            }, 2000);
+        } catch (error) {
+            console.error("Error placing order:", error);
+            alert("Đã xảy ra lỗi khi gửi yêu cầu gọi món. Vui lòng thử lại!");
+        }
     };
 
     return (
-        <div className="max-w-sm mx-auto bg-gray-100 min-h-screen">
+        <div className="bg-gray-100 h-screen">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-white shadow-md">
+            <div className="bg-white shadow-md p-4 sticky top-0 left-0 w-full z-10 items-center justify-between flex h-[10%]">
                 <button
                     className="text-gray-500 text-lg"
                     onClick={() => navigate(-1)} // Quay lại trang trước
@@ -82,7 +87,7 @@ const CartPage = () => {
             </div>
 
             {/* Danh sách món ăn */}
-            <div className="p-4">
+            <div className="p-4 pb-25">
                 {cart.length === 0 ? (
                     <p className="text-center text-gray-500">Giỏ hàng trống</p>
                 ) : (
@@ -131,22 +136,20 @@ const CartPage = () => {
             {/* Hộp thoại xác nhận xóa giỏ */}
             {showConfirmClear && (
                 <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-64 text-center">
-                        <p className="text-sm font-semibold mb-4">
-                            Bạn có chắc muốn xóa toàn bộ giỏ hàng không?
-                        </p>
+                    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <p className="text-lg font-semibold mb-4">Bạn có chắc chắn muốn xóa giỏ hàng?</p>
                         <div className="flex justify-center space-x-4">
                             <button
-                                className="bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm"
-                                onClick={() => setShowConfirmClear(false)} // Hủy xóa giỏ
-                            >
-                                Không
-                            </button>
-                            <button
-                                className="bg-red-500 text-white px-3 py-2 rounded-lg text-sm"
+                                className="bg-red-500 text-white px-4 py-2 rounded-lg"
                                 onClick={handleClearCart} // Xóa giỏ hàng
                             >
-                                Đồng ý
+                                Xóa
+                            </button>
+                            <button
+                                className="bg-gray-300 text-black px-4 py-2 rounded-lg"
+                                onClick={() => setShowConfirmClear(false)} // Đóng hộp thoại
+                            >
+                                Hủy
                             </button>
                         </div>
                     </div>
@@ -165,7 +168,7 @@ const CartPage = () => {
 
             {/* Tổng tiền và nút xác nhận */}
             {cart.length > 0 && (
-                <div className="sticky bottom-0 left-0 w-full bg-white p-4 shadow-md flex justify-between items-center z-10">
+                <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow-md flex justify-between items-center z-10">
                     <span className="font-bold text-lg">{total.toLocaleString()}Đ</span>
                     <button
                         className="bg-yellow-500 text-white px-4 py-2 rounded-lg"

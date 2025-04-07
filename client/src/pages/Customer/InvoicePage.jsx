@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.png"; // Import logo
+import { updateTableStatus } from "../../services/tableService"; // Import hàm cập nhật trạng thái bàn
+import { updateOrderPaymentStatus } from "../../services/orderService"; // Import hàm cập nhật trạng thái thanh toán
 
 const InvoicePage = () => {
     const navigate = useNavigate();
@@ -9,25 +11,58 @@ const InvoicePage = () => {
 
     const [showPaymentOptions, setShowPaymentOptions] = useState(false); // Hiển thị hộp thoại thanh toán
     const [paymentMethod, setPaymentMethod] = useState("VNPay"); // Phương thức thanh toán mặc định
+    const [mergedItems, setMergedItems] = useState([]); // Danh sách món đã gộp
 
-    const handleCompletePayment = () => {
-        if (paymentMethod === "VNPay") {
-            // Hiển thị mã QR cho VNPay
-            alert("Hiển thị mã QR VNPay để thanh toán!");
-        } else {
-            // Xử lý thanh toán tiền mặt
-            alert("Thanh toán bằng tiền mặt thành công!");
+    useEffect(() => {
+        // Gộp các món từ nhiều đơn hàng thành một danh sách duy nhất
+        const merged = {};
+        orderList?.forEach((order) => {
+            order.items.forEach((item) => {
+                if (merged[item.dish_id]) {
+                    merged[item.dish_id].quantity += item.quantity;
+                } else {
+                    merged[item.dish_id] = { ...item };
+                }
+            });
+        });
+        setMergedItems(Object.values(merged)); // Chuyển từ object sang array
+    }, [orderList]);
+
+    const handleCompletePayment = async () => {
+        try {
+            if (!orderList || !tableNumber) {
+                alert("Dữ liệu không hợp lệ. Vui lòng thử lại!");
+                return;
+            }
+
+            // Cập nhật trạng thái thanh toán cho tất cả các đơn hàng liên quan đến bàn
+            for (const order of orderList) {
+                await updateOrderPaymentStatus(order.id, "Paid"); // Gọi API cập nhật trạng thái thanh toán
+            }
+
+            // Cập nhật trạng thái bàn về "Available"
+            await updateTableStatus(tableNumber, "Available");
+
+            // Hiển thị thông báo thanh toán thành công
+            if (paymentMethod === "VNPay") {
+                alert("Thanh toán qua VNPay thành công!");
+            } else {
+                alert("Thanh toán bằng tiền mặt thành công!");
+            }
+
+            // Xóa giỏ hàng khỏi localStorage
+            localStorage.removeItem("cart");
+
+            // Chuyển về trang HomePage của bàn
+            navigate(`/table/${tableNumber}`);
+        } catch (error) {
+            console.error("Error completing payment:", error);
+            alert("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");
         }
-
-        // Xóa giỏ hàng khỏi localStorage
-        localStorage.removeItem("cart");
-
-        // Sau khi thanh toán, chuyển về trang chủ
-        navigate("/");
     };
 
     return (
-        <div className="max-w-sm mx-auto bg-gray-100 min-h-screen ">
+        <div className="bg-gray-100 h-screen">
             {/* Header */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg shadow-md">
                 <button
@@ -41,12 +76,12 @@ const InvoicePage = () => {
 
             {/* Thông tin hóa đơn */}
             <div className="bg-white p-4 rounded-lg shadow-md mt-4">
-                <img src={Logo} alt="Logo" className="w-25 mx-auto " />
+                <img src={Logo} alt="Logo" className="w-25 mx-auto" />
                 <p className="text-center text-sm">Số 450 Lê Văn Việt - TP Thủ Đức</p>
                 <p className="text-center text-sm">SDT: 0389379012</p>
                 <hr className="my-2" />
                 <p className="text-sm">Bàn: {tableNumber || "N/A"}</p>
-                <p className="text-sm">Phiếu thanh toán: 121</p>
+                <p className="text-sm">Phiếu thanh toán: {}</p>
                 <hr className="my-2" />
 
                 {/* Danh sách món */}
@@ -60,13 +95,13 @@ const InvoicePage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {orderList?.map((item, index) => (
+                        {mergedItems.map((item, index) => (
                             <tr key={index}>
                                 <td>{item.name}</td>
                                 <td className="text-center">{item.quantity}</td>
-                                <td className="text-right">{item.price.toLocaleString()}Đ</td>
+                                <td className="text-right">{item.unit_price.toLocaleString()}Đ</td>
                                 <td className="text-right">
-                                    {(item.price * item.quantity).toLocaleString()}Đ
+                                    {(item.unit_price * item.quantity).toLocaleString()}Đ
                                 </td>
                             </tr>
                         ))}

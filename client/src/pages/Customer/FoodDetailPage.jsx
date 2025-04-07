@@ -1,30 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getFoodById } from "../../services/foodService"; // Import hàm gọi API
+import { getFoodById } from "../../services/foodService";
+import HeaderDetail from "../../components/Customer/HeaderDetail";
+import FoodDetails from "../../components/Customer/FoodDetail";
+import CartActions from "../../components/Customer/CartActions";
+import FoodImageDetail from "../../components/Customer/FoodImageDetail";
+import CustomerNote from "../../components/Customer/CustomerNote";
 
 const FoodDetailPage = () => {
     const { foodId } = useParams(); // Lấy ID món ăn từ URL
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Điều hướng
     const [food, setFood] = useState(null); // State để lưu thông tin món ăn
     const [quantity, setQuantity] = useState(1); // State để lưu số lượng món ăn
+    const [note, setNote] = useState(""); // State để lưu lời nhắn của khách hàng
 
+    // Lấy thông tin món ăn từ API
     useEffect(() => {
         const fetchFood = async () => {
             try {
                 const data = await getFoodById(foodId); // Gọi API để lấy thông tin món ăn
+                if (!data) {
+                    alert("Không tìm thấy thông tin món ăn. Vui lòng thử lại!");
+                    navigate(-1); // Quay lại trang trước
+                    return;
+                }
                 setFood(data);
             } catch (error) {
                 console.error("Error fetching food details:", error);
+                alert("Đã xảy ra lỗi khi tải thông tin món ăn. Vui lòng thử lại!");
+                navigate(-1); // Quay lại trang trước
             }
         };
 
         fetchFood();
-    }, [foodId]);
+    }, [foodId, navigate]);
 
+    // Xử lý khi chưa tải xong dữ liệu món ăn
     if (!food) {
         return <p className="text-center py-4">Đang tải chi tiết món ăn...</p>;
     }
 
+    // Xử lý tăng/giảm số lượng món ăn
     const handleQuantityChange = (type) => {
         if (type === "increase") {
             setQuantity(quantity + 1);
@@ -33,76 +49,62 @@ const FoodDetailPage = () => {
         }
     };
 
+    // Xử lý thêm món ăn vào giỏ hàng
     const handleAddToCart = () => {
-        // Lấy giỏ hàng hiện tại từ localStorage
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        try {
+            // Lấy giỏ hàng hiện tại từ localStorage
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-        // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-        const existingItemIndex = cart.findIndex((item) => item.id === food.id);
+            // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+            const existingItemIndex = cart.findIndex((item) => item.id === food.id);
 
-        if (existingItemIndex !== -1) {
-            // Nếu sản phẩm đã tồn tại, cập nhật số lượng
-            cart[existingItemIndex].quantity += quantity;
-        } else {
-            // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
-            cart.push({
-                id: food.id,
-                name: food.name,
-                price: food.price,
-                image: food.image,
-                quantity: quantity,
-            });
+            if (existingItemIndex !== -1) {
+                // Nếu sản phẩm đã tồn tại, cập nhật số lượng và lời nhắn
+                cart[existingItemIndex].quantity += quantity;
+                cart[existingItemIndex].note = note;
+            } else {
+                // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
+                cart.push({
+                    id: food.id,
+                    name: food.name,
+                    price: food.price,
+                    image: food.image,
+                    quantity: quantity,
+                    note: note, // Thêm lời nhắn
+                });
+            }
+
+            // Lưu giỏ hàng vào localStorage
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            // Chuyển hướng về trang MenuPage
+            navigate("/menu");
+        } catch (error) {
+            console.error("Error adding to cart:", error);
         }
-
-        // Lưu giỏ hàng vào localStorage
-        localStorage.setItem("cart", JSON.stringify(cart));
-
-        // Chuyển hướng về trang MenuPage
-        navigate("/menu");
     };
 
     return (
-        <div className="max-w-sm mx-auto bg-gray-100 min-h-screen p-4">
-            <button
-                className="text-yellow-500 text-4xl mb-4 p-2 rounded-full hover:bg-gray-100 transition-transform transform hover:scale-110"
-                onClick={() => navigate(-1)} // Quay lại trang trước
-            >
-                &#8592;
-            </button>
-            <img
-                src={food.image}
-                alt={food.name}
-                className="w-full h-64 object-cover rounded-lg mb-4"
+        <div className="bg-gray-100 h-screen ">
+            {/* Header */}
+            <HeaderDetail />
+
+            {/* Hình ảnh món ăn */}
+            <FoodImageDetail image={food?.image || ""} name={food?.name || "Unknown"} />
+
+            {/* Thông tin món ăn */}
+            <FoodDetails name={food?.name || "Unknown"} price={food?.price || 0} />
+
+            {/* Lời nhắn của khách hàng */}
+            <CustomerNote />
+
+            {/* Hành động thêm vào giỏ hàng */}
+            <CartActions
+                quantity={quantity}
+                onIncrease={() => handleQuantityChange("increase")}
+                onDecrease={() => handleQuantityChange("decrease")}
+                onAddToCart={handleAddToCart}
             />
-            <h1 className="text-2xl font-bold mb-2">{food.name}</h1>
-            <p className="text-gray-500 text-lg mb-4">{food.price.toLocaleString()}Đ</p>
-            <textarea
-                placeholder="Bạn có nhắn gì với nhà hàng không?"
-                className="w-full p-2 border rounded-lg mb-4"
-            />
-            <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                    <button
-                        className="text-2xl px-4 py-2 border rounded-lg"
-                        onClick={() => handleQuantityChange("decrease")}
-                    >
-                        -
-                    </button>
-                    <span className="mx-4">{quantity}</span>
-                    <button
-                        className="text-2xl px-4 py-2 border rounded-lg"
-                        onClick={() => handleQuantityChange("increase")}
-                    >
-                        +
-                    </button>
-                </div>
-                <button
-                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
-                    onClick={handleAddToCart}
-                >
-                    Thêm vào giỏ
-                </button>
-            </div>
         </div>
     );
 };
