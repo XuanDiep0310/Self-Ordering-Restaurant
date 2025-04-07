@@ -1,5 +1,21 @@
-// authService.js - Thêm function logout
 import axiosInstance from "../config/axios";
+
+export const login = async (username, password) => {
+  try {
+    const response = await axiosInstance.post("/api/auth/login", { username, password });
+    const { token, role } = response.data;
+
+    // Lưu thông tin vào localStorage
+    localStorage.setItem("username", username);
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+
+    return { success: true, role };
+  } catch (error) {
+    console.error("Error during login:", error);
+    return { success: false, message: "Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin." };
+  }
+};
 
 export const logout = async () => {
   try {

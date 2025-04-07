@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../config/axios";
+import { login } from "../services/authService";
 import RestaurantBanner from "../assets/images/restaurant-banner.jpg";
 import Logo from "../assets/images/logo.png";
 
@@ -12,31 +12,19 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axiosInstance.post("/api/auth/login", { username, password });
-      console.log("response.data:", response.data);
+    const result = await login(username, password);
 
-      // Lấy token và role từ response API
-      const { token, role } = response.data;
-
-      // Lưu username vào localStorage
-      localStorage.setItem("username", username);
-      // Lưu token vào localStorage
-      localStorage.setItem("token", token);
-      // Lưu role để sử dụng sau này
-      localStorage.setItem("role", role);
-
+    if (result.success) {
       // Chuyển hướng dựa trên vai trò người dùng
-      if (role === "ADMIN") {
+      if (result.role === "ADMIN") {
         navigate("/admin");
-      } else if (role === "STAFF") {
+      } else if (result.role === "STAFF") {
         navigate("/staff");
       } else {
         setError("Vai trò người dùng không hợp lệ! Trang này chỉ dành cho admin và nhân viên.");
       }
-    } catch (err) {
-      console.error("Error during login:", err);
-      setError("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+    } else {
+      setError(result.message);
     }
   };
 
