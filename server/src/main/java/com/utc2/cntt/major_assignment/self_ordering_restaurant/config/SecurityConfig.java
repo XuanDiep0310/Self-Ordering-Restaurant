@@ -5,9 +5,10 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.security.CustomUs
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,9 +21,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -43,26 +46,26 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // Cho phép tất cả các yêu cầu đến /api/auth/**
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // Các endpoint public khác
-                        .requestMatchers(
-                                "/api/customers/**",
-                                "/api/payment/**",
-                                "/api/orders/**",
-                                "/api/notifications/**",
-                                "/error").permitAll()
+                        // Đặt OPTIONS lên đầu tiên để đảm bảo nó được xử lý trước
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Yêu cầu vai trò STAFF hoặc ADMIN cho các endpoints của staff
+                        // Public endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/customers/**").permitAll()
+                        .requestMatchers("/api/payment/**").permitAll()
+                        .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers("/api/notifications/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+
+                        // Staff endpoints
                         .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
 
-                        // Yêu cầu vai trò ADMIN cho các endpoints của admin
+                        // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // Các endpoints khác yêu cầu xác thực
+                        // Còn lại yêu cầu xác thực
                         .anyRequest().authenticated()
                 )
-                // Đặt filter JWT trước filter xác thực username/password
                 .addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -76,11 +79,25 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+
+        // Cho phép tất cả các origin
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+
+        // Cho phép tất cả các phương thức HTTP
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+
+        // Cho phép tất cả các header phổ biến
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+
+        // Cho phép header Authorization được hiển thị cho frontend
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
-        configuration.setAllowCredentials(false);
+
+        // Cho phép credentials
+        configuration.setAllowCredentials(true);
+
+        // Cấu hình thời gian cache cho preflight
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

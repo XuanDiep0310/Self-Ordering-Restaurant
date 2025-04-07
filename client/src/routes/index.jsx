@@ -1,3 +1,4 @@
+// routes/index.jsx
 import HomePage from "../pages/Customer/HomePage";
 import MenuPage from "../pages/Customer/MenuPage";
 import FoodDetailPage from "../pages/Customer/FoodDetailPage";
@@ -11,19 +12,38 @@ import AdminDashboard from "../pages/AdminDashBoard";
 import EditMenu from "../components/EditMenu";
 import ManagementTable from "../components/Management_table";
 import Employees from "../components/Employees";
+import ProtectedRoute from "../components/ProtectedRoute";
+import ForbiddenPage from "../pages/Forbidden";
 
-export const routes = [
-  { path: "/login", element: <LoginPage /> },
+// Tạo helper function để làm ngắn gọn code
+const adminRoute = (element) => (
+  <ProtectedRoute allowedRoles={['ADMIN']}>{element}</ProtectedRoute>
+);
+
+const staffRoute = (element) => (
+  <ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}>{element}</ProtectedRoute>
+);
+
+const routes = [
+  // Public routes
   { path: "/", element: <HomePage /> },
-  { path: "/order", element: <OrderPage /> },
-  { path: "/invoice", element: <InvoicePage /> },
-  { path: "/review", element: <ReviewPage /> },
   { path: "/menu", element: <MenuPage /> },
   { path: "/food/:foodId", element: <FoodDetailPage /> },
   { path: "/cart", element: <CartPage /> },
-  { path: "/dashboard", element: <StaffDashboard /> },
-  { path: "/admin", element: <AdminDashboard /> },
-  { path: "/admin/menu", element: <EditMenu /> },
-  { path: "/admin/tables", element: <ManagementTable /> },
-  { path: "/admin/employees", element: <Employees /> },
+  { path: "/order", element: <OrderPage /> },
+  { path: "/invoice", element: <InvoicePage /> },
+  { path: "/review", element: <ReviewPage /> },
+  { path: "/forbidden", element: <ForbiddenPage /> },
+  { path: "/login", element: <LoginPage /> },
+
+  // Staff routes (cho phép cả STAFF và ADMIN truy cập)
+  { path: "/staff", element: staffRoute(<StaffDashboard />) },
+
+  // Admin routes (chỉ ADMIN)
+  { path: "/admin", element: adminRoute(<AdminDashboard />) },
+  { path: "/admin/menu", element: adminRoute(<EditMenu />) },
+  { path: "/admin/tables", element: adminRoute(<ManagementTable />) },
+  { path: "/admin/employees", element: adminRoute(<Employees />) },
 ];
+
+export default routes;
