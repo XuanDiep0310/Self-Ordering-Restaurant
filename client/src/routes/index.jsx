@@ -14,8 +14,8 @@ import Employees from "../components/Employees";
 
 export const routes = [
   { path: "/login", element: <LoginPage /> },
-  { path: "/", element: <HomePage /> },
-  { path: "/order", element: <OrderPage /> },
+  { path: "/table/:tableId", element: <HomePage /> },
+  { path: "/order/:tableId", element: <OrderPage /> },
   { path: "/invoice", element: <InvoicePage /> },
   { path: "/review", element: <ReviewPage /> },
   { path: "/menu", element: <MenuPage /> },

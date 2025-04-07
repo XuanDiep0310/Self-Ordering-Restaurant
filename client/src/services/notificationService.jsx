@@ -10,3 +10,14 @@ export const getNotifications = async () => {
     throw error; // Ném lỗi để xử lý ở nơi gọi hàm
   }
 };
+
+// Hàm gửi thông báo
+export const sendNotification = async (notificationData) => {
+  try {
+    const response = await axiosInstance.post("/notifications", notificationData);
+    return response.data; // Trả về thông báo vừa thêm
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};

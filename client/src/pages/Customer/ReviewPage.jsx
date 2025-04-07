@@ -1,36 +1,52 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../assets/images/logo.png";
+import { sendFeedback } from "../../services/feedbackService"; // Import hàm gửi đánh giá
 
 const ReviewPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const tableId = location.state?.tableId; // Lấy tableId từ state
     const [name, setName] = useState("");
     const [review, setReview] = useState("");
     const [rating, setRating] = useState(5); // Mặc định 5 sao
     const [success, setSuccess] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Xử lý gửi đánh giá (có thể gửi đến API)
-        console.log("Tên:", name);
-        console.log("Đánh giá:", review);
-        console.log("Số sao:", rating);
+        if (!tableId) {
+            alert("Không tìm thấy thông tin bàn. Vui lòng thử lại!");
+            return;
+        }
 
-        // Hiển thị thông báo thành công
-        setSuccess(true);
+        try {
+            // Gửi đánh giá lên cơ sở dữ liệu
+            await sendFeedback({
+                customer_id: 1, // ID khách hàng (cần thay bằng ID thực tế)
+                order_id: 1, // ID đơn hàng (cần thay bằng ID thực tế)
+                rating,
+                comment: review,
+            });
 
-        // Ẩn thông báo sau 2 giây và quay lại trang chủ
-        setTimeout(() => {
-            setSuccess(false);
-            navigate("/");
-        }, 2000);
+            // Hiển thị thông báo thành công
+            setSuccess(true);
+
+            // Ẩn thông báo sau 2 giây và quay lại trang chủ
+            setTimeout(() => {
+                setSuccess(false);
+                navigate(`/table/${tableId}`);
+            }, 2000);
+        } catch (error) {
+            console.error("Error submitting feedback:", error);
+            alert("Đã xảy ra lỗi khi gửi đánh giá. Vui lòng thử lại!");
+        }
     };
 
     return (
-        <div className="max-w-sm mx-auto bg-gray-100 min-h-screen ">
+        <div className="bg-gray-100 h-screen">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg shadow-md">
+            <div className="flex items-center h-[10%] justify-between p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg shadow-md">
                 <button
                     className="text-white text-lg"
                     onClick={() => navigate(-1)} // Quay lại trang trước
@@ -41,8 +57,8 @@ const ReviewPage = () => {
             </div>
 
             {/* Form đánh giá */}
-            <div className="bg-white p-4 rounded-lg shadow-md mt-4">
-                <img src={Logo} alt="Logo" className="w-20 mx-auto mb-4" />
+            <div className="bg-white p-4 rounded-lg mt-4">
+                <img src={Logo} alt="Logo" className="w-30 mx-auto mb-4" />
                 <form onSubmit={handleSubmit}>
                     <div className="flex justify-center mb-4">
                         {[1, 2, 3, 4, 5].map((star) => (

@@ -1,34 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { AiOutlineHome, AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
+import { AiOutlineHome, AiOutlineSearch } from "react-icons/ai";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getCategories } from "../../services/categoriesService";
 import { getFoodItemsByCategory } from "../../services/foodService";
 import "../../assets/styles/scrollbar.css"; // Import CSS cho scrollbar
 import { Link } from "react-router-dom"; // Import Link từ react-router-dom
 
-
-const Header = ({ searchTerm, setSearchTerm }) => {
+const Header = ({ searchTerm, setSearchTerm, selectedCategory, setSelectedCategory }) => {
     const navigate = useNavigate();
-
-    return (
-        <div className="flex items-center justify-between p-4 bg-white shadow-md">
-            <AiOutlineHome
-                className="text-2xl text-yellow-500 cursor-pointer"
-                onClick={() => navigate("/")}
-            />
-            <input
-                type="text"
-                placeholder="Tìm kiếm"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật từ khóa tìm kiếm
-                className="flex-1 mx-4 px-4 py-2 border rounded-lg text-sm"
-            />
-            <AiOutlineSearch className="text-xl text-gray-500" />
-        </div>
-    );
-};
-
-const CategoryTabs = ({ selectedCategory, setSelectedCategory }) => {
+    const location = useLocation();
+    const tableId = location.state?.tableId; // Lấy tableId từ state
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -50,26 +31,43 @@ const CategoryTabs = ({ selectedCategory, setSelectedCategory }) => {
         fetchCategories();
     }, [setSelectedCategory]);
 
-    if (loading) {
-        return <p className="text-center py-4">Đang tải danh mục...</p>;
-    }
-
     return (
-        <div className="relative">
-            <div className="flex overflow-x-auto whitespace-nowrap bg-white shadow-md py-2 px-2 scrollbar-custom">
-                {categories.map((category) => (
-                    <button
-                        key={category.id}
-                        className={`font-semibold mx-2 ${selectedCategory === category.id
-                                ? "text-yellow-500 border-b-2 border-yellow-500"
-                                : "text-gray-500"
-                            } hover:text-yellow-500`}
-                        onClick={() => setSelectedCategory(category.id)}
-                    >
-                        {category.name}
-                    </button>
-                ))}
+        <div className="bg-white shadow-md sticky top-0 left-0 w-full z-10">
+            {/* Thanh điều hướng */}
+            <div className="flex items-center justify-between p-4">
+                <AiOutlineHome
+                    className="text-2xl text-yellow-500 cursor-pointer"
+                    onClick={() => navigate(`/table/${tableId}`)} // Quay lại HomePage với tableId
+                />
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm món ăn..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật từ khóa tìm kiếm
+                    className="flex-1 mx-4 px-4 py-2 border rounded-lg text-sm"
+                />
+                <AiOutlineSearch className="text-xl text-gray-500" />
             </div>
+
+            {/* Tabs danh mục */}
+            {loading ? (
+                <p className="text-center py-2">Đang tải danh mục...</p>
+            ) : (
+                <div className="flex overflow-x-auto whitespace-nowrap bg-white py-2 px-2 scrollbar-custom">
+                    {categories.map((category) => (
+                        <button
+                            key={category.id}
+                            className={`font-semibold mx-2 ${selectedCategory === category.id
+                                    ? "text-yellow-500 border-b-2 border-yellow-500"
+                                    : "text-gray-500"
+                                } hover:text-yellow-500`}
+                            onClick={() => setSelectedCategory(category.id)}
+                        >
+                            {category.name}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
@@ -138,13 +136,13 @@ const MenuList = ({ selectedCategory, searchTerm, cart, setCart, setTotal }) => 
     }
 
     return (
-        <div className="p-4">
+        <div className="p-4 pb-25">
             {dishes.map((dish) => {
                 const cartItem = cart.find((item) => item.id === dish.id);
                 return (
                     <div
                         key={dish.id}
-                        className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-4 cursor-pointer"
+                        className="flex items-center shadow-md justify-between p-4 bg-white mb-4 cursor-pointer"
                         onClick={() => navigate(`/food/${dish.id}`)} // Chuyển hướng khi nhấn vào món ăn
                     >
                         <img
@@ -209,9 +207,10 @@ const MenuPage = () => {
     }, []);
 
     return (
-        <div className="max-w-sm mx-auto bg-gray-100 min-h-screen">
-            <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-            <CategoryTabs
+        <div className="bg-gray-100 h-screen">
+            <Header
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
             />
@@ -223,7 +222,7 @@ const MenuPage = () => {
                 setTotal={setTotal}
             />
             {/* Tổng tiền */}
-            <div className="sticky bottom-0 left-0 w-full bg-white p-4 shadow-md flex justify-between items-center z-10">
+            <div className="fixed shadow-md bottom-0 left-0 w-full bg-white p-4 flex justify-between items-center z-10">
                 <span className="font-bold text-lg">{total.toLocaleString()}Đ</span>
                 <Link
                     to="/cart" // Chuyển hướng đến trang giỏ hàng
