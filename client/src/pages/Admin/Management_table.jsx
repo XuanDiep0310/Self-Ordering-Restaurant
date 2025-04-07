@@ -1,31 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AdminHeader from "../../components/Admin/Admin_header";
+import axios from "axios";
 
 const TableManagement = () => {
-  const [tables, setTables] = useState([
-    { name: "Bàn 1", capacity: 4, status: "available" },
-    { name: "Bàn 2", capacity: 4, status: "occupied" },
-    { name: "Bàn 3", capacity: 4, status: "available" },
-    { name: "Bàn 4", capacity: 4, status: "available" },
-    { name: "Bàn 5", capacity: 4, status: "occupied" },
-    { name: "Bàn 6", capacity: 4, status: "available" },
-    { name: "Bàn 7", capacity: 4, status: "available" },
-    { name: "Bàn 8", capacity: 4, status: "occupied" },
-    { name: "Bàn 9", capacity: 4, status: "available" },
-    { name: "Bàn 10", capacity: 4, status: "available" },
-    { name: "Bàn 11", capacity: 4, status: "occupied" },
-    { name: "Bàn 12", capacity: 4, status: "available" },
-    { name: "Bàn 13", capacity: 4, status: "available" },
-    { name: "Bàn 14", capacity: 4, status: "occupied" },
-    { name: "Bàn 15", capacity: 4, status: "available" },
-    { name: "Bàn 16", capacity: 4, status: "available" },
-    { name: "Bàn 17", capacity: 4, status: "occupied" },
-    { name: "Bàn 18", capacity: 4, status: "available" },
-    { name: "Bàn 19", capacity: 4, status: "available" },
-    { name: "Bàn 20", capacity: 4, status: "available" },
-  ]);
-
+  const [tables, setTables] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
+
+  // Fetch tables from API
+  useEffect(() => {
+    axios.get("http://localhost:3000/tables")
+      .then((response) => setTables(response.data))
+      .catch((error) => console.error("Error fetching tables:", error));
+  }, []);
 
   const handleEditClick = (table) => {
     setEditingTable(table);
@@ -33,7 +20,7 @@ const TableManagement = () => {
   };
 
   const handleAddTable = () => {
-    setEditingTable(null);
+    setEditingTable({ name: "", capacity: "", status: "available" });
     setIsModalOpen(true);
   };
 
@@ -42,112 +29,150 @@ const TableManagement = () => {
     setEditingTable(null);
   };
 
-  const handleSaveTable = () => {
-    console.log("Table saved:", editingTable);
-    setIsModalOpen(false);
+  const handleDeleteTable = (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bàn này?")) {
+      axios.delete(`http://localhost:3000/tables/${id}`)
+        .then(() => {
+          setTables((prevTables) => prevTables.filter((table) => table.id !== id));
+          alert("Xóa bàn thành công!");
+        })
+        .catch((error) => console.error("Error deleting table:", error));
+    }
   };
 
   return (
-    <div className="min-h-screen background-image">
+    <div className="min-h-screen background-image relative">
       {/* Header */}
-      <header className="flex items-center bg-green-700 text-white px-4 py-3 w-1/4">
-        <button className="text-2xl mr-4 focus:outline-none">☰</button>
-        <h1 className="text-xl font-bold">QUẢN LÝ BÀN</h1>
-      </header>
+      <AdminHeader title="QUẢN LÝ BÀN" />
 
       {/* Content */}
       <div className="p-8">
         {/* Action Bar */}
         <div className="flex justify-end mb-6">
           <button
-            className="bg-white text-green-600 px-8 py-4 rounded-md flex items-center text-xl shadow-md"
+            className="bg-white text-[#124035] px-6 py-3 rounded-md flex items-center text-md shadow-md"
             onClick={handleAddTable}
           >
             <span className="cursor-pointer">Thêm</span>
-            <span className="ml-2 text-2xl">+</span>
+            <span className="ml-2 text-2xl">
+              <i className="fa-solid fa-circle-plus"></i>
+            </span>
           </button>
         </div>
 
         {/* Table List */}
-        <div className="grid grid-cols-4 gap-4">
-          {tables.map((table, index) => (
+        <div className="grid grid-cols-3 gap-4">
+          {tables.map((table) => (
             <div
-              key={index}
-              className={`flex justify-between items-center p-4 rounded-md text-lg ${
-                table.status === "occupied"
-                  ? "bg-blue-200"
-                  : "bg-gray-100"
+              key={table.id}
+              className={`flex items-center justify-between p-6 rounded-md shadow-md border border-white ${
+                table.status === "available" ? "bg-[#7bb7e0]" : "bg-white"
               }`}
             >
-              <div>
-                <p className="font-bold">{table.name}</p>
-                <p className="text-sm text-gray-600">Sức chứa: {table.capacity}</p>
-              </div>
-              <div className="flex space-x-4">
+              <p className="font-bold text-lg">{table.name}</p>
+              <p className="font-bold text-lg">Sức chứa: {table.capacity}</p>
+              <div className="flex space-x-2">
                 <button
                   className="text-blue-500 focus:outline-none"
                   onClick={() => handleEditClick(table)}
                 >
-                  ✏️
+                  <i className="fa-solid fa-pen"></i>
                 </button>
                 <button
                   className="text-red-500 focus:outline-none"
-                  onClick={() => console.log("Delete clicked for:", table)}
+                  onClick={() => handleDeleteTable(table.id)}
                 >
-                  🗑️
+                  <i className="fa-solid fa-trash"></i>
                 </button>
               </div>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-8 w-1/3">
-            <h2 className="text-2xl font-bold text-green-700 mb-4">
-              {editingTable ? "SỬA BÀN" : "THÊM BÀN"}
-            </h2>
-            <div className="mb-4">
-              <label className="block text-lg font-bold mb-2">Tên bàn:</label>
-              <input
-                type="text"
-                value={editingTable?.name || ""}
-                onChange={(e) =>
-                  setEditingTable({ ...editingTable, name: e.target.value })
-                }
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-lg font-bold mb-2">Sức chứa:</label>
-              <input
-                type="number"
-                value={editingTable?.capacity || ""}
-                onChange={(e) =>
-                  setEditingTable({ ...editingTable, capacity: e.target.value })
-                }
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-            </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                className="bg-green-700 text-white px-4 py-2 rounded-md"
-                onClick={handleSaveTable}
-              >
-                {editingTable ? "Sửa" : "Thêm"}
-              </button>
-              <button
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
-                onClick={handleModalClose}
-              >
-                Hủy bỏ
-              </button>
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+            <div className="bg-[#124035] rounded-lg p-8 w-2/3">
+              <h2 className="text-3xl font-bold text-center text-white py-5">
+                {editingTable?.id ? "SỬA BÀN" : "THÊM BÀN"}
+              </h2>
+              <div className="bg-white p-4 rounded-lg">
+                <div className="mb-4">
+                  <label className="block text-lg font-bold mb-2">Tên bàn:</label>
+                  <input
+                    type="text"
+                    value={editingTable?.name || ""}
+                    onChange={(e) =>
+                      setEditingTable({ ...editingTable, name: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-md p-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-lg font-bold mb-2">Sức chứa:</label>
+                  <input
+                    type="number"
+                    value={editingTable?.capacity || ""}
+                    onChange={(e) =>
+                      setEditingTable({ ...editingTable, capacity: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-md p-2"
+                  />
+                </div>
+                {/* <div className="mb-4">
+                  <label className="block text-lg font-bold mb-2">Trạng thái:</label>
+                  <select
+                    value={editingTable?.status || "available"}
+                    onChange={(e) =>
+                      setEditingTable({ ...editingTable, status: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-md p-2"
+                  >
+                    <option value="available">Còn trống</option>
+                    <option value="occupied">Đã đặt</option>
+                  </select>
+                </div> */}
+                {/* <div className="mb-4">
+                  <label className="block text-lg font-bold mb-2">Vị trí:</label>
+                  <input
+                    type="text"
+                    value={editingTable?.location || ""}
+                    onChange={(e) =>
+                      setEditingTable({ ...editingTable, location: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-md p-2"
+                  />
+                </div> */}
+                {/* <div className="mb-4">
+                  <label className="block text-lg font-bold mb-2">QR Code:</label>
+                  <input
+                    type="text"
+                    value={editingTable?.qrcode || ""}
+                    onChange={(e) =>
+                      setEditingTable({ ...editingTable, qrcode: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-md p-2"
+                  />
+                </div> */}
+                <div className="flex justify-end space-x-4">
+                  <button
+                    className="bg-green-700 text-white px-4 py-2 rounded-md"
+                    onClick={() => console.log("Save table")}
+                  >
+                    {editingTable?.id ? "Sửa" : "Thêm"}
+                  </button>
+                  <button
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
+                    onClick={handleModalClose}
+                  >
+                    Hủy bỏ
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

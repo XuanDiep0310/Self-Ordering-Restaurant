@@ -18,8 +18,8 @@ public class Notifications {
     private Integer notificationId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
+    @JoinColumn(name = "table_number")
+    private Tables table;
 
     @Column(name = "title")
     private String title;
