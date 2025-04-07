@@ -5,29 +5,27 @@ import { getStaffInfo } from "../services/staffService";
 const Navbar = ({ activeTab, setActiveTab }) => {
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Giả sử user_id được lưu trong localStorage
-  const userId = 2; // Thay bằng giá trị thực tế từ localStorage hoặc context
+  // username từ localStorage
+  const usernameStaff = "";
 
   useEffect(() => {
     const fetchUserInfo = async () => {
+      setLoading(true);
       try {
-        const staffData = await getStaffInfo(userId);
-        setUserInfo({
-          name: staffData.fullname,
-          phone: staffData.phone || "Không có số điện thoại",
-          email: staffData.email || "Không có email",
-          position: staffData.position,
-        });
+        const staffData = await getStaffInfo(usernameStaff);
+        console.log("Staff data:", staffData);
+        setUserInfo(staffData);
       } catch (error) {
         console.error("Error fetching user info:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (showUserInfo) {
-      fetchUserInfo();
-    }
-  }, [showUserInfo]);
+    fetchUserInfo();
+  }, [usernameStaff]);
 
   const tabs = ["ĐƠN HÀNG", "MÓN ĂN", "THÔNG BÁO"];
 
@@ -48,9 +46,11 @@ const Navbar = ({ activeTab, setActiveTab }) => {
         ))}
       </div>
       <div
-        className="border-[#ebcd95] border-1 w-16 h-16 bg-[#124035] rounded-full z-10 cursor-pointer"
+        className="border-[#ebcd95] border-1 w-16 h-16 bg-[#124035] rounded-full z-10 cursor-pointer flex items-center justify-center text-white"
         onClick={() => setShowUserInfo(!showUserInfo)}
-      ></div>
+      >
+        {userInfo?.fullname?.charAt(0) || "U"}
+      </div>
       {showUserInfo && userInfo && (
         <StaffInfo user={userInfo} onClose={() => setShowUserInfo(false)} />
       )}

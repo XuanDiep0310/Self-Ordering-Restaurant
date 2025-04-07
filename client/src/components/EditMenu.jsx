@@ -66,7 +66,7 @@ const EditMenu = () => {
           className="text-2xl mr-4 focus:outline-none"
           onClick={handleMenuClick}
         >
-          ☰
+          <i class="fa-solid fa-list"></i>
         </button>
         <h1 className="text-xl font-bold">QUẢN LÝ MENU</h1>
       </header>
@@ -167,7 +167,7 @@ const EditMenu = () => {
                     </div>
                   </div>
                 ))}
-            </div>  
+            </div>
           </div>
         </div>
       </div>
