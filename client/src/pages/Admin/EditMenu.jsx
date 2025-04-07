@@ -7,6 +7,7 @@ import { getCategories } from "../../services/categoriesService";
 import { getFoodItemsByCategory } from "../../services/foodService";
 import "../../assets/styles/scrollbar.css";
 import CategoryList from "../../components/Admin/CategoryList";
+import Sidebar from "./Sidebar";
 
 const EditMenu = () => {
   const [categories, setCategories] = useState([]);
@@ -219,10 +220,13 @@ const EditMenu = () => {
       }
     }
   };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen background-image">
-      <AdminHeader title="QUẢN LÝ MENU" />
+      {/* <AdminHeader title="QUẢN LÝ MENU" /> */}
+      <AdminHeader title="QUẢN LÝ MENU" onToggleSidebar={() => setIsSidebarOpen(true)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="px-15">
         <div className="flex justify-end mb-2">

@@ -58,10 +58,8 @@ public class AuthService implements AuthServiceImpl {
             System.out.println("Login attempt for username: " + loginRequest.getUsername());
 
             // Lấy thông tin người dùng trước để kiểm tra
-            Users user = userRepository.findByUsername(loginRequest.getUsername());
-            if (user == null) {
-                throw new UsernameNotFoundException("User not found with username: " + loginRequest.getUsername());
-            }
+            Users user = userRepository.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + loginRequest.getUsername()));
 
             // Xác thực người dùng với username và password
             Authentication authentication = authenticationManager.authenticate(

@@ -203,50 +203,38 @@
   ],
   "tables": [
     {
+      "status": "Available",
       "id": "1",
-      "capacity": "6",
-      "status": "occupied",
-      "location": "Tầng 1 - Góc cửa sổ",
-      "qrcode": "https://nhahang.com/qr/table1",
-      "name": "Bàn 1"
+      "name": "Bàn 1",
+      "capacity": "7"
     },
     {
       "id": "2",
       "capacity": 4,
       "status": "Available",
       "location": "Tầng 1 - Giữa",
-      "qrcode": "https://nhahang.com/qr/table2",
-      "name": "Bàn 2"
+      "qrcode": "http://localhost:5173/table/2"
     },
     {
       "id": "3",
       "capacity": 6,
       "status": "Occupied",
       "location": "Tầng 1 - Gần quầy bar",
-      "qrcode": "https://nhahang.com/qr/table3",
-      "name": "Bàn 3"
+      "qrcode": "http://localhost:5173/table/3"
     },
     {
       "id": "4",
       "capacity": 8,
       "status": "Available",
       "location": "Tầng 2 - Ban công",
-      "qrcode": "https://nhahang.com/qr/table4",
-      "name": "Bàn 4"
+      "qrcode": "http://localhost:5173/table/4"
     },
     {
       "id": "5",
       "capacity": 2,
       "status": "Occupied",
       "location": "Tầng 2 - Góc lãng mạn",
-      "qrcode": "https://nhahang.com/qr/table5",
-      "name": "Bàn 5"
-    },
-    {
-      "id": "fca7",
-      "name": "Bàn 6",
-      "capacity": "7",
-      "status": "available"
+      "qrcode": "http://localhost:5173/table/5"
     }
   ],
   "categories": [
@@ -254,7 +242,7 @@
       "id": "1",
       "name": "Món khai vị",
       "description": "Các món ăn nhẹ khai vị",
-      "image": "khaivi.jpg",
+      "image": "https://heyyofoods.com/wp-content/uploads/2024/03/3-4.jpg",
       "status": "Active"
     },
     {
@@ -293,7 +281,7 @@
       "name": "Gỏi cuốn tôm thịt",
       "description": "Gỏi cuốn tươi với tôm, thịt heo và rau thơm",
       "price": 65000,
-      "image": "goicuon.jpg",
+      "image": "https://heyyofoods.com/wp-content/uploads/2024/03/3-4.jpg",
       "status": "Available"
     },
     {
@@ -454,6 +442,153 @@
       "status": "Completed",
       "notes": "Khách muốn thêm đá",
       "payment_status": "Paid"
+    },
+    {
+      "id": "4b3f",
+      "items": [
+        {
+          "dish_id": "1",
+          "quantity": 1,
+          "unit_price": 65000
+        }
+      ],
+      "total_price": 65000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T12:10:13.153Z"
+    },
+    {
+      "id": "091d",
+      "items": [
+        {
+          "dish_id": "1",
+          "quantity": 1,
+          "unit_price": 65000
+        },
+        {
+          "dish_id": "2",
+          "quantity": 1,
+          "unit_price": 75000
+        },
+        {
+          "dish_id": "3",
+          "quantity": 1,
+          "unit_price": 85000
+        }
+      ],
+      "total_price": 225000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T12:15:27.830Z"
+    },
+    {
+      "id": "7785",
+      "items": [
+        {
+          "dish_id": "1",
+          "quantity": 1,
+          "unit_price": 65000
+        }
+      ],
+      "total_price": 65000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T12:20:12.373Z"
+    },
+    {
+      "id": "547e",
+      "items": [
+        {
+          "dish_id": "7",
+          "quantity": 1,
+          "unit_price": 45000
+        }
+      ],
+      "total_price": 45000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T12:23:25.511Z"
+    },
+    {
+      "id": "b656",
+      "items": [
+        {
+          "dish_id": "1",
+          "quantity": 1,
+          "unit_price": 65000
+        }
+      ],
+      "total_price": 65000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T12:48:53.429Z"
+    },
+    {
+      "id": "5f8a",
+      "items": [
+        {
+          "dish_id": "3",
+          "quantity": 1,
+          "unit_price": 85000
+        }
+      ],
+      "total_price": 85000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T12:50:48.297Z"
+    },
+    {
+      "id": "14b0",
+      "items": [
+        {
+          "dish_id": "1",
+          "quantity": 1,
+          "unit_price": 65000
+        },
+        {
+          "dish_id": "2",
+          "quantity": 1,
+          "unit_price": 75000
+        },
+        {
+          "dish_id": "3",
+          "quantity": 1,
+          "unit_price": 85000
+        }
+      ],
+      "total_price": 225000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T14:30:34.829Z"
+    },
+    {
+      "id": "8a0c",
+      "items": [
+        {
+          "dish_id": "1",
+          "quantity": 1,
+          "unit_price": 65000
+        },
+        {
+          "dish_id": "2",
+          "quantity": 1,
+          "unit_price": 75000
+        },
+        {
+          "dish_id": "3",
+          "quantity": 1,
+          "unit_price": 85000
+        }
+      ],
+      "total_price": 225000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T15:04:04.695Z"
+    },
+    {
+      "id": "3203",
+      "items": [
+        {
+          "dish_id": "2",
+          "quantity": 1,
+          "unit_price": 75000
+        }
+      ],
+      "total_price": 75000,
+      "status": "Ordered",
+      "order_date": "2025-04-07T15:04:38.238Z"
     }
   ],
   "order_items": [
@@ -611,6 +746,62 @@
       "table_number": 4,
       "title": "Yêu cầu đổi món",
       "content": "Khách hàng ở bàn 4 muốn đổi món vì quá mặn",
+      "type": "TableRequest"
+    },
+    {
+      "id": "cd2b",
+      "table_number": "1",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 1 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "bc01",
+      "table_number": "1",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 1 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "b21b",
+      "table_number": "1",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 1 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "8b56",
+      "table_number": "1",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 1 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "e206",
+      "table_number": "4",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 4 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "74d3",
+      "table_number": "5",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 5 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "60e9",
+      "table_number": "4",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 4 cần sự hỗ trợ từ nhân viên.",
+      "type": "TableRequest"
+    },
+    {
+      "id": "bc23",
+      "table_number": "2",
+      "title": "Yêu cầu hỗ trợ",
+      "content": "Khách hàng ở bàn 2 cần sự hỗ trợ từ nhân viên.",
       "type": "TableRequest"
     }
   ],

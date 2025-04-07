@@ -1,12 +1,15 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const isAuthenticated = localStorage.getItem('token'); // Hoặc cách xác thực của bạn
+  const userRole = localStorage.getItem('role');
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" />;
+  }
+
+  if (!allowedRoles.includes(userRole)) {
+    return <Navigate to="/forbidden" />;
   }
 
   return children;

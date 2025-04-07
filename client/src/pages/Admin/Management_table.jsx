@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from "../../components/Admin/Admin_header";
+import Sidebar from "./Sidebar";
 import axios from "axios";
 
 const TableManagement = () => {
@@ -40,10 +41,40 @@ const TableManagement = () => {
     }
   };
 
+  const handleSaveTable = () => {
+    if (editingTable?.id) {
+      // Update existing table
+      axios
+        .put(`http://localhost:3000/tables/${editingTable.id}`, editingTable)
+        .then((response) => {
+          setTables((prevTables) =>
+            prevTables.map((table) =>
+              table.id === editingTable.id ? response.data : table
+            )
+          );
+          alert("Cập nhật bàn thành công!");
+          handleModalClose();
+        })
+        .catch((error) => console.error("Error updating table:", error));
+    } else {
+      // Add new table
+      axios
+        .post("http://localhost:3000/tables", editingTable)
+        .then((response) => {
+          setTables((prevTables) => [...prevTables, response.data]);
+          alert("Thêm bàn mới thành công!");
+          handleModalClose();
+        })
+        .catch((error) => console.error("Error adding table:", error));
+    }
+  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen background-image relative">
       {/* Header */}
-      <AdminHeader title="QUẢN LÝ BÀN" />
+      <AdminHeader title="QUẢN LÝ BÀNBÀN" onToggleSidebar={() => setIsSidebarOpen(true)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Content */}
       <div className="p-8">
@@ -59,34 +90,40 @@ const TableManagement = () => {
             </span>
           </button>
         </div>
-
-        {/* Table List */}
-        <div className="grid grid-cols-3 gap-4">
-          {tables.map((table) => (
-            <div
-              key={table.id}
-              className={`flex items-center justify-between p-6 rounded-md shadow-md border border-white ${
-                table.status === "available" ? "bg-[#7bb7e0]" : "bg-white"
-              }`}
-            >
-              <p className="font-bold text-lg">{table.name}</p>
-              <p className="font-bold text-lg">Sức chứa: {table.capacity}</p>
-              <div className="flex space-x-2">
-                <button
-                  className="text-blue-500 focus:outline-none"
-                  onClick={() => handleEditClick(table)}
-                >
-                  <i className="fa-solid fa-pen"></i>
-                </button>
-                <button
-                  className="text-red-500 focus:outline-none"
-                  onClick={() => handleDeleteTable(table.id)}
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </button>
+        
+          {/* Table List */}
+          <div className="bg-black/50 p-4 grid grid-cols-3 gap-4 overflow-y-auto">
+            {tables.map((table) => (
+              <div
+                key={table.id}
+                className={`flex items-center justify-between p-6 rounded-md shadow-md border border-white h-[100px] ${
+                  table.status === "available" ? "bg-[#7bb7e0]" : "bg-white"
+                }`}
+              >
+                <p className="font-bold text-lg">{table.name}</p>
+                <p className="font-bold text-lg">Sức chứa: {table.capacity}</p>
+                <div className="flex space-x-2">
+                  <button
+                    className="text-blue-500 focus:outline-none"
+                    onClick={() => handleEditClick(table)}
+                  >
+                    <i className="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    className="text-red-500 focus:outline-none"
+                    onClick={() => handleDeleteTable(table.id)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Status Info */}
+        <div className="absolute bottom-4 right-4 flex space-x-4">
+          <span className="bg-[#7bb7e0] rounded-2xl p-4 text-gray-700">Còn trống</span>
+          <span className="bg-white rounded-2xl p-4 text-gray-700">Hết chỗ</span>
         </div>
 
         {/* Modal */}
@@ -157,7 +194,7 @@ const TableManagement = () => {
                 <div className="flex justify-end space-x-4">
                   <button
                     className="bg-green-700 text-white px-4 py-2 rounded-md"
-                    onClick={() => console.log("Save table")}
+                    onClick={handleSaveTable}
                   >
                     {editingTable?.id ? "Sửa" : "Thêm"}
                   </button>
