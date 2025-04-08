@@ -204,7 +204,9 @@
   "tables": [
     {
       "status": "Available",
-      "id": "1"
+      "id": "1",
+      "name": "Bàn 1",
+      "capacity": "7"
     },
     {
       "id": "2",
@@ -388,6 +390,15 @@
       "description": "Bò cuộn lá lốt nướng than hoa",
       "price": 165000,
       "image": "bonuong.jpg",
+      "status": "Available"
+    },
+    {
+      "id": "bc14",
+      "category_id": "1",
+      "name": "Nộm",
+      "price": 50000,
+      "image": "blob:http://localhost:5173/b7a21c1f-0564-4b72-a124-988cac6152dd",
+      "description": "",
       "status": "Available"
     }
   ],

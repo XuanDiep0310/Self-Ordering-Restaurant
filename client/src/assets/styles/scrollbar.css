@@ -19,3 +19,7 @@
     background-color: #f3f4f6;
     /* Màu nền thanh cuộn */
 }
+
+.icon-hover:hover {
+    filter: brightness(0) invert(1); /* Đổi màu icon sang trắng */
+  }

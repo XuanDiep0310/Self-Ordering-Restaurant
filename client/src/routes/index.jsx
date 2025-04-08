@@ -8,10 +8,10 @@ import StaffDashboard from "../pages/StaffDashboard";
 import OrderPage from "../pages/Customer/OrderPage";
 import InvoicePage from "../pages/Customer/InvoicePage";
 import ReviewPage from "../pages/Customer/ReviewPage";
-import AdminDashboard from "../pages/AdminDashBoard";
-import EditMenu from "../components/EditMenu";
-import ManagementTable from "../components/Management_table";
-import Employees from "../components/Employees";
+import AdminDashboard from "../pages/Admin";
+import EditMenu from "../pages/Admin/EditMenu";
+import ManagementTable from "../pages/Admin/Management_table";
+import Employees from "../pages/Admin/Employees";
 import ProtectedRoute from "../components/ProtectedRoute";
 import ForbiddenPage from "../pages/Forbidden";
 
@@ -40,10 +40,10 @@ const routes = [
   { path: "/staff", element: staffRoute(<StaffDashboard />) },
 
   // Admin routes (chỉ ADMIN)
-  { path: "/admin", element: adminRoute(<AdminDashboard />) },
-  { path: "/admin/menu", element: adminRoute(<EditMenu />) },
-  { path: "/admin/tables", element: adminRoute(<ManagementTable />) },
-  { path: "/admin/employees", element: adminRoute(<Employees />) },
+  { path: "/admin", element: (<AdminDashboard />) },
+  { path: "/admin/menu", element:(<EditMenu />) },
+  { path: "/admin/tables", element: (<ManagementTable />) },
+  { path: "/admin/employees", element: (<Employees />) },
 ];
 
 export default routes;
