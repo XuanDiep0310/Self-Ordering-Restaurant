@@ -40,10 +40,11 @@ const routes = [
   { path: "/staff", element: staffRoute(<StaffDashboard />) },
 
   // Admin routes (chỉ ADMIN)
-  { path: "/admin", element: (<AdminDashboard />) },
-  { path: "/admin/menu", element:(<EditMenu />) },
-  { path: "/admin/tables", element: (<ManagementTable />) },
-  { path: "/admin/employees", element: (<Employees />) },
+  { path: "/admin", element: adminRoute(<AdminDashboard />) },
+  { path: "/admin/menu", element: adminRoute(<EditMenu />) },
+  { path: "/admin/tables", element: adminRoute(<ManagementTable />) },
+  { path: "/admin/employees", element: adminRoute(<Employees />) },
+
 ];
 
 export default routes;

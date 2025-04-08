@@ -21,16 +21,16 @@ const Sidebar = ({ isOpen, onClose }) => {
         navigate("/admin/employees");
         break;
       case "KHO":
-        navigate("/kho");
+        navigate("/admin/inventory");
         break;
       case "DOANH THU":
-        navigate("/doanhthu");
+        navigate("/admin/revenue");
         break;
       case "PHẢN HỒI":
-        navigate("/phanhoi");
+        navigate("/admin/feedback");
         break;
       case "TÀI KHOẢN":
-        navigate("/taikhoan");
+        navigate("/admin/account");
         break;
       default:
         break;

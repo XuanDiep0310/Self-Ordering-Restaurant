@@ -33,6 +33,9 @@ public class CustomJwtFilter extends OncePerRequestFilter {
             "/api/payment/**",
             "/api/orders/**",
             "/api/notifications/**",
+            "/api/dishes/**",
+            "/api/categories/**",
+            "/api/tables/**",
             "/error"
     );
 

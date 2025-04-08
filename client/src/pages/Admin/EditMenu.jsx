@@ -25,7 +25,7 @@ const EditMenu = () => {
       const categoryList = await getCategories();
       const categoriesWithItems = await Promise.all(
         categoryList.map(async (cat) => {
-          const items = await getFoodItemsByCategory(cat.id);
+          const items = await getFoodItemsByCategory(cat.categoryId);
           return { ...cat, items };
         })
       );
@@ -67,21 +67,21 @@ const EditMenu = () => {
       alert("Vui lòng nhập tên danh mục!");
       return;
     }
-  
+
     const newCategory = {
-      id: editingCategory.id || Date.now().toString(), // Tạo ID mới nếu không có
+      categoryId: editingCategory.categoryId || Date.now().toString(), // Tạo ID mới nếu không có
       name: editingCategory.name,
       description: editingCategory.description || "",
       image: editingCategory.image || "default.jpg",
       status: "Active",
     };
-  
+
     try {
-      const method = editingCategory.id ? "PUT" : "POST";
-      const url = editingCategory.id
-        ? `http://localhost:3000/categories/${editingCategory.id}`
-        : "http://localhost:3000/categories";
-  
+      const method = editingCategory.categoryId ? "PUT" : "POST";
+      const url = editingCategory.categoryId
+        ? `http://localhost:8080/api/categories/${editingCategory.categoryId}`
+        : "http://localhost:8080/api/categories";
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -89,18 +89,18 @@ const EditMenu = () => {
         },
         body: JSON.stringify(newCategory),
       });
-  
+
       if (response.ok) {
         const updatedCategory = await response.json();
         console.log("Danh mục đã được cập nhật:", updatedCategory);
-  
+
         // Cập nhật danh sách danh mục trong giao diện
-        const updatedCategories = editingCategory.id
+        const updatedCategories = editingCategory.categoryId
           ? categories.map((cat) =>
-              cat.id === updatedCategory.id ? updatedCategory : cat
+              cat.categoryId === updatedCategory.categoryId ? updatedCategory : cat
             )
           : [...categories, updatedCategory];
-  
+
         setCategories(updatedCategories);
         setIsModalOpen(false);
         setEditingCategory(null);
@@ -118,32 +118,32 @@ const EditMenu = () => {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-  
+
     const newDish = {
-      category_id: selectedCategory.id, // Lấy ID danh mục đã chọn
+      categoryId: selectedCategory.categoryId, // Lấy ID danh mục đã chọn
       name: newItem.name,
       price: parseFloat(newItem.price),
       image: newItemImage ? URL.createObjectURL(newItemImage) : null, // Tạm thời sử dụng URL preview
       description: "", // Có thể thêm mô tả nếu cần
       status: "Available", // Trạng thái mặc định
     };
-  
+
     try {
-      const response = await fetch("http://localhost:3000/dishes", {
+      const response = await fetch("http://localhost:8080/api/dishes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newDish),
       });
-  
+
       if (response.ok) {
         const addedDish = await response.json();
         console.log("Món ăn mới đã được thêm:", addedDish);
-  
+
         // Cập nhật danh sách món ăn trong giao diện
         const updatedCategories = categories.map((cat) => {
-          if (cat.id === selectedCategory.id) {
+          if (cat.categoryId === selectedCategory.categoryId) {
             return {
               ...cat,
               items: [...cat.items, addedDish],
@@ -152,7 +152,7 @@ const EditMenu = () => {
           return cat;
         });
         setCategories(updatedCategories);
-  
+
         // Reset form
         setNewItem({ name: "", price: "" });
         setNewItemImage(null);
@@ -174,12 +174,12 @@ const EditMenu = () => {
   const handleDeleteCategory = async (categoryId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
       try {
-        const response = await fetch(`http://localhost:3000/categories/${categoryId}`, {
+        const response = await fetch(`http://localhost:8080/api/categories/${categoryId}`, {
           method: "DELETE",
         });
-  
+
         if (response.ok) {
-          setCategories(categories.filter((cat) => cat.id !== categoryId));
+          setCategories(categories.filter((cat) => cat.categoryId !== categoryId));
           alert("Danh mục đã được xóa thành công!");
         } else {
           alert("Xóa danh mục thất bại!");
@@ -194,21 +194,21 @@ const EditMenu = () => {
   const handleDeleteDish = async (dishId, categoryId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
       try {
-        const response = await fetch(`http://localhost:3000/dishes/${dishId}`, {
+        const response = await fetch(`http://localhost:8080/api/dishes/${dishId}`, {
           method: "DELETE",
         });
-  
+
         if (response.ok) {
           const updatedCategories = categories.map((cat) => {
-            if (cat.id === categoryId) {
+            if (cat.categoryId === categoryId) {
               return {
                 ...cat,
-                items: cat.items.filter((item) => item.id !== dishId),
+                items: cat.items.filter((item) => item.categoryId !== dishId),
               };
             }
             return cat;
           });
-  
+
           setCategories(updatedCategories);
           alert("Món ăn đã được xóa thành công!");
         } else {
@@ -260,13 +260,13 @@ const EditMenu = () => {
             <div className="w-3/10 border-r border-gray-300 p-3 overflow-y-auto max-h-[450px]">
               {categories.map((category) => (
                 <div
-                  key={category.id}
+                  key={category.categoryId}
                   className={`flex justify-between items-center p-4 mb-4 rounded-md cursor-pointer text-2xl ${
-                    selectedCategory === category.id
+                    selectedCategory === category.categoryId
                       ? "bg-[#124035] text-white"
                       : "bg-gray-100"
                   }`}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => setSelectedCategory(category.categoryId)}
                 >
                   <span>{category.name}</span>
                   <div className="flex space-x-4">
@@ -283,7 +283,7 @@ const EditMenu = () => {
                         className="w-10 h-10"
                         style={{
                           filter:
-                            selectedCategory === category.id
+                            selectedCategory === category.categoryId
                               ? "brightness(0) invert(1)"
                               : "none",
                         }}
@@ -293,7 +293,7 @@ const EditMenu = () => {
                       className="focus:outline-none"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteCategory(category.id);
+                        handleDeleteCategory(category.categoryId);
                       }}
                     >
                       <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
@@ -304,9 +304,9 @@ const EditMenu = () => {
             </div>
 
             <div className="w-7/10 p-3 overflow-y-auto max-h-[450px]">
-              {categories.find((cat) => cat.id === selectedCategory)?.items.map((item, index) => (
+              {categories.find((cat) => cat.categoryId === selectedCategory)?.items.map((item, index) => (
                 <div
-                  key={item.id || index}
+                  key={item.dishId || index}
                   className="flex items-center justify-between p-1 mb-4 bg-gray-100 rounded-md relative"
                 >
                   <div className="flex items-center space-x-4">
@@ -342,7 +342,7 @@ const EditMenu = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-[#124035] rounded-lg p-8 w-2/3">
             <h2 className="text-3xl font-bold text-center text-white py-5">
-              {editingCategory?.id ? "SỬA DANH MỤC" : "THÊM DANH MỤC"}
+              {editingCategory?.categoryId ? "SỬA DANH MỤC" : "THÊM DANH MỤC"}
             </h2>
             <div className="bg-white p-2 rounded-lg">
               <div className="mb-4 text-2xl">
@@ -362,7 +362,7 @@ const EditMenu = () => {
                   className="bg-gray-300 text-gray-700 px-8 py-6 rounded-md"
                   onClick={handleUpdateCategory}
                 >
-                  {editingCategory?.id ? "Sửa" : "Thêm"}
+                  {editingCategory?.categoryId ? "Sửa" : "Thêm"}
                 </button>
                 <button
                   className="bg-gray-300 text-gray-700 px-8 py-6 rounded-md"

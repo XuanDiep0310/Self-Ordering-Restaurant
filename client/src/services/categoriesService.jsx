@@ -3,7 +3,7 @@ import axiosInstance from "../config/axios";
 // Hàm lấy danh sách danh mục
 export const getCategories = async () => {
     try {
-        const response = await axiosInstance.get("/categories");
+        const response = await axiosInstance.get("/api/categories");
         return response.data; // Trả về danh sách danh mục
     } catch (error) {
         console.error("Error fetching categories:", error);

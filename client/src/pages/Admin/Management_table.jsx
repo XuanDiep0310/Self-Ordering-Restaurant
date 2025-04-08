@@ -10,7 +10,7 @@ const TableManagement = () => {
 
   // Fetch tables from API
   useEffect(() => {
-    axios.get("http://localhost:3000/tables")
+    axios.get("http://localhost:8080/api/tables")
       .then((response) => setTables(response.data))
       .catch((error) => console.error("Error fetching tables:", error));
   }, []);
@@ -21,7 +21,7 @@ const TableManagement = () => {
   };
 
   const handleAddTable = () => {
-    setEditingTable({ name: "", capacity: "", status: "available" });
+    setEditingTable({ name: "", capacity: "", status: "Available" });
     setIsModalOpen(true);
   };
 
@@ -30,11 +30,11 @@ const TableManagement = () => {
     setEditingTable(null);
   };
 
-  const handleDeleteTable = (id) => {
+  const handleDeleteTable = (tableNumber) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa bàn này?")) {
-      axios.delete(`http://localhost:3000/tables/${id}`)
+      axios.delete(`http://localhost:8080/api/tables/${tableNumber}`)
         .then(() => {
-          setTables((prevTables) => prevTables.filter((table) => table.id !== id));
+          setTables((prevTables) => prevTables.filter((table) => table.tableNumber !== tableNumber));
           alert("Xóa bàn thành công!");
         })
         .catch((error) => console.error("Error deleting table:", error));
@@ -42,14 +42,14 @@ const TableManagement = () => {
   };
 
   const handleSaveTable = () => {
-    if (editingTable?.id) {
+    if (editingTable?.tableNumber) {
       // Update existing table
       axios
-        .put(`http://localhost:3000/tables/${editingTable.id}`, editingTable)
+        .put(`http://localhost:8080/api/tables/${editingTable.tableNumber}`, editingTable)
         .then((response) => {
           setTables((prevTables) =>
             prevTables.map((table) =>
-              table.id === editingTable.id ? response.data : table
+              table.tableNumber === editingTable.tableNumber ? response.data : table
             )
           );
           alert("Cập nhật bàn thành công!");
@@ -59,7 +59,7 @@ const TableManagement = () => {
     } else {
       // Add new table
       axios
-        .post("http://localhost:3000/tables", editingTable)
+        .post("http://localhost:8080/api/tables", editingTable)
         .then((response) => {
           setTables((prevTables) => [...prevTables, response.data]);
           alert("Thêm bàn mới thành công!");
@@ -90,12 +90,12 @@ const TableManagement = () => {
             </span>
           </button>
         </div>
-        
+
           {/* Table List */}
           <div className="bg-black/50 p-4 grid grid-cols-3 gap-4 overflow-y-auto">
             {tables.map((table) => (
               <div
-                key={table.id}
+                key={table.tableNumber}
                 className={`flex items-center justify-between p-6 rounded-md shadow-md border border-white h-[100px] ${
                   table.status === "available" ? "bg-[#7bb7e0]" : "bg-white"
                 }`}
@@ -111,7 +111,7 @@ const TableManagement = () => {
                   </button>
                   <button
                     className="text-red-500 focus:outline-none"
-                    onClick={() => handleDeleteTable(table.id)}
+                    onClick={() => handleDeleteTable(table.tableNumber)}
                   >
                     <i className="fa-solid fa-trash"></i>
                   </button>
@@ -131,7 +131,7 @@ const TableManagement = () => {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
             <div className="bg-[#124035] rounded-lg p-8 w-2/3">
               <h2 className="text-3xl font-bold text-center text-white py-5">
-                {editingTable?.id ? "SỬA BÀN" : "THÊM BÀN"}
+                {editingTable?.tableNumber ? "SỬA BÀN" : "THÊM BÀN"}
               </h2>
               <div className="bg-white p-4 rounded-lg">
                 <div className="mb-4">
@@ -196,7 +196,7 @@ const TableManagement = () => {
                     className="bg-green-700 text-white px-4 py-2 rounded-md"
                     onClick={handleSaveTable}
                   >
-                    {editingTable?.id ? "Sửa" : "Thêm"}
+                    {editingTable?.tableNumber ? "Sửa" : "Thêm"}
                   </button>
                   <button
                     className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"

@@ -3,7 +3,7 @@ import axiosInstance from "../config/axios";
 // Hàm lấy danh sách món ăn
 export const getFoodItems = async () => {
   try {
-    const response = await axiosInstance.get("/dishes");
+    const response = await axiosInstance.get("/api/dishes");
     return response.data; // Trả về danh sách món ăn từ API
   } catch (error) {
     console.error("Error fetching food items:", error);
@@ -14,7 +14,7 @@ export const getFoodItems = async () => {
 // Hàm thêm món ăn mới
 export const addFoodItem = async (foodData) => {
   try {
-    const response = await axiosInstance.post("/dishes", foodData);
+    const response = await axiosInstance.post("/api/dishes", foodData);
     return response.data; // Trả về dữ liệu món ăn vừa thêm
   } catch (error) {
     console.error("Error adding food item:", error);
@@ -25,7 +25,7 @@ export const addFoodItem = async (foodData) => {
 // Hàm cập nhật món ăn
 export const updateFoodItem = async (foodId, foodData) => {
   try {
-    const response = await axiosInstance.put(`/dishes/${foodId}`, foodData);
+    const response = await axiosInstance.put(`/api/dishes/${foodId}`, foodData);
     return response.data; // Trả về dữ liệu món ăn sau khi cập nhật
   } catch (error) {
     console.error(`Error updating food item ${foodId}:`, error);
@@ -36,7 +36,7 @@ export const updateFoodItem = async (foodId, foodData) => {
 // Hàm xóa món ăn
 export const deleteFoodItem = async (foodId) => {
   try {
-    const response = await axiosInstance.delete(`/dishes/${foodId}`);
+    const response = await axiosInstance.delete(`/api/dishes/${foodId}`);
     return response.data; // Trả về dữ liệu sau khi xóa món ăn
   } catch (error) {
     console.error(`Error deleting food item ${foodId}:`, error);
@@ -68,7 +68,7 @@ export const getPendingFoodItems = async () => {
       }, []);
 
     // Lấy danh sách dishes
-    const dishesResponse = await axiosInstance.get("/dishes");
+    const dishesResponse = await axiosInstance.get("/api/dishes");
     if (!dishesResponse || !dishesResponse.data) {
       throw new Error("Failed to fetch dishes");
     }
@@ -92,7 +92,7 @@ export const getPendingFoodItems = async () => {
 // Hàm lấy danh sách món ăn theo danh mục
 export const getFoodItemsByCategory = async (categoryId) => {
   try {
-    const response = await axiosInstance.get(`/dishes?category_id=${categoryId}`);
+    const response = await axiosInstance.get(`/api/dishes?categoryId=${categoryId}`);
     return response.data; // Trả về danh sách món ăn
   } catch (error) {
     console.error("Error fetching food items by category:", error);
@@ -103,7 +103,7 @@ export const getFoodItemsByCategory = async (categoryId) => {
 // Hàm lấy thông tin món ăn theo ID
 export const getFoodById = async (foodId) => {
   try {
-    const response = await axiosInstance.get(`/dishes/${foodId}`);
+    const response = await axiosInstance.get(`/api/dishes/${foodId}`);
     return response.data; // Trả về thông tin chi tiết món ăn
   } catch (error) {
     console.error(`Error fetching food item with ID ${foodId}:`, error);

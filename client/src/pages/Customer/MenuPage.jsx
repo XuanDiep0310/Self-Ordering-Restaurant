@@ -56,12 +56,12 @@ const Header = ({ searchTerm, setSearchTerm, selectedCategory, setSelectedCatego
                 <div className="flex overflow-x-auto whitespace-nowrap bg-white py-2 px-2 scrollbar-custom">
                     {categories.map((category) => (
                         <button
-                            key={category.id}
-                            className={`font-semibold mx-2 ${selectedCategory === category.id
+                            key={category.cartegoryId}
+                            className={`font-semibold mx-2 ${selectedCategory === category.categoryId
                                     ? "text-yellow-500 border-b-2 border-yellow-500"
                                     : "text-gray-500"
                                 } hover:text-yellow-500`}
-                            onClick={() => setSelectedCategory(category.id)}
+                            onClick={() => setSelectedCategory(category.categoryId)} // Cập nhật danh mục đã chọn
                         >
                             {category.name}
                         </button>
@@ -80,7 +80,7 @@ const MenuList = ({ selectedCategory, searchTerm, cart, setCart, setTotal }) => 
     useEffect(() => {
         const fetchDishes = async () => {
             try {
-                const data = await getFoodItemsByCategory(selectedCategory); // Gọi API để lấy danh sách món ăn theo danh mục
+                const data = await getFoodItemsByCategory(selectedCategory); // Gọi API để lấy danh sách món ăn theo danh
                 const filteredDishes = data.filter((dish) =>
                     dish.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );

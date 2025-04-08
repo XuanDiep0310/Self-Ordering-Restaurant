@@ -6,10 +6,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.DishServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,8 +17,13 @@ public class DishController {
     DishService dishService;
 
     @GetMapping
-    public ResponseEntity<List<DishResponseDTO>> getAllDishes() {
-        return ResponseEntity.ok(dishService.getAllDishes());
+    public ResponseEntity<List<DishResponseDTO>> getAllDishes(@RequestParam(required = false) Integer categoryId) {
+        return ResponseEntity.ok(dishService.getAllDishes(categoryId));
+    }
+
+    @GetMapping("/{dishId}")
+    public ResponseEntity<DishResponseDTO> getDishById(@PathVariable Integer dishId) {
+        return ResponseEntity.ok(dishService.getDishById(dishId));
     }
 
     @PostMapping

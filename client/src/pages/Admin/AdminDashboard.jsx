@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/custom.css";
 import "../../assets/styles/Admin_menu.css";
-import logo from "../../assets/images/logo.png"; 
+import logo from "../../assets/images/logo.png";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("");
@@ -11,19 +11,19 @@ const AdminDashboard = () => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     if (tab === "MENU") {
-      navigate("/menu");
+      navigate("/admin/menu");
     } else if (tab === "BÀN") {
-      navigate("/ban");
+      navigate("/admin/tables");
     } else if (tab === "NHÂN VIÊN") {
-      navigate("/employees");
+      navigate("/admin/employees");
     } else if (tab === "KHO") {
-      navigate("/kho");
+      navigate("/admin/inventory");
     } else if (tab === "DOANH THU") {
-      navigate("/doanhthu");
+      navigate("/admin/revenue");
     } else if (tab === "PHẢN HỒI") {
-      navigate("/phanhoi");
+      navigate("/admin/feedback");
     } else if (tab === "TÀI KHOẢN") {
-      navigate("/taikhoan");
+      navigate("/admin/account");
     }
   };
 

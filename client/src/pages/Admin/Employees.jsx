@@ -266,7 +266,7 @@ const Employees = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:3000/staff");
+        const response = await fetch("http://localhost:8080/staff");
         const data = await response.json();
         setEmployees(data);
       } catch (error) {
@@ -313,7 +313,7 @@ const Employees = () => {
     }
 
     if (emp.id) {
-      await fetch(`http://localhost:3000/staff/${emp.id}`, {
+      await fetch(`http://localhost:8080/staff/${emp.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(emp),
@@ -335,7 +335,7 @@ const Employees = () => {
 
   const addEmployee = async (newEmployee) => {
     try {
-      const response = await fetch("http://localhost:3000/staff", {
+      const response = await fetch("http://localhost:8080/staff", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -356,7 +356,7 @@ const Employees = () => {
 
   const deleteEmployee = async (employeeId) => {
     try {
-      const response = await fetch(`http://localhost:3000/staff/${employeeId}`, {
+      const response = await fetch(`http://localhost:8080/staff/${employeeId}`, {
         method: "DELETE",
       });
 
