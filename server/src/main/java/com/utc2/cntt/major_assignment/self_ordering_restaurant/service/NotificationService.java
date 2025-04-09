@@ -56,10 +56,17 @@ public class NotificationService {
                     savedNotification.isRead()));
     }
 
-    public void markNotificationAsRead(Integer notificationId) {
+    public void updateNotificationReadStatus(Integer notificationId, boolean isRead) {
         Notifications notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
-        notification.setRead(true);
+        notification.setRead(isRead);
         notificationRepository.save(notification);
+    }
+
+    public void deleteNotification(Integer notificationId) {
+        if (!notificationRepository.existsById(notificationId)) {
+            throw new ResourceNotFoundException("Notification not found");
+        }
+        notificationRepository.deleteById(notificationId);
     }
 }

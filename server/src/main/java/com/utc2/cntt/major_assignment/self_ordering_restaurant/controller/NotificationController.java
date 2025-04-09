@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/api/notifications")
@@ -27,8 +28,22 @@ public class NotificationController {
     }
 
     @PutMapping("/{notificationId}/read")
-    public ResponseEntity<?> markAsRead(@PathVariable Integer notificationId) {
-        notificationService.markNotificationAsRead(notificationId);
-        return ResponseEntity.ok("Marked as read");
+    public ResponseEntity<?> updateReadStatus(
+            @PathVariable Integer notificationId,
+            @RequestBody Map<String, Boolean> payload) {
+
+        Boolean isRead = payload.get("isRead");
+        if (isRead == null) {
+            return ResponseEntity.badRequest().body("isRead field is required");
+        }
+
+        notificationService.updateNotificationReadStatus(notificationId, isRead);
+        return ResponseEntity.ok("Notification status updated");
+    }
+
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<?> deleteNotification(@PathVariable Integer notificationId) {
+        notificationService.deleteNotification(notificationId);
+        return ResponseEntity.ok("Notification deleted successfully");
     }
 }

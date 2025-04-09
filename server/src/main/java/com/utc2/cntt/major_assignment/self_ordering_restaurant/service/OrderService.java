@@ -4,7 +4,12 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.Order
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.UpdateOrderStatusDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.OrderResponseDTO;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.*;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Dishes;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.OrderItems;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Orders;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Tables;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.key.KeyOrderItem;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
@@ -13,7 +18,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,17 +55,12 @@ public class OrderService {
             throw new IllegalStateException("One or more repositories are not initialized!");
         }
 
-        // Kiểm tra khách hàng có tồn tại không
-        Customers customer = customerRepository.findById(orderRequestDTO.getCustomerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + orderRequestDTO.getCustomerId()));
-
         // Kiểm tra bàn có tồn tại không
         Tables table = tableRepository.findById(orderRequestDTO.getTableId())
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + orderRequestDTO.getTableId()));
 
         // Tạo đơn hàng mới
         Orders order = new Orders();
-        order.setCustomer(customer);
         order.setTable(table);
         order.setStatus(OrderStatus.Pending);
 
@@ -111,7 +111,6 @@ public class OrderService {
     public List<OrderResponseDTO> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(order -> new OrderResponseDTO(order.getOrderId(),
-                        order.getCustomer().getFullname(),
                         order.getTable().getTableNumber(),
                         order.getStatus()))
                 .collect(Collectors.toList());
@@ -129,4 +128,22 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    private static final List<OrderItemStatus> PENDING_STATUSES = Arrays.asList(
+            OrderItemStatus.Ordered,
+            OrderItemStatus.Processing
+    );
+
+    @Transactional
+    public List<PendingDishItemDTO> getPendingItemsForTable(Integer tableNumber) {
+        if (tableNumber == null || tableNumber <= 0) {
+            // Có thể throw exception hoặc trả về list rỗng tùy logic mong muốn
+            throw new IllegalArgumentException("Table number must be positive.");
+            // return Collections.emptyList();
+        }
+        return orderItemRepository.findPendingItemsByTableNumber(tableNumber, PENDING_STATUSES);
+    }
+
+    public List<PendingDishItemDTO> getPendingOrderItems() {
+        return orderItemRepository.findPendingOrderItems(PENDING_STATUSES);
+    }
 }

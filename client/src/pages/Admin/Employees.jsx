@@ -266,7 +266,7 @@ const Employees = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:8080/staff");
+        const response = await fetch("http://localhost:8080/api/staff");
         const data = await response.json();
         setEmployees(data);
       } catch (error) {
@@ -282,7 +282,7 @@ const Employees = () => {
       fullname: "",
       position: "",
       salary: "",
-      hire_date: new Date().toISOString().split("T")[0],
+      hireDate: new Date().toISOString().split("T")[0],
       status: "Active",
     });
     setIsModalOpen(true);
@@ -295,7 +295,7 @@ const Employees = () => {
 
   const handleDeleteEmployee = (employeeId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
-      setEmployees(employees.filter((emp) => emp.id !== employeeId));
+      setEmployees(employees.filter((emp) => emp.staffId !== employeeId));
       deleteEmployee(employeeId);
     }
   };
@@ -307,23 +307,23 @@ const Employees = () => {
 
   const handleSaveEmployee = async () => {
     const emp = editingEmployee;
-    if (!emp.fullname || !emp.position || !emp.salary || !emp.hire_date || !emp.status) {
+    if (!emp.fullname || !emp.position || !emp.salary || !emp.hireDate || !emp.status) {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
 
-    if (emp.id) {
-      await fetch(`http://localhost:8080/staff/${emp.id}`, {
+    if (emp.staffId) {
+      await fetch(`http://localhost:8080/api/staff/${emp.staffId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(emp),
       });
-      setEmployees(employees.map((e) => (e.id === emp.id ? emp : e)));
+      setEmployees(employees.map((e) => (e.staffId === emp.staffId ? emp : e)));
     } else {
       const newEmp = {
         ...emp,
         id: Date.now().toString(),
-        user_id: Date.now(),
+        userId: Date.now(),
       };
       await addEmployee(newEmp);
       setEmployees([...employees, newEmp]);
@@ -335,7 +335,7 @@ const Employees = () => {
 
   const addEmployee = async (newEmployee) => {
     try {
-      const response = await fetch("http://localhost:8080/staff", {
+      const response = await fetch("http://localhost:8080/api/staff", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -356,7 +356,7 @@ const Employees = () => {
 
   const deleteEmployee = async (employeeId) => {
     try {
-      const response = await fetch(`http://localhost:8080/staff/${employeeId}`, {
+      const response = await fetch(`http://localhost:8080/api/staff/${employeeId}`, {
         method: "DELETE",
       });
 

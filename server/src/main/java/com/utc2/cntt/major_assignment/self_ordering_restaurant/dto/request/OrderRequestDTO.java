@@ -12,7 +12,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequestDTO {
-    private Integer customerId;
     private Integer tableId;
     private Set<OrderItemRequestDTO> items;
 }
