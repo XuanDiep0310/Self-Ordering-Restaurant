@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AdminHeader from "../../components/Admin/Admin_header";
-import editIcon from "../../assets/images/Change_Icon.png";
-import deleteIcon from "../../assets/images/Delete_Icon.png";
-import { getCategories } from "../../services/categoriesService";
-import { getFoodItemsByCategory } from "../../services/foodService";
 import "../../assets/styles/scrollbar.css";
 import CategoryList from "../../components/Admin/CategoryList";
 import Sidebar from "./Sidebar";
+import AdminHeader from "../../components/Admin/Admin_header";
+import editIcon from "../../assets/images/Change_Icon.png";
+import deleteIcon from "../../assets/images/Delete_Icon.png";
+import axiosInstance from "../../config/axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getCategories } from "../../services/categoriesService";
+import { getFoodItemsByCategory } from "../../services/foodService";
 
 const EditMenu = () => {
   const [categories, setCategories] = useState([]);
@@ -61,110 +62,89 @@ const EditMenu = () => {
     setSelectedCategory(category); // Lưu toàn bộ đối tượng danh mục
     console.log("Selected Category:", category);
   };
-
   const handleUpdateCategory = async () => {
     if (!editingCategory?.name) {
       alert("Vui lòng nhập tên danh mục!");
       return;
     }
-
+  
     const newCategory = {
-      categoryId: editingCategory.categoryId || Date.now().toString(), // Tạo ID mới nếu không có
+      categoryId: editingCategory.categoryId || Date.now().toString(),
       name: editingCategory.name,
       description: editingCategory.description || "",
       image: editingCategory.image || "default.jpg",
       status: "Active",
     };
-
+  
     try {
-      const method = editingCategory.categoryId ? "PUT" : "POST";
-      const url = editingCategory.categoryId
-        ? `http://localhost:8080/api/categories/${editingCategory.categoryId}`
-        : "http://localhost:8080/api/categories";
-
-      const response = await fetch(url, {
+      const method = editingCategory.categoryId ? "put" : "post";
+      const url = editingCategory?.categoryId
+        ? `api/categories/${editingCategory.categoryId}`
+        : "api/categories";
+  
+      const response = await axiosInstance({
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newCategory),
+        url,
+        data: newCategory,
       });
-
-      if (response.ok) {
-        const updatedCategory = await response.json();
-        console.log("Danh mục đã được cập nhật:", updatedCategory);
-
-        // Cập nhật danh sách danh mục trong giao diện
-        const updatedCategories = editingCategory.categoryId
-          ? categories.map((cat) =>
-              cat.categoryId === updatedCategory.categoryId ? updatedCategory : cat
-            )
-          : [...categories, updatedCategory];
-
-        setCategories(updatedCategories);
-        setIsModalOpen(false);
-        setEditingCategory(null);
-      } else {
-        alert("Cập nhật danh mục thất bại!");
-      }
+  
+      const updatedCategory = response.data;
+      console.log("Danh mục đã được cập nhật:", updatedCategory);
+  
+      const updatedCategories = editingCategory.categoryId
+        ? categories.map((cat) =>
+            cat.categoryId === updatedCategory.categoryId ? updatedCategory : cat
+          )
+        : [...categories, updatedCategory];
+  
+      setCategories(updatedCategories);
+      setIsModalOpen(false);
+      setEditingCategory(null);
     } catch (error) {
       console.error("Lỗi khi cập nhật danh mục:", error);
       alert("Đã xảy ra lỗi khi cập nhật danh mục!");
     }
   };
-
   const handleAddNewItem = async () => {
     if (!selectedCategory || !newItem.name || !newItem.price) {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-
+  
     const newDish = {
-      categoryId: selectedCategory.categoryId, // Lấy ID danh mục đã chọn
       name: newItem.name,
       price: parseFloat(newItem.price),
-      image: newItemImage ? URL.createObjectURL(newItemImage) : null, // Tạm thời sử dụng URL preview
-      description: "", // Có thể thêm mô tả nếu cần
-      status: "Available", // Trạng thái mặc định
+      categoryId: selectedCategory.categoryId,
+      status: "Available",
+      // ❌ Không gửi ảnh nếu không cần
     };
-
+  
     try {
-      const response = await fetch("http://localhost:8080/api/dishes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newDish),
+      const response = await axiosInstance.post("api/dishes", newDish);
+      const addedDish = response.data;
+      console.log("Món ăn mới đã được thêm:", addedDish);
+  
+      const updatedCategories = categories.map((cat) => {
+        if (cat.categoryId === selectedCategory.categoryId) {
+          return {
+            ...cat,
+            items: [...cat.items, addedDish],
+          };
+        }
+        return cat;
       });
-
-      if (response.ok) {
-        const addedDish = await response.json();
-        console.log("Món ăn mới đã được thêm:", addedDish);
-
-        // Cập nhật danh sách món ăn trong giao diện
-        const updatedCategories = categories.map((cat) => {
-          if (cat.categoryId === selectedCategory.categoryId) {
-            return {
-              ...cat,
-              items: [...cat.items, addedDish],
-            };
-          }
-          return cat;
-        });
-        setCategories(updatedCategories);
-
-        // Reset form
-        setNewItem({ name: "", price: "" });
-        setNewItemImage(null);
-        setIsAddItemModalOpen(false);
-      } else {
-        alert("Thêm món ăn thất bại!");
-      }
+  
+      setCategories(updatedCategories);
+      setNewItem({ name: "", price: "" });
+      setNewItemImage(null);
+      setIsAddItemModalOpen(false);
     } catch (error) {
       console.error("Lỗi khi thêm món ăn:", error);
       alert("Đã xảy ra lỗi khi thêm món ăn!");
     }
   };
+  
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -174,16 +154,9 @@ const EditMenu = () => {
   const handleDeleteCategory = async (categoryId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
       try {
-        const response = await fetch(`http://localhost:8080/api/categories/${categoryId}`, {
-          method: "DELETE",
-        });
-
-        if (response.ok) {
-          setCategories(categories.filter((cat) => cat.categoryId !== categoryId));
-          alert("Danh mục đã được xóa thành công!");
-        } else {
-          alert("Xóa danh mục thất bại!");
-        }
+        await axiosInstance.delete(`api/categories/${categoryId}`);
+        setCategories(categories.filter((cat) => cat.categoryId !== categoryId));
+        alert("Danh mục đã được xóa thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa danh mục:", error);
         alert("Đã xảy ra lỗi khi xóa danh mục!");
@@ -194,32 +167,27 @@ const EditMenu = () => {
   const handleDeleteDish = async (dishId, categoryId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
       try {
-        const response = await fetch(`http://localhost:8080/api/dishes/${dishId}`, {
-          method: "DELETE",
+        await axiosInstance.delete(`api/dishes/${dishId}`);
+  
+        const updatedCategories = categories.map((cat) => {
+          if (cat.categoryId === categoryId) {
+            return {
+              ...cat,
+              items: cat.items.filter((item) => item.dishId !== dishId),
+            };
+          }
+          return cat;
         });
-
-        if (response.ok) {
-          const updatedCategories = categories.map((cat) => {
-            if (cat.categoryId === categoryId) {
-              return {
-                ...cat,
-                items: cat.items.filter((item) => item.categoryId !== dishId),
-              };
-            }
-            return cat;
-          });
-
-          setCategories(updatedCategories);
-          alert("Món ăn đã được xóa thành công!");
-        } else {
-          alert("Xóa món ăn thất bại!");
-        }
+  
+        setCategories(updatedCategories);
+        alert("Món ăn đã được xóa thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa món ăn:", error);
         alert("Đã xảy ra lỗi khi xóa món ăn!");
       }
     }
   };
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -307,7 +275,7 @@ const EditMenu = () => {
               {categories.find((cat) => cat.categoryId === selectedCategory)?.items.map((item, index) => (
                 <div
                   key={item.dishId || index}
-                  className="flex items-center justify-between p-1 mb-4 bg-gray-100 rounded-md relative"
+                  className="flex items-center justify-between p-4 mb-4 bg-gray-100 rounded-md relative"
                 >
                   <div className="flex items-center space-x-4">
                     <img
