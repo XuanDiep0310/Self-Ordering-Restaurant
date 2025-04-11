@@ -13,5 +13,6 @@ import lombok.Setter;
 public class TableResponseDTO {
     private Integer tableNumber;
     private int capacity;
+    private String location;
     private TableStatus status;
 }

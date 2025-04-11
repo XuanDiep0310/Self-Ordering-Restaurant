@@ -20,6 +20,12 @@ public class TableController {
         return ResponseEntity.ok(tableService.getAllTables());
     }
 
+    @GetMapping("/{tableNumber}")
+    public ResponseEntity<?> getTableByTableNumber(@PathVariable("tableNumber") Integer tableNumber) {
+        TableResponseDTO tableResponseDTO = tableService.getTableByTableNumber(tableNumber);
+        return ResponseEntity.ok(tableResponseDTO);
+    }
+
     @PutMapping("/{table_id}")
     public ResponseEntity<?> updateTableStatus(@PathVariable("table_id") Integer tableNumber, @RequestBody TableRequestDTO tableRequestDTO) {
         tableService.updateTableStatus(tableNumber, tableRequestDTO);

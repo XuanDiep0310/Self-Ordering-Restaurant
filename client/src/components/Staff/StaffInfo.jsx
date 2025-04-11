@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { updateStaffInfo } from "../services/staffService";
+import { updateStaffInfo } from "../../services/staffService";
 import InputField from "./InputField";
-import { logout } from "../services/authService";
+import { logout } from "../../services/authService";
 
 const StaffInfo = ({ user, onClose }) => {
   const [isEditing, setIsEditing] = useState(false);
