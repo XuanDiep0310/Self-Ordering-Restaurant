@@ -10,10 +10,13 @@ import InvoicePage from "../pages/Customer/InvoicePage";
 import ReviewPage from "../pages/Customer/ReviewPage";
 import AdminDashboard from "../pages/Admin";
 import EditMenu from "../pages/Admin/EditMenu";
-import ManagementTable from "../pages/Admin/Management_table";
+import ManagementTable from "../pages/Admin/ManagementTable";
 import Employees from "../pages/Admin/Employees";
+import Account from "../pages/Admin/ManagementAccount";
 import ProtectedRoute from "../components/ProtectedRoute";
 import ForbiddenPage from "../pages/Forbidden";
+import Feedback from "../pages/Admin/Feedback";
+import Inventory from "../pages/Admin/Inventory";
 
 // Tạo helper function để làm ngắn gọn code
 const adminRoute = (element) => (
@@ -44,6 +47,9 @@ const routes = [
   { path: "/admin/menu", element: adminRoute(<EditMenu />) },
   { path: "/admin/tables", element: adminRoute(<ManagementTable />) },
   { path: "/admin/employees", element: adminRoute(<Employees />) },
+  { path: "/admin/account", element: adminRoute(<Account />) },
+  { path: "/admin/feedback", element: adminRoute(<Feedback />) },
+  { path: "/admin/inventory", element: adminRoute(<Inventory />) },
 
 ];
 
