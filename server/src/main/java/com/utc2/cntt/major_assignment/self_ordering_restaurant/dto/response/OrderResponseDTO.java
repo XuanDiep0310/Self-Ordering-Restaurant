@@ -12,7 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderResponseDTO {
     private Integer orderId;
-    private String customer;
     private Integer table;
     private OrderStatus status = OrderStatus.Pending;
 }
