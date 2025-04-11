@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPendingFoodItems } from "../services/foodService";
+import { getPendingFoodItems } from "../../services/foodService";
 
 const FoodList = () => {
   const [foodItems, setFoodItems] = useState([]);
@@ -47,7 +47,9 @@ const FoodList = () => {
         {/* Items */}
         <div className="space-y-3">
           {foodItems.length === 0 ? (
-            <div className="text-center py-8 text-white">Không có món ăn nào cần làm</div>
+            <div className="text-center py-8 text-white">
+              Không có món ăn nào cần làm
+            </div>
           ) : (
             foodItems.map((food, index) => (
               <div
@@ -73,7 +75,8 @@ const FoodList = () => {
                     <p className="font-medium text-lg">{food.dishName}</p>
                     {food.notes && (
                       <p className="text-sm text-gray-500 mt-1">
-                        <span className="font-semibold">Ghi chú:</span> {food.notes}
+                        <span className="font-semibold">Ghi chú:</span>{" "}
+                        {food.notes}
                       </p>
                     )}
                   </div>

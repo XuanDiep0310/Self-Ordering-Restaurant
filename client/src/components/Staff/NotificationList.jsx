@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { getNotifications, markAsRead, deleteNotification } from "../services/notificationService";
+import {
+  getNotifications,
+  markAsRead,
+  deleteNotification,
+} from "../../services/notificationService";
 
 const NotificationList = () => {
   const [notifications, setNotifications] = useState([]);
@@ -14,7 +18,9 @@ const NotificationList = () => {
       setLoading(true);
       const data = await getNotifications();
       // Sắp xếp thông báo mới nhất lên đầu
-      const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const sortedData = data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
       setNotifications(sortedData);
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -28,9 +34,11 @@ const NotificationList = () => {
     try {
       await markAsRead(id, !read);
       // Cập nhật lại danh sách thông báo sau khi thay đổi trạng thái
-      setNotifications(notifications.map(notif =>
-        notif.notificationId === id ? { ...notif, read: !read } : notif
-      ));
+      setNotifications(
+        notifications.map((notif) =>
+          notif.notificationId === id ? { ...notif, read: !read } : notif
+        )
+      );
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -41,7 +49,9 @@ const NotificationList = () => {
     try {
       await deleteNotification(id);
       // Cập nhật lại danh sách thông báo sau khi xóa
-      setNotifications(notifications.filter(notif => notif.notificationId !== id));
+      setNotifications(
+        notifications.filter((notif) => notif.notificationId !== id)
+      );
     } catch (error) {
       console.error("Error deleting notification:", error);
     }
@@ -51,7 +61,14 @@ const NotificationList = () => {
   const formatTime = (timestamp) => {
     if (!timestamp) return "";
     const date = new Date(timestamp);
-    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} · ${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+    return `${date.getHours().toString().padStart(2, "0")}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")} · ${date.getDate().toString().padStart(2, "0")}/${(
+      date.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   if (loading) {
@@ -103,21 +120,39 @@ const NotificationList = () => {
               return (
                 <div
                   key={notification.notificationId || index}
-                  className={`grid grid-cols-12 items-center ${notification.read ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-50 transition-colors duration-200 p-2 rounded-lg shadow-md border-l-4 ${notification.read ? 'border-gray-400' : 'border-[#124035]'}`}
+                  className={`grid grid-cols-12 items-center ${
+                    notification.read ? "bg-gray-100" : "bg-white"
+                  } hover:bg-gray-50 transition-colors duration-200 p-2 rounded-lg shadow-md border-l-4 ${
+                    notification.read ? "border-gray-400" : "border-[#124035]"
+                  }`}
                 >
                   <div className="col-span-2 flex justify-center">
                     <div className="relative">
-                      <div className={`h-12 w-12 ${notification.read ? 'bg-gray-400' : 'bg-gradient-to-br from-[#124035] to-[#1d705e]'} rounded-full flex items-center justify-center`}>
-                        <span className="text-white font-bold text-lg">{notification.tableNumber}</span>
+                      <div
+                        className={`h-12 w-12 ${
+                          notification.read
+                            ? "bg-gray-400"
+                            : "bg-gradient-to-br from-[#124035] to-[#1d705e]"
+                        } rounded-full flex items-center justify-center`}
+                      >
+                        <span className="text-white font-bold text-lg">
+                          {notification.tableNumber}
+                        </span>
                       </div>
                       {!notification.read && (
-                        <div className={`absolute -top-1 -right-1 h-4 w-4 ${statusClass} rounded-full border-2 border-white`}></div>
+                        <div
+                          className={`absolute -top-1 -right-1 h-4 w-4 ${statusClass} rounded-full border-2 border-white`}
+                        ></div>
                       )}
                     </div>
                   </div>
 
                   <div className="col-span-5 pl-2  text-center">
-                    <p className={`font-medium ${notification.read ? 'text-gray-600' : 'text-gray-800'}`}>
+                    <p
+                      className={`font-medium ${
+                        notification.read ? "text-gray-600" : "text-gray-800"
+                      }`}
+                    >
                       {notification.content}
                     </p>
                   </div>
@@ -130,10 +165,19 @@ const NotificationList = () => {
 
                   <div className="col-span-3 flex items-center justify-center space-x-2">
                     <button
-                      onClick={() => handleMarkAsRead(notification.notificationId, notification.read)}
-                      className={`cursor-pointer px-3 py-1 rounded text-white text-sm ${notification.read ? 'bg-gray-400 hover:bg-gray-700' : 'bg-green-400 hover:bg-green-700'}`}
+                      onClick={() =>
+                        handleMarkAsRead(
+                          notification.notificationId,
+                          notification.read
+                        )
+                      }
+                      className={`cursor-pointer px-3 py-1 rounded text-white text-sm ${
+                        notification.read
+                          ? "bg-gray-400 hover:bg-gray-700"
+                          : "bg-green-400 hover:bg-green-700"
+                      }`}
                     >
-                      {notification.read ? 'Đã đọc' : 'Chưa đọc'}
+                      {notification.read ? "Đã đọc" : "Chưa đọc"}
                     </button>
                     <button
                       onClick={() => handleDelete(notification.notificationId)}
