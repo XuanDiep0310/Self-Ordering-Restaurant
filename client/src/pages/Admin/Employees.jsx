@@ -118,7 +118,7 @@ const Employees = () => {
             </span>
           </button>
         </div>
-        <div className="bg-black/50 rounded-lg shadow-lg overflow-hidden w-full h-[450px]">
+        <div className="bg-black/50 rounded-lg shadow-lg overflow-auto w-full h-[580px]">
           <div className="flex bg-[#124035] text-white text-xl font-bold p-4">
             {/* <div className="w-1/6 text-center">Mã NV</div> */}
             <div className="w-3/10 text-center">Họ tên</div>

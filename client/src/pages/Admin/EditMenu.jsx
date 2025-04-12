@@ -67,7 +67,7 @@ const EditMenu = () => {
       alert("Vui lòng nhập tên danh mục!");
       return;
     }
-  
+
     const newCategory = {
       categoryId: editingCategory.categoryId || Date.now().toString(),
       name: editingCategory.name,
@@ -75,28 +75,28 @@ const EditMenu = () => {
       image: editingCategory.image || "default.jpg",
       status: "Active",
     };
-  
+
     try {
       const method = editingCategory.categoryId ? "put" : "post";
       const url = editingCategory?.categoryId
         ? `api/categories/${editingCategory.categoryId}`
         : "api/categories";
-  
+
       const response = await axiosInstance({
         method,
         url,
         data: newCategory,
       });
-  
+
       const updatedCategory = response.data;
       console.log("Danh mục đã được cập nhật:", updatedCategory);
-  
+
       const updatedCategories = editingCategory.categoryId
         ? categories.map((cat) =>
             cat.categoryId === updatedCategory.categoryId ? updatedCategory : cat
           )
         : [...categories, updatedCategory];
-  
+
       setCategories(updatedCategories);
       setIsModalOpen(false);
       setEditingCategory(null);
@@ -110,7 +110,7 @@ const EditMenu = () => {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-  
+
     const newDish = {
       name: newItem.name,
       price: parseFloat(newItem.price),
@@ -118,12 +118,12 @@ const EditMenu = () => {
       status: "Available",
       // ❌ Không gửi ảnh nếu không cần
     };
-  
+
     try {
       const response = await axiosInstance.post("api/dishes", newDish);
       const addedDish = response.data;
       console.log("Món ăn mới đã được thêm:", addedDish);
-  
+
       const updatedCategories = categories.map((cat) => {
         if (cat.categoryId === selectedCategory.categoryId) {
           return {
@@ -133,7 +133,7 @@ const EditMenu = () => {
         }
         return cat;
       });
-  
+
       setCategories(updatedCategories);
       setNewItem({ name: "", price: "" });
       setNewItemImage(null);
@@ -143,8 +143,8 @@ const EditMenu = () => {
       alert("Đã xảy ra lỗi khi thêm món ăn!");
     }
   };
-  
-  
+
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -168,7 +168,7 @@ const EditMenu = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
       try {
         await axiosInstance.delete(`api/dishes/${dishId}`);
-  
+
         const updatedCategories = categories.map((cat) => {
           if (cat.categoryId === categoryId) {
             return {
@@ -178,7 +178,7 @@ const EditMenu = () => {
           }
           return cat;
         });
-  
+
         setCategories(updatedCategories);
         alert("Món ăn đã được xóa thành công!");
       } catch (error) {
@@ -187,7 +187,7 @@ const EditMenu = () => {
       }
     }
   };
-  
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
