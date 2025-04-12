@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import StaffInfo from "./StaffInfo";
-import { getStaffInfo } from "../services/staffService";
+import { getStaffInfo } from "../../services/staffService";
 
 const Navbar = ({ activeTab, setActiveTab }) => {
   const [showUserInfo, setShowUserInfo] = useState(false);
@@ -38,7 +38,9 @@ const Navbar = ({ activeTab, setActiveTab }) => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`border-[#ebcd95] border-1 px-12 py-6 rounded cursor-pointer ${
-              activeTab === tab ? "bg-[#124035] text-white" : "bg-[#737373] text-black"
+              activeTab === tab
+                ? "bg-[#124035] text-white"
+                : "bg-[#737373] text-black"
             }`}
           >
             {tab}
