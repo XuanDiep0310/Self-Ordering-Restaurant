@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { getFoodById } from "../../services/foodService";
 import HeaderDetail from "../../components/Customer/HeaderDetail";
 import FoodDetails from "../../components/Customer/FoodDetail";
@@ -10,6 +10,8 @@ import CustomerNote from "../../components/Customer/CustomerNote";
 const FoodDetailPage = () => {
     const { foodId } = useParams(); // Lấy ID món ăn từ URL
     const navigate = useNavigate(); // Điều hướng
+    const [searchParams] = useSearchParams(); // Lấy tableNumber từ URL
+    const tableNumber = searchParams.get("tableNumber"); // Lấy tableNumber từ URL
     const [food, setFood] = useState(null); // State để lưu thông tin món ăn
     const [quantity, setQuantity] = useState(1); // State để lưu số lượng món ăn
     const [note, setNote] = useState(""); // State để lưu lời nhắn của khách hàng
@@ -25,6 +27,14 @@ const FoodDetailPage = () => {
                     return;
                 }
                 setFood(data);
+
+                // Kiểm tra số lượng món ăn trong giỏ hàng
+                const cart = JSON.parse(localStorage.getItem("cart")) || [];
+                const existingItem = cart.find((item) => item.id === data.id);
+                if (existingItem) {
+                    setQuantity(existingItem.quantity); // Cập nhật số lượng từ giỏ hàng
+                    setNote(existingItem.note || ""); // Cập nhật lời nhắn nếu có
+                }
             } catch (error) {
                 console.error("Error fetching food details:", error);
                 alert("Đã xảy ra lỗi khi tải thông tin món ăn. Vui lòng thử lại!");
@@ -34,11 +44,6 @@ const FoodDetailPage = () => {
 
         fetchFood();
     }, [foodId, navigate]);
-
-    // Xử lý khi chưa tải xong dữ liệu món ăn
-    if (!food) {
-        return <p className="text-center py-4">Đang tải chi tiết món ăn...</p>;
-    }
 
     // Xử lý tăng/giảm số lượng món ăn
     const handleQuantityChange = (type) => {
@@ -60,8 +65,8 @@ const FoodDetailPage = () => {
 
             if (existingItemIndex !== -1) {
                 // Nếu sản phẩm đã tồn tại, cập nhật số lượng và lời nhắn
-                cart[existingItemIndex].quantity += quantity;
-                cart[existingItemIndex].note = note;
+                cart[existingItemIndex].quantity = quantity; // Cập nhật số lượng
+                cart[existingItemIndex].note = note; // Cập nhật lời nhắn
             } else {
                 // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
                 cart.push({
@@ -78,11 +83,15 @@ const FoodDetailPage = () => {
             localStorage.setItem("cart", JSON.stringify(cart));
 
             // Chuyển hướng về trang MenuPage
-            navigate("/menu");
+            navigate(`/menu?tableNumber=${tableNumber}`);
         } catch (error) {
             console.error("Error adding to cart:", error);
         }
     };
+
+    if (!food) {
+        return <p className="text-center py-4">Đang tải chi tiết món ăn...</p>;
+    }
 
     return (
         <div className="bg-gray-100 h-screen ">
@@ -96,7 +105,7 @@ const FoodDetailPage = () => {
             <FoodDetails name={food?.name || "Unknown"} price={food?.price || 0} />
 
             {/* Lời nhắn của khách hàng */}
-            <CustomerNote />
+            <CustomerNote note={note} setNote={setNote} />
 
             {/* Hành động thêm vào giỏ hàng */}
             <CartActions

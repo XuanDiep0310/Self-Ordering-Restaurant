@@ -1,34 +1,60 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { createOrder } from "../../services/orderService"; // Import hàm tạo đơn hàng
 
 const CartPage = () => {
     const navigate = useNavigate();
-    const location = useLocation(); // Lấy thông tin từ URL hoặc state
+    const [searchParams] = useSearchParams();
+    const tableNumber = searchParams.get("tableNumber"); // Lấy tableNumber từ URL
     const [cart, setCart] = useState([]);
     const [total, setTotal] = useState(0);
-    const [showConfirmClear, setShowConfirmClear] = useState(false); // Trạng thái hiển thị hộp thoại xác nhận xóa giỏ
+    const [showConfirmClear, setShowConfirmClear] = useState(false);
     const [showOrderSuccess, setShowOrderSuccess] = useState(false);
 
-    // Lấy tableId từ state được truyền từ HomePage
-    const tableId = location.state?.tableId;
-
+    // Lấy giỏ hàng từ localStorage khi trang được tải
     useEffect(() => {
-        // Lấy giỏ hàng từ localStorage
         const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
         setCart(storedCart);
         setTotal(storedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
     }, []);
 
-    
+    // Xử lý tăng/giảm số lượng món ăn
+    const handleQuantityChange = (id, type) => {
+        const updatedCart = cart.map((item) => {
+            if (item.id === id) {
+                if (type === "increase") {
+                    return { ...item, quantity: item.quantity + 1 };
+                } else if (type === "decrease" && item.quantity > 1) {
+                    return { ...item, quantity: item.quantity - 1 };
+                }
+            }
+            return item;
+        });
+
+        const filteredCart = updatedCart.filter((item) => item.quantity > 0);
+
+        setCart(filteredCart);
+        localStorage.setItem("cart", JSON.stringify(filteredCart));
+        setTotal(filteredCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
+    };
+
+    // Xóa một món ăn khỏi giỏ hàng
+    const handleRemoveItem = (id) => {
+        const updatedCart = cart.filter((item) => item.id !== id);
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        setTotal(updatedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
+    };
+
+    // Xóa toàn bộ giỏ hàng
     const handleClearCart = () => {
-        // Xóa giỏ hàng
         setCart([]);
         localStorage.removeItem("cart");
         setTotal(0);
-        setShowConfirmClear(false); // Đóng hộp thoại xác nhận
+        setShowConfirmClear(false);
     };
 
+    // Gửi yêu cầu gọi món
     const handleOrder = async () => {
         if (cart.length === 0) {
             alert("Giỏ hàng trống. Vui lòng thêm món trước khi gọi món!");
@@ -37,29 +63,28 @@ const CartPage = () => {
 
         try {
             const orderData = {
-                table_number: tableId, // ID bàn
+                tableId: parseInt(tableNumber), // Đảm bảo tableId là số
                 items: cart.map((item) => ({
-                    dish_id: item.id,
+                    dishId: item.id,
                     quantity: item.quantity,
-                    unit_price: item.price,
                 })),
-                total_price: total,
-                status: "Ordered", // Trạng thái đơn hàng
-                order_date: new Date().toISOString(), // Ngày giờ hiện tại
             };
 
-            await createOrder(orderData);
+            console.log("Order Data:", orderData); // Kiểm tra dữ liệu gửi đi
 
-            setShowOrderSuccess(true);
+            await createOrder(orderData); // Gửi yêu cầu đến API
+
+            setShowOrderSuccess(true); // Hiển thị thông báo thành công
 
             // Xóa giỏ hàng sau khi gọi món
             setCart([]);
             localStorage.removeItem("cart");
             setTotal(0);
 
+            // Điều hướng về trang chính sau 2 giây
             setTimeout(() => {
                 setShowOrderSuccess(false);
-                navigate(`/table/${tableId}`); // Quay lại trang HomePage
+                navigate(`/table/${tableNumber}`); // Quay lại trang HomePage
             }, 2000);
         } catch (error) {
             console.error("Error placing order:", error);
