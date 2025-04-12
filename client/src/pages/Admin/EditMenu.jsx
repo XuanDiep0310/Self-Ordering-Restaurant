@@ -82,22 +82,22 @@ const EditMenu = () => {
         ? `api/categories/${editingCategory.categoryId}`
         : "api/categories";
   
-      const response = await axiosInstance({
+      await axiosInstance({
         method,
         url,
         data: newCategory,
       });
   
-      const updatedCategory = response.data;
-      console.log("Danh mục đã được cập nhật:", updatedCategory);
+      // Reload categories
+      const categoryList = await getCategories();
+      const categoriesWithItems = await Promise.all(
+        categoryList.map(async (cat) => {
+          const items = await getFoodItemsByCategory(cat.categoryId);
+          return { ...cat, items };
+        })
+      );
+      setCategories(categoriesWithItems);
   
-      const updatedCategories = editingCategory.categoryId
-        ? categories.map((cat) =>
-            cat.categoryId === updatedCategory.categoryId ? updatedCategory : cat
-          )
-        : [...categories, updatedCategory];
-  
-      setCategories(updatedCategories);
       setIsModalOpen(false);
       setEditingCategory(null);
     } catch (error) {
@@ -105,6 +105,7 @@ const EditMenu = () => {
       alert("Đã xảy ra lỗi khi cập nhật danh mục!");
     }
   };
+  
   const handleAddNewItem = async () => {
     if (!selectedCategory || !newItem.name || !newItem.price) {
       alert("Vui lòng điền đầy đủ thông tin!");
@@ -116,25 +117,21 @@ const EditMenu = () => {
       price: parseFloat(newItem.price),
       categoryId: selectedCategory.categoryId,
       status: "Available",
-      // ❌ Không gửi ảnh nếu không cần
     };
   
     try {
-      const response = await axiosInstance.post("api/dishes", newDish);
-      const addedDish = response.data;
-      console.log("Món ăn mới đã được thêm:", addedDish);
+      await axiosInstance.post("api/dishes", newDish);
   
-      const updatedCategories = categories.map((cat) => {
-        if (cat.categoryId === selectedCategory.categoryId) {
-          return {
-            ...cat,
-            items: [...cat.items, addedDish],
-          };
-        }
-        return cat;
-      });
+      // Reload categories
+      const categoryList = await getCategories();
+      const categoriesWithItems = await Promise.all(
+        categoryList.map(async (cat) => {
+          const items = await getFoodItemsByCategory(cat.categoryId);
+          return { ...cat, items };
+        })
+      );
+      setCategories(categoriesWithItems);
   
-      setCategories(updatedCategories);
       setNewItem({ name: "", price: "" });
       setNewItemImage(null);
       setIsAddItemModalOpen(false);

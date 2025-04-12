@@ -6,22 +6,8 @@ export const getAllEmployees = async () => {
 };
 
 export const updateEmployee = async (id, data) => {
-  try {
-    const response = await fetch(`/api/admin/staff/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to update employee");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error updating employee:", error);
-    throw error;
-  }
+  const response = await axiosInstance.put(`/api/admin/staff/${id}`, data);
+  return response.data;
 };
 
 export const deleteEmployeeById = async (id) => {
@@ -29,12 +15,12 @@ export const deleteEmployeeById = async (id) => {
   return response.data;
 };
 
-export const addNewEmployee = async (employee) => {
+export const addNewEmployee = async (data) => {
   try {
-    const response = await axiosInstance.post("/api/admin/staff/register");
+    const response = await axiosInstance.post("/api/admin/staff/register", data);
     return response.data;
   } catch (error) {
     console.error("Error adding new employee:", error);
-    throw new Error("Failed to add employee");
+    throw error;
   }
 };

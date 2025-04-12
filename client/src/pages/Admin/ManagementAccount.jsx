@@ -104,17 +104,6 @@ const ManagementAccount = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="p-10">
-        <div className="flex justify-end mb-4 space-x-4">
-          <button
-            className="bg-white text-[#124035] px-6 py-3 rounded-md mr-4 flex items-center text-md shadow-md"
-            onClick={handleAddAccount}
-          >
-            Thêm tài khoản
-            <span className="ml-2 text-2xl">
-              <i className="fa-solid fa-circle-plus"></i>
-            </span>
-          </button>
-        </div>
         <div className="bg-black/50 rounded-lg shadow-lg overflow-hidden w-full h-[450px]">
           <div className="flex bg-[#124035] text-white text-xl font-bold p-4">
             <div className="w-3/10 text-center">Tên đăng nhập</div>
@@ -130,9 +119,9 @@ const ManagementAccount = () => {
               >
                 <div className="w-3/10">{acc.username}</div>
                 <div className="w-3/10">{acc.email}</div>
-                <div className="w-3/10">{acc.phone}</div>
+                <div className="w-4/12">{acc.phone}</div>
                 <div className="flex space-x-2">
-                  <button
+                  {/* <button
                     className="text-blue-500 hover:underline"
                     onClick={() => handleEditAccount(acc)}
                   >
@@ -143,7 +132,7 @@ const ManagementAccount = () => {
                     onClick={() => handleDeleteAccount(acc.user_id)}
                   >
                     <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
             ))}
