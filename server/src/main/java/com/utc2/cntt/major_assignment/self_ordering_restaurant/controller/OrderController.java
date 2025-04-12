@@ -3,8 +3,10 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.controller;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.UpdateOrderStatusDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.OrderResponseDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,5 +33,25 @@ public class OrderController {
     public ResponseEntity<?> updateOrderStatus(@PathVariable("order_id") Integer orderId, @RequestBody UpdateOrderStatusDTO updateOrderStatusDTO) {
         orderService.updateOrderStatus(orderId, updateOrderStatusDTO);
         return ResponseEntity.ok("Order status updated successfully!");
+    }
+
+    @GetMapping("/pending-items/{tableNumber}")
+    public ResponseEntity<List<PendingDishItemDTO>> getPendingItemsForTable(@PathVariable Integer tableNumber) {
+        try {
+            List<PendingDishItemDTO> pendingItems = orderService.getPendingItemsForTable(tableNumber);
+            if (pendingItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(pendingItems);
+        } catch (IllegalArgumentException e) {
+            // Nếu service throw IllegalArgumentException (ví dụ: số bàn không hợp lệ)
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/pending-items")
+    public ResponseEntity<List<PendingDishItemDTO>> getPendingOrderItems() {
+        List<PendingDishItemDTO> pendingItems = orderService.getPendingOrderItems();
+        return new ResponseEntity<>(pendingItems, HttpStatus.OK);
     }
 }

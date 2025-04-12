@@ -47,44 +47,10 @@ export const deleteFoodItem = async (foodId) => {
 // Hàm lấy danh sách món cần làm
 export const getPendingFoodItems = async () => {
   try {
-    // Lấy danh sách order_items
-    const orderItemsResponse = await axiosInstance.get("/order_items");
-    if (!orderItemsResponse || !orderItemsResponse.data) {
-      throw new Error("Failed to fetch order items");
-    }
-    const orderItems = orderItemsResponse.data;
-
-    // Lọc các món có trạng thái "Ordered" và tính tổng số lượng
-    const pendingItems = orderItems
-      .filter((item) => item.status === "Ordered")
-      .reduce((acc, item) => {
-        const existingItem = acc.find((i) => i.dish_id === item.dish_id);
-        if (existingItem) {
-          existingItem.quantity += item.quantity;
-        } else {
-          acc.push({ dish_id: item.dish_id, quantity: item.quantity });
-        }
-        return acc;
-      }, []);
-
-    // Lấy danh sách dishes
-    const dishesResponse = await axiosInstance.get("/api/dishes");
-    if (!dishesResponse || !dishesResponse.data) {
-      throw new Error("Failed to fetch dishes");
-    }
-    const dishes = dishesResponse.data;
-
-    // Kết hợp dữ liệu từ order_items và dishes
-    return pendingItems.map((item) => {
-      const dish = dishes.find((d) => d.id === item.dish_id);
-      return {
-        id: item.dish_id,
-        name: dish ? dish.name : "Unknown Dish", // Nếu không tìm thấy món, trả về "Unknown Dish"
-        quantity: item.quantity,
-      };
-    });
+    const response = await axiosInstance.get(`/api/orders/pending-items`);
+    return response.data;
   } catch (error) {
-    console.error("Error fetching pending food items:", error);
+    console.error(`Error get pending food item: `, error);
     throw error;
   }
 };
