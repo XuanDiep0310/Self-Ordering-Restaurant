@@ -29,7 +29,7 @@ const staffRoute = (element) => (
 
 const routes = [
   // Public routes
-  { path: "/table/:tableId", element: <HomePage /> },
+  { path: "/customer", element: <HomePage /> },
   { path: "/menu", element: <MenuPage /> },
   { path: "/food/:foodId", element: <FoodDetailPage /> },
   { path: "/cart", element: <CartPage /> },

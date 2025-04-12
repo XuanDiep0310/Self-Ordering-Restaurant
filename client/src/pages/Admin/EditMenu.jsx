@@ -98,6 +98,17 @@ const EditMenu = () => {
         : [...categories, updatedCategory];
 
       setCategories(updatedCategories);
+
+      // Reload categories
+      const categoryList = await getCategories();
+      const categoriesWithItems = await Promise.all(
+        categoryList.map(async (cat) => {
+          const items = await getFoodItemsByCategory(cat.categoryId);
+          return { ...cat, items };
+        })
+      );
+      setCategories(categoriesWithItems);
+
       setIsModalOpen(false);
       setEditingCategory(null);
     } catch (error) {
@@ -105,6 +116,7 @@ const EditMenu = () => {
       alert("Đã xảy ra lỗi khi cập nhật danh mục!");
     }
   };
+
   const handleAddNewItem = async () => {
     if (!selectedCategory || !newItem.name || !newItem.price) {
       alert("Vui lòng điền đầy đủ thông tin!");
@@ -116,7 +128,6 @@ const EditMenu = () => {
       price: parseFloat(newItem.price),
       categoryId: selectedCategory.categoryId,
       status: "Available",
-      // ❌ Không gửi ảnh nếu không cần
     };
 
     try {
