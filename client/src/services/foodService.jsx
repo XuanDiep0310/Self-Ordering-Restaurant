@@ -67,12 +67,12 @@ export const getFoodItemsByCategory = async (categoryId) => {
 };
 
 // Hàm lấy thông tin món ăn theo ID
-export const getFoodById = async (foodId) => {
+export const getFoodById = async (dishId) => {
   try {
-    const response = await axiosInstance.get(`/api/dishes/${foodId}`);
+    const response = await axiosInstance.get(`/api/dishes/${dishId}`);
     return response.data; // Trả về thông tin chi tiết món ăn
   } catch (error) {
-    console.error(`Error fetching food item with ID ${foodId}:`, error);
+    console.error(`Error fetching food item with ID ${dishId}:`, error);
     throw error; // Ném lỗi để xử lý ở nơi gọi hàm
   }
 };
