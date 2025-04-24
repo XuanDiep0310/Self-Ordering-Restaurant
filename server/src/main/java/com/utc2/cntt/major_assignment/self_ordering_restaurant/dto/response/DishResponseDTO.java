@@ -13,6 +13,7 @@ import lombok.Setter;
 public class DishResponseDTO {
     private Integer dishId;
     private String name;
+    private String image;
     private Long price;
     private DishStatus status = DishStatus.Available;
 }

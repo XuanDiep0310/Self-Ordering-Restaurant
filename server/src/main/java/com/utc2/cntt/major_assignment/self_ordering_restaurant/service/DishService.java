@@ -29,7 +29,7 @@ public class DishService {
         }
 
         return dishes.stream()
-                .map(dish -> new DishResponseDTO(dish.getDishId(), dish.getName(), dish.getPrice(), dish.getStatus()))
+                .map(dish -> new DishResponseDTO(dish.getDishId(), dish.getName(), dish.getImage(), dish.getPrice(), dish.getStatus()))
                 .collect(Collectors.toList());
     }
 
@@ -37,7 +37,7 @@ public class DishService {
         Dishes dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dish not found with id: " + dishId));
 
-        return new DishResponseDTO(dish.getDishId(), dish.getName(), dish.getPrice(), dish.getStatus());
+        return new DishResponseDTO(dish.getDishId(), dish.getName(), dish.getImage(), dish.getPrice(), dish.getStatus());
     }
 
     public void addDish(DishRequestDTO dishRequestDTO) {

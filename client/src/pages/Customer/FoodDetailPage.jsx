@@ -27,6 +27,7 @@ const FoodDetailPage = () => {
                     return;
                 }
                 setFood(data);
+                console.log(data); 
 
                 // Kiểm tra số lượng món ăn trong giỏ hàng
                 const cart = JSON.parse(localStorage.getItem("cart")) || [];
