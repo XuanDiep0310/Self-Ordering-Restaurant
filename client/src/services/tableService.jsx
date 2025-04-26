@@ -20,16 +20,16 @@ export const getTableByNumber = async (tableNumber) => {
   }
 };
 // Hàm cập nhật trạng thái bàn
-export const updateTableStatus = async (tableNumber, status) => {
+export const updateTableStatus = async (tableId, status) => {
   try {
-    const response = await axiosInstance.put(`/api/tables/${tableNumber}`, { status });
-    return response.data; // Trả về dữ liệu sau khi cập nhật
+    console.log("Sending request to update table status:", { tableId, status });
+    const response = await axiosInstance.put(`/api/tables/${tableId}`, { status });
+    return response.data;
   } catch (error) {
-    console.error(`Error updating table ${tableNumber} status:`, error);
+    console.error(`Error updating table ${tableId} status:`, error);
     throw error;
   }
 };
-
 // Hàm thêm bàn mới
 export const addTable = async (tableData) => {
   try {

@@ -56,8 +56,8 @@ const Header = ({ searchTerm, setSearchTerm, selectedCategory, setSelectedCatego
                         <button
                             key={category.categoryId}
                             className={`font-semibold mx-2 ${selectedCategory === category.categoryId
-                                    ? "text-yellow-500 border-b-2 border-yellow-500"
-                                    : "text-gray-500"
+                                ? "text-yellow-500 border-b-2 border-yellow-500"
+                                : "text-gray-500"
                                 } hover:text-yellow-500`}
                             onClick={() => setSelectedCategory(category.categoryId)}
                         >
@@ -97,35 +97,33 @@ const MenuList = ({ selectedCategory, searchTerm, cart, setCart, tableNumber }) 
 
     const handleQuantityChange = (dishId, type) => {
         const updatedCart = cart.map((item) => {
-            if (item.id === dishId) {
+            if (item.dishId === dishId) {
                 if (type === "increase") {
                     return { ...item, quantity: item.quantity + 1 };
-                } else if (type === "decrease" && item.quantity > 1) {
+                } else if (type === "decrease") {
                     return { ...item, quantity: item.quantity - 1 };
                 }
             }
             return item;
-        });
+        }).filter((item) => item.quantity > 0); // Loại bỏ sản phẩm có số lượng <= 0
 
-        const filteredCart = updatedCart.filter((item) => item.quantity > 0);
-
-        setCart(filteredCart);
-        localStorage.setItem("cart", JSON.stringify(filteredCart));
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     const handleAddToCart = (dish) => {
-        const existingItem = cart.find((item) => item.id === dish.dishId);
+        const existingItem = cart.find((item) => item.dishId === dish.dishId);
 
         if (existingItem) {
             // Nếu món ăn đã tồn tại, tăng số lượng
             const updatedCart = cart.map((item) =>
-                item.id === dish.dishId ? { ...item, quantity: item.quantity + 1 } : item
+                item.dishId === dish.dishId ? { ...item, quantity: item.quantity + 1 } : item
             );
             setCart(updatedCart);
             localStorage.setItem("cart", JSON.stringify(updatedCart));
         } else {
             // Nếu món ăn chưa tồn tại, thêm mới
-            const updatedCart = [...cart, { id: dish.dishId, name: dish.name, price: dish.price, quantity: 1 }];
+            const updatedCart = [...cart, { dishId: dish.dishId, name: dish.name, price: dish.price, quantity: 1 }];
             setCart(updatedCart);
             localStorage.setItem("cart", JSON.stringify(updatedCart));
         }
@@ -142,7 +140,7 @@ const MenuList = ({ selectedCategory, searchTerm, cart, setCart, tableNumber }) 
     return (
         <div className="p-4 pb-25">
             {dishes.map((dish) => {
-                const cartItem = cart.find((item) => item.id === dish.dishId); // Kiểm tra món ăn trong giỏ hàng
+                const cartItem = cart.find((item) => item.dishId === dish.dishId); // Kiểm tra món ăn trong giỏ hàng
                 return (
                     <div
                         key={dish.dishId}
@@ -212,7 +210,7 @@ const MenuPage = () => {
     }, []);
 
     return (
-        <div className="bg-gray-100 h-screen">
+        <div className="bg-gray-100 h-screen overflow-y-auto">
             <Header
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}

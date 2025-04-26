@@ -31,9 +31,9 @@ const routes = [
   // Public routes
   { path: "/customer", element: <HomePage /> },
   { path: "/menu", element: <MenuPage /> },
-  { path: "/food/:foodId", element: <FoodDetailPage /> },
+  { path: "/food/:dishId", element: <FoodDetailPage /> },
   { path: "/cart", element: <CartPage /> },
-  { path: "/order/:tableId", element: <OrderPage /> },
+  { path: "/order", element: <OrderPage /> },
   { path: "/invoice", element: <InvoicePage /> },
   { path: "/review", element: <ReviewPage /> },
   { path: "/forbidden", element: <ForbiddenPage /> },
