@@ -51,12 +51,13 @@ export const updateOrderPaymentStatus = async (orderId, paymentStatus = "Paid") 
 };
 
 // Hàm lấy danh sách món order theo số bàn
-export const getOrdersByTable = async (tableNumber) => {
+// Hàm lấy danh sách món ăn đang chờ xử lý theo tableId
+export const getPendingItemsByTable = async (tableId) => {
     try {
-        const response = await axiosInstance.get(`/api/orders/table/${tableNumber}`);
-        return response.data; // Trả về danh sách đơn hàng
+        const response = await axiosInstance.get(`/api/orders/pending-items/${tableId}`);
+        return response.data; // Trả về danh sách món ăn
     } catch (error) {
-        console.error(`Error fetching orders for table ${tableNumber}:`, error);
+        console.error(`Error fetching pending items for table ${tableId}:`, error);
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm
     }
 };

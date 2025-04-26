@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createOrder } from "../../services/orderService"; // Import hàm tạo đơn hàng
+import { updateTableStatus } from "../../services/tableService"; // Import hàm cập nhật trạng thái bàn
 
 const CartPage = () => {
     const navigate = useNavigate();
@@ -19,9 +20,9 @@ const CartPage = () => {
     }, []);
 
     // Xử lý tăng/giảm số lượng món ăn
-    const handleQuantityChange = (id, type) => {
+    const handleQuantityChange = (dishId, type) => {
         const updatedCart = cart.map((item) => {
-            if (item.id === id) {
+            if (item.dishId === dishId) {
                 if (type === "increase") {
                     return { ...item, quantity: item.quantity + 1 };
                 } else if (type === "decrease" && item.quantity > 1) {
@@ -39,8 +40,8 @@ const CartPage = () => {
     };
 
     // Xóa một món ăn khỏi giỏ hàng
-    const handleRemoveItem = (id) => {
-        const updatedCart = cart.filter((item) => item.id !== id);
+    const handleRemoveItem = (dishId) => {
+        const updatedCart = cart.filter((item) => item.dishId !== dishId);
         setCart(updatedCart);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         setTotal(updatedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
@@ -65,14 +66,19 @@ const CartPage = () => {
             const orderData = {
                 tableId: parseInt(tableNumber), // Đảm bảo tableId là số
                 items: cart.map((item) => ({
-                    dishId: item.id,
+                    dishId: item.dishId,
                     quantity: item.quantity,
                 })),
             };
 
             console.log("Order Data:", orderData); // Kiểm tra dữ liệu gửi đi
 
-            await createOrder(orderData); // Gửi yêu cầu đến API
+            // Gửi yêu cầu tạo đơn hàng
+            await createOrder(orderData);
+
+            // Cập nhật trạng thái bàn về "Occupied"
+            console.log("Updating table status...");
+            await updateTableStatus(tableNumber, "Occupied");
 
             setShowOrderSuccess(true); // Hiển thị thông báo thành công
 
@@ -81,19 +87,25 @@ const CartPage = () => {
             localStorage.removeItem("cart");
             setTotal(0);
 
-            // Điều hướng về trang chính sau 2 giây
+            // Điều hướng về trang HomePage sau 2 giây
             setTimeout(() => {
                 setShowOrderSuccess(false);
-                navigate(`/table/${tableNumber}`); // Quay lại trang HomePage
+                navigate(`/customer?tableNumber=${tableNumber}`); // Quay lại HomePage
             }, 2000);
         } catch (error) {
-            console.error("Error placing order:", error);
-            alert("Đã xảy ra lỗi khi gửi yêu cầu gọi món. Vui lòng thử lại!");
+            if (error.response) {
+                console.error("Server response error:", error.response.data); // Log lỗi từ server
+            } else if (error.request) {
+                console.error("No response received:", error.request); // Log lỗi khi không nhận được phản hồi
+            } else {
+                console.error("Error:", error.message); // Log lỗi khác
+            }
+            alert("Đã xảy ra lỗi khi gửi yêu cầu gọi món hoặc cập nhật trạng thái bàn. Vui lòng thử lại!");
         }
     };
 
     return (
-        <div className="bg-gray-100 h-screen">
+        <div className="bg-gray-100 h-screen overflow-y-auto">
             {/* Header */}
             <div className="bg-white shadow-md p-4 sticky top-0 left-0 w-full z-10 items-center justify-between flex h-[10%]">
                 <button
@@ -118,7 +130,7 @@ const CartPage = () => {
                 ) : (
                     cart.map((item) => (
                         <div
-                            key={item.id}
+                            key={item.dishId}
                             className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-4"
                         >
                             <img
@@ -134,14 +146,14 @@ const CartPage = () => {
                                 <div className="flex items-center mt-2">
                                     <button
                                         className="text-2xl px-2 border rounded-lg"
-                                        onClick={() => handleQuantityChange(item.id, "decrease")}
+                                        onClick={() => handleQuantityChange(item.dishId, "decrease")}
                                     >
                                         -
                                     </button>
                                     <span className="mx-4">{item.quantity}</span>
                                     <button
                                         className="text-2xl px-2 border rounded-lg"
-                                        onClick={() => handleQuantityChange(item.id, "increase")}
+                                        onClick={() => handleQuantityChange(item.dishId, "increase")}
                                     >
                                         +
                                     </button>
@@ -149,7 +161,7 @@ const CartPage = () => {
                             </div>
                             <button
                                 className="text-red-500 text-lg"
-                                onClick={() => handleRemoveItem(item.id)}
+                                onClick={() => handleRemoveItem(item.dishId)}
                             >
                                 &#10005;
                             </button>
@@ -186,7 +198,7 @@ const CartPage = () => {
                 <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-64 text-center">
                         <div className="text-green-500 text-4xl mb-4">✔</div>
-                        <p className="text-sm font-semibold">Gọi món thành công</p>
+                        <p className="text-sm font-semibold">Gọi món thành công!</p>
                     </div>
                 </div>
             )}

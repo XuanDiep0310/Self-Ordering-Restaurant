@@ -39,14 +39,26 @@ const ActionButtons = () => {
         <div className="mt-2 space-y-2 p-4">
             <button
                 className="w-full h-20 bg-gradient-to-r from-yellow-400 to-orange-500 py-2 rounded-lg text-black font-semibold"
-                onClick={() => navigate(`/menu?tableNumber=${tableNumber}`)}
+                onClick={() => {
+                    if (!tableNumber) {
+                        alert("Không tìm thấy thông tin bàn. Vui lòng thử lại!");
+                        return;
+                    }
+                    navigate(`/menu?tableNumber=${tableNumber}`);
+                }}
             >
                 XEM MENU - GỌI MÓN
             </button>
             <div className="grid grid-cols-3 gap-2 mt-4">
                 <button
                     className="bg-gradient-to-r from-yellow-400 to-orange-500 py-2 rounded-lg text-black h-20"
-                    onClick={() => navigate(`/order?tableNumber=${tableNumber}`)}
+                    onClick={() => {
+                        if (!tableNumber) {
+                            alert("Không tìm thấy thông tin bàn. Vui lòng thử lại!");
+                            return;
+                        }
+                        navigate(`/order?tableNumber=${tableNumber}`);
+                    }}
                 >
                     Thanh toán
                 </button>
@@ -58,7 +70,13 @@ const ActionButtons = () => {
                 </button>
                 <button
                     className="bg-gradient-to-r from-yellow-400 to-orange-500 py-2 rounded-lg text-black"
-                    onClick={() => navigate(`/review?tableNumber=${tableNumber}`)}
+                    onClick={() => {
+                        if (!tableNumber) {
+                            alert("Không tìm thấy thông tin bàn. Vui lòng thử lại!");
+                            return;
+                        }
+                        navigate(`/review?tableNumber=${tableNumber}`);
+                    }}
                 >
                     Đánh giá
                 </button>

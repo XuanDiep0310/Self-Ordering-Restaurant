@@ -8,7 +8,7 @@ import FoodImageDetail from "../../components/Customer/FoodImageDetail";
 import CustomerNote from "../../components/Customer/CustomerNote";
 
 const FoodDetailPage = () => {
-    const { foodId } = useParams(); // Lấy ID món ăn từ URL
+    const { dishId } = useParams(); // Lấy ID món ăn từ URL
     const navigate = useNavigate(); // Điều hướng
     const [searchParams] = useSearchParams(); // Lấy tableNumber từ URL
     const tableNumber = searchParams.get("tableNumber"); // Lấy tableNumber từ URL
@@ -18,20 +18,20 @@ const FoodDetailPage = () => {
 
     // Lấy thông tin món ăn từ API
     useEffect(() => {
+        console.log("Fetching food details for dishId:", dishId); // Log giá trị dishId
         const fetchFood = async () => {
             try {
-                const data = await getFoodById(foodId); // Gọi API để lấy thông tin món ăn
+                const data = await getFoodById(dishId); // Gọi API để lấy thông tin món ăn
                 if (!data) {
                     alert("Không tìm thấy thông tin món ăn. Vui lòng thử lại!");
                     navigate(-1); // Quay lại trang trước
                     return;
                 }
                 setFood(data);
-                console.log(data); 
 
                 // Kiểm tra số lượng món ăn trong giỏ hàng
                 const cart = JSON.parse(localStorage.getItem("cart")) || [];
-                const existingItem = cart.find((item) => item.id === data.id);
+                const existingItem = cart.find((item) => item.dishId === data.dishId); // Sử dụng dishId
                 if (existingItem) {
                     setQuantity(existingItem.quantity); // Cập nhật số lượng từ giỏ hàng
                     setNote(existingItem.note || ""); // Cập nhật lời nhắn nếu có
@@ -44,7 +44,7 @@ const FoodDetailPage = () => {
         };
 
         fetchFood();
-    }, [foodId, navigate]);
+    }, [dishId, navigate]);
 
     // Xử lý tăng/giảm số lượng món ăn
     const handleQuantityChange = (type) => {
@@ -62,7 +62,7 @@ const FoodDetailPage = () => {
             const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
             // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-            const existingItemIndex = cart.findIndex((item) => item.id === food.id);
+            const existingItemIndex = cart.findIndex((item) => item.dishId === food.dishId); // Sử dụng dishId
 
             if (existingItemIndex !== -1) {
                 // Nếu sản phẩm đã tồn tại, cập nhật số lượng và lời nhắn
@@ -71,7 +71,7 @@ const FoodDetailPage = () => {
             } else {
                 // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
                 cart.push({
-                    id: food.id,
+                    dishId: food.dishId, // Sử dụng dishId
                     name: food.name,
                     price: food.price,
                     image: food.image,
@@ -95,7 +95,7 @@ const FoodDetailPage = () => {
     }
 
     return (
-        <div className="bg-gray-100 h-screen ">
+        <div className="bg-gray-100 h-screen">
             {/* Header */}
             <HeaderDetail />
 
