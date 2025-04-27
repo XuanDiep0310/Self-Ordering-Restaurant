@@ -54,7 +54,11 @@ const InvoicePage = () => {
             localStorage.removeItem("cart");
 
             // Chuyển về trang HomePage của bàn
-            navigate(`/table/${tableNumber}`);
+            if (tableNumber) {
+                navigate(`/customer/home?tableNumber=${tableNumber}`); // Cập nhật link về trang HomePage
+            } else {
+                alert("Số bàn không hợp lệ. Vui lòng thử lại!");
+            }
         } catch (error) {
             console.error("Error completing payment:", error);
             alert("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");
@@ -81,7 +85,7 @@ const InvoicePage = () => {
                 <p className="text-center text-sm">SDT: 0389379012</p>
                 <hr className="my-2" />
                 <p className="text-sm">Bàn: {tableNumber || "N/A"}</p>
-                <p className="text-sm">Phiếu thanh toán: {}</p>
+                <p className="text-sm">Phiếu thanh toán: { }</p>
                 <hr className="my-2" />
 
                 {/* Danh sách món */}
@@ -96,8 +100,8 @@ const InvoicePage = () => {
                     </thead>
                     <tbody>
                         {mergedItems.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.name}</td>
+                            <tr key={item.dish_id}>
+                                <td>{item.dish_name}</td>
                                 <td className="text-center">{item.quantity}</td>
                                 <td className="text-right">{item.unit_price.toLocaleString()}Đ</td>
                                 <td className="text-right">

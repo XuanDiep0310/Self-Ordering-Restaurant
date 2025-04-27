@@ -18,16 +18,16 @@ const ActionButtons = () => {
         }
 
         try {
+            // Gửi thông báo lên cơ sở dữ liệu
             await sendNotification({
-                table_number: tableNumber,
-                title: "Yêu cầu hỗ trợ",
-                content: `Khách hàng ở bàn ${tableNumber} cần sự hỗ trợ từ nhân viên.`,
-                type: "TableRequest",
+                tableNumber: parseInt(tableNumber, 10), // Đảm bảo tableNumber là số
+                content: `Khách tại bàn ${tableNumber} cần sự hỗ trợ từ nhân viên.`,
             });
 
+            // Hiển thị hộp thoại chờ
             setShowAlert(true);
             setTimeout(() => {
-                setShowAlert(false);
+                setShowAlert(false); // Tắt hộp thoại sau 2 giây
             }, 2000);
         } catch (error) {
             console.error("Error sending notification:", error);
@@ -150,8 +150,6 @@ const TableInfo = () => {
     return (
         <div className="text-center font-bold text-lg">
             BÀN: {table.tableNumber}
-            <p>Sức chứa: {table.capacity}</p>
-            <p>Trạng thái: {table.status}</p>
         </div>
     );
 };
