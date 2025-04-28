@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final TableRepository tableRepository;
+    private final WebSocketService webSocketService;
+
+    private static final String NOTIFICATION_TOPIC = "/topic/notifications";
 
     public List<NotificationResponseDTO> getAllNotifications() {
         List<Notifications> notifications = notificationRepository.findAll();
@@ -47,13 +50,16 @@ public class NotificationService {
 
             Notifications savedNotification = notificationRepository.save(notification);
 
-            return ResponseEntity.ok(new NotificationResponseDTO(
+            ResponseEntity<?> response = ResponseEntity.ok(new NotificationResponseDTO(
                     savedNotification.getNotificationId(),
                     savedNotification.getTable().getTableNumber(),
                     savedNotification.getTitle(),
                     savedNotification.getContent(),
                     savedNotification.getCreatedAt(),
                     savedNotification.isRead()));
+
+        webSocketService.sendMessage(NOTIFICATION_TOPIC, getAllNotifications());
+        return response;
     }
 
     public void updateNotificationReadStatus(Integer notificationId, boolean isRead) {
@@ -61,6 +67,7 @@ public class NotificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
         notification.setRead(isRead);
         notificationRepository.save(notification);
+        webSocketService.sendMessage(NOTIFICATION_TOPIC, getAllNotifications());
     }
 
     public void deleteNotification(Integer notificationId) {
@@ -68,5 +75,6 @@ public class NotificationService {
             throw new ResourceNotFoundException("Notification not found");
         }
         notificationRepository.deleteById(notificationId);
+        webSocketService.sendMessage(NOTIFICATION_TOPIC, getAllNotifications());
     }
 }

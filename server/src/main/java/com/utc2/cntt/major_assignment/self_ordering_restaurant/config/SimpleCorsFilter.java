@@ -19,32 +19,17 @@ public class SimpleCorsFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
-        // Ghi log để debug
-        System.out.println("CORS Filter processing: " + request.getMethod() + " " + request.getRequestURI());
-
-        // Cấu hình CORS headers cho response
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // Change from wildcard
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Requested-With");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        // Nếu là OPTIONS request, trả về OK ngay lập tức
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            System.out.println("Responding to OPTIONS request with 200 OK");
             response.setStatus(HttpServletResponse.SC_OK);
-            return; // Kết thúc xử lý ngay, không chuyển xuống chain
+            return;
         }
 
-        // Tiếp tục chuỗi filter
         chain.doFilter(req, res);
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) {
-    }
-
-    @Override
-    public void destroy() {
     }
 }

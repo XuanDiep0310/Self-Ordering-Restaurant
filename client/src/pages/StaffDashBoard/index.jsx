@@ -6,6 +6,7 @@ import FoodList from "../../components/Staff/FoodList";
 import NotificationList from "../../components/Staff/NotificationList";
 import "../../assets/styles/custom.css";
 import { getTableData } from "../../services/tableService";
+import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
 
 const StaffDashboard = () => {
   const [tables, setTables] = useState([]);
@@ -13,7 +14,22 @@ const StaffDashboard = () => {
 
   useEffect(() => {
     getTableData().then((data) => setTables(data));
-  }, []);
+
+    // WebSocket connection
+    let subscription;
+    const onConnect = () => {
+        subscription = subscribeTopic("/topic/tables", (data) => {
+            setTables(data);
+        });
+    };
+
+    connectWebSocket(onConnect);
+
+    return () => {
+        if (subscription) subscription.unsubscribe();
+        disconnectWebSocket();
+    };
+}, []);
 
   return (
     <div className="min-h-screen background-image">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../config/axios";
 import OrderModal from "./OrderModal";
+import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
 
 const TableItem = ({ table }) => {
     const [showOrderModal, setShowOrderModal] = useState(false);
@@ -15,7 +16,7 @@ const TableItem = ({ table }) => {
             const response = await axiosInstance.get(
                 `/api/orders/pending-items/${table.tableNumber}`
             );
-            const data = Array.isArray(response.data) ? response.data : []; // Đảm bảo dữ liệu là mảng
+            const data = Array.isArray(response.data) ? response.data : [];
             setPendingItems(data);
         } catch (err) {
             setError("Không thể tải dữ liệu, vui lòng thử lại sau");
@@ -26,8 +27,43 @@ const TableItem = ({ table }) => {
     };
 
     useEffect(() => {
+        // Initial fetch
         fetchPendingItems();
-    }, []);
+
+        // WebSocket setup
+        let wsClient;
+        let subscription;
+
+        const setupWebSocket = () => {
+            const onConnect = () => {
+                console.log(`Subscribing to table ${table.tableNumber} updates...`);
+                subscription = subscribeTopic(
+                    `/topic/table-dishes/${table.tableNumber}`,
+                    (data) => {
+                        console.log(`Received update for table ${table.tableNumber}:`, data);
+                        if (Array.isArray(data)) {
+                            setPendingItems(data);
+                        }
+                    }
+                );
+            };
+
+            wsClient = connectWebSocket(onConnect);
+        };
+
+        setupWebSocket();
+
+        // Cleanup
+        return () => {
+            console.log(`Cleaning up WebSocket for table ${table.tableNumber}`);
+            if (subscription) {
+                subscription.unsubscribe();
+            }
+            if (wsClient) {
+                disconnectWebSocket();
+            }
+        };
+    }, [table.tableNumber]);
 
     const handleBellClick = () => {
         setShowOrderModal(true);

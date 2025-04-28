@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPendingFoodItems } from "../../services/foodService";
+import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
 
 const FoodList = () => {
   const [foodItems, setFoodItems] = useState([]);
@@ -7,18 +8,33 @@ const FoodList = () => {
 
   useEffect(() => {
     const fetchFoodItems = async () => {
-      try {
-        const data = await getPendingFoodItems(); // Gọi API từ foodService
-        setFoodItems(data);
-      } catch (error) {
-        console.error("Error fetching food items:", error);
-      } finally {
-        setLoading(false);
-      }
+        try {
+            const data = await getPendingFoodItems();
+            setFoodItems(data);
+        } catch (error) {
+            console.error("Error fetching food items:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     fetchFoodItems();
-  }, []);
+
+    // WebSocket connection
+    let subscription;
+    const onConnect = () => {
+        subscription = subscribeTopic("/topic/pending-dishes", (data) => {
+            setFoodItems(data);
+        });
+    };
+
+    connectWebSocket(onConnect);
+
+    return () => {
+        if (subscription) subscription.unsubscribe();
+        disconnectWebSocket();
+    };
+}, []);
 
   if (loading) {
     return (

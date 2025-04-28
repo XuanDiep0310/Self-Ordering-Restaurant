@@ -6,16 +6,19 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Tables;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.TableRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TableService {
-    @Autowired
-    private TableRepository tableRepository;
+    private final TableRepository tableRepository;
+    private final WebSocketService webSocketService;
+
+    private static final String TABLES_TOPIC = "/topic/tables";
 
     @Transactional
     public List<TableResponseDTO> getAllTables() {
@@ -30,6 +33,8 @@ public class TableService {
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + tableNumber));
         table.setStatus(tableRequestDTO.getStatus());
         tableRepository.save(table);
+
+        webSocketService.sendMessage(TABLES_TOPIC, getAllTables());
     }
 
     public TableResponseDTO getTableByTableNumber(Integer tableNumber) {

@@ -15,7 +15,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.key.KeyOrd
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.*;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -25,21 +25,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
-    @Autowired
-    OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final CustomerRepository customerRepository;
+    private final TableRepository tableRepository;
+    private final DishRepository dishRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final WebSocketService webSocketService;
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
-    private TableRepository tableRepository;
-
-    @Autowired
-    private DishRepository dishRepository;
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
+    private static final String PENDING_DISHES_TOPIC = "/topic/pending-dishes";
+    private static final String TABLE_DISHES_TOPIC = "/topic/table-dishes/";
 
     @Transactional
     public void createOrder(OrderRequestDTO orderRequestDTO) {
@@ -104,6 +100,10 @@ public class OrderService {
 //        response.setStatus(savedOrder.getStatus());
 //
 //        return response;
+
+        webSocketService.sendMessage(TABLE_DISHES_TOPIC + orderRequestDTO.getTableId(),
+                getPendingItemsForTable(orderRequestDTO.getTableId()));
+        webSocketService.sendMessage(PENDING_DISHES_TOPIC, getPendingOrderItems());
     }
 
 
@@ -127,6 +127,12 @@ public class OrderService {
 
         order.setStatus(updateOrderStatusDTO.getStatus());
         orderRepository.save(order);
+
+        // Gửi WebSocket update
+        Integer tableNumber = order.getTable().getTableNumber();
+        webSocketService.sendMessage(TABLE_DISHES_TOPIC + tableNumber,
+                getPendingItemsForTable(tableNumber));
+        webSocketService.sendMessage(PENDING_DISHES_TOPIC, getPendingOrderItems());
     }
 
     private static final List<OrderItemStatus> PENDING_STATUSES = Arrays.asList(

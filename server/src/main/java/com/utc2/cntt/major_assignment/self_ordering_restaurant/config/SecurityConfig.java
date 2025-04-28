@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/tables/**").permitAll()
                         .requestMatchers("/api/feedback/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
 
                         // Staff endpoints
                         .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
@@ -83,11 +84,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Cho phép tất cả các origin
-        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
-
-        // Cho phép tất cả các phương thức HTTP
+        configuration.setAllowedOriginPatterns(Collections.singletonList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
         // Cho phép tất cả các header phổ biến

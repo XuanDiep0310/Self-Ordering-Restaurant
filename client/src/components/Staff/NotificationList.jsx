@@ -4,6 +4,7 @@ import {
   markAsRead,
   deleteNotification,
 } from "../../services/notificationService";
+import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
 
 const NotificationList = () => {
   const [notifications, setNotifications] = useState([]);
@@ -11,7 +12,25 @@ const NotificationList = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+
+    // WebSocket connection
+    let subscription;
+    const onConnect = () => {
+        subscription = subscribeTopic("/topic/notifications", (data) => {
+            const sortedData = data.sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            setNotifications(sortedData);
+        });
+    };
+
+    connectWebSocket(onConnect);
+
+    return () => {
+        if (subscription) subscription.unsubscribe();
+        disconnectWebSocket();
+    };
+}, []);
 
   const fetchNotifications = async () => {
     try {
