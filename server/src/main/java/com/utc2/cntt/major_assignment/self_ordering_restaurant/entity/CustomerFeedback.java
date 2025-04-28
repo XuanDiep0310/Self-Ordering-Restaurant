@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class CustomerFeedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "deedback_id")
+    @Column(name = "feedback_id")
     private Integer feedbackId;
 
     @ManyToOne

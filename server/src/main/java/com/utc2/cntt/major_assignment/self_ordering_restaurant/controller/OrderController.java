@@ -5,6 +5,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.Updat
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.OrderResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@RequiredArgsConstructor
 public class OrderController {
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {

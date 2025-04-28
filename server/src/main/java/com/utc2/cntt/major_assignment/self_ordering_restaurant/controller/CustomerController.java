@@ -3,6 +3,7 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.controller;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.CustomerRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.CustomerResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.CustomerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
+@RequiredArgsConstructor
 public class CustomerController {
-    @Autowired
-    CustomerService customerService;
+    private final CustomerService customerService;
 
     @GetMapping
     public ResponseEntity<List<CustomerResponseDTO>> getAllCustomer() {

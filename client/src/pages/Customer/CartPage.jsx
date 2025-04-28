@@ -68,6 +68,7 @@ const CartPage = () => {
                 items: cart.map((item) => ({
                     dishId: item.dishId,
                     quantity: item.quantity,
+                    note: item.note || "",
                 })),
             };
 

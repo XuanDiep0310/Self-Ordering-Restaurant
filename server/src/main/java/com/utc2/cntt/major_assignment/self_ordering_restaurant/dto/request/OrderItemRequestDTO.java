@@ -12,4 +12,5 @@ import lombok.Setter;
 public class OrderItemRequestDTO {
     private Integer dishId;
     private int quantity;
+    private String note;
 }
