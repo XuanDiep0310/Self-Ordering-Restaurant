@@ -3,7 +3,7 @@ import axiosInstance from "../config/axios";
 // Hàm gửi đánh giá
 export const sendFeedback = async (reviewData) => {
     try {
-        const response = await axiosInstance.post("/reviews", reviewData);
+        const response = await axiosInstance.post("/api/feedback", reviewData);
         return response.data; // Trả về đánh giá vừa thêm
     } catch (error) {
         console.error("Error sending review:", error);
@@ -14,7 +14,7 @@ export const sendFeedback = async (reviewData) => {
 // Hàm lấy danh sách đánh giá
 export const getReviews = async () => {
     try {
-        const response = await axiosInstance.get("/reviews");
+        const response = await axiosInstance.get("/api/feedback");
         return response.data; // Trả về danh sách đánh giá
     } catch (error) {
         console.error("Error fetching reviews:", error);

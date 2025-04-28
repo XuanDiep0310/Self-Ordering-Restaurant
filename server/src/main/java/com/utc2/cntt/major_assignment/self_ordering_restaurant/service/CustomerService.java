@@ -9,6 +9,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.OrderR
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.PaymentRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +21,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CustomerService {
-    @Autowired
-    CustomerRepository customerRepository;
+
+    private final CustomerRepository customerRepository;
 
     @Autowired
     UserRepository userRepository;

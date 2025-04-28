@@ -88,6 +88,7 @@ public class OrderService {
             orderItem.setOrder(order);
             orderItem.setDish(dish);
             orderItem.setQuantity(itemDTO.getQuantity());
+            orderItem.setNotes(itemDTO.getNote());
             orderItem.setUnitPrice(dish.getPrice());
 
             orderItemsList.add(orderItem);

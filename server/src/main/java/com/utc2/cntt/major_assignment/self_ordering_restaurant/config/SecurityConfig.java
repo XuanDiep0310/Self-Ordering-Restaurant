@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/dishes/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/tables/**").permitAll()
+                        .requestMatchers("/api/feedback/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
                         // Staff endpoints
