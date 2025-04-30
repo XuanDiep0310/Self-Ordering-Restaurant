@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getPendingItemsByTable } from "../../services/orderService";
+import { getBillByTable } from "../../services/orderService";
 
 const OrderPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const tableNumber = searchParams.get("tableNumber");
-    const [pendingItems, setPendingItems] = useState([]);
+    const [billItems, setBillItems] = useState([]);
     const [total, setTotal] = useState(0);
 
     useEffect(() => {
-        const fetchPendingItems = async () => {
+        const fetchBillItems = async () => {
             try {
-                const data = await getPendingItemsByTable(tableNumber);
-                setPendingItems(data);
+                const data = await getBillByTable(tableNumber);
+                setBillItems(data);
 
                 // Tính tổng tiền
-                const totalAmount = data.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
+                const totalAmount = data.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
                 setTotal(totalAmount);
             } catch (error) {
-                console.error("Error fetching pending items:", error);
-                alert("Đã xảy ra lỗi khi tải danh sách món ăn. Vui lòng thử lại!");
+                console.error(`Error fetching bill for table ${tableNumber}:`, error);
+                alert("Đã xảy ra lỗi khi tải hóa đơn. Vui lòng thử lại!");
             }
         };
 
-        fetchPendingItems();
+        fetchBillItems();
     }, [tableNumber]);
 
     const handlePayment = () => {
         // Điều hướng đến trang hóa đơn
-        navigate(`/invoice/customer?tableNumber=${tableNumber}`, {
+        navigate(`/invoice?tableNumber=${tableNumber}`, {
             state: {
-                pendingItems,
+                billItems,
                 total,
                 tableNumber,
             },
@@ -48,15 +48,15 @@ const OrderPage = () => {
                 >
                     &#8592; Quay lại
                 </button>
-                <h1 className="font-bold text-lg">Món ăn bàn {tableNumber}</h1>
+                <h1 className="font-bold text-lg">Hóa đơn bàn {tableNumber}</h1>
             </div>
 
             {/* Content */}
             <div className="p-4 pb-25">
-                {pendingItems.length === 0 ? (
-                    <p className="text-center text-gray-500">Không có món ăn nào đang chờ xử lý</p>
+                {billItems.length === 0 ? (
+                    <p className="text-center text-gray-500">Không có món ăn nào trong hóa đơn</p>
                 ) : (
-                    pendingItems.map((item, index) => (
+                    billItems.map((item, index) => (
                         <div
                             key={index}
                             className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-4"
@@ -72,7 +72,7 @@ const OrderPage = () => {
                                 {item.notes && <p className="text-gray-400 italic">Ghi chú: {item.notes}</p>}
                             </div>
                             <span className="font-bold">
-                                {(item.quantity * item.unit_price).toLocaleString()}Đ
+                                {(item.quantity * item.unitPrice).toLocaleString()}Đ
                             </span>
                         </div>
                     ))
@@ -80,7 +80,7 @@ const OrderPage = () => {
             </div>
 
             {/* Footer */}
-            {pendingItems.length > 0 && (
+            {billItems.length > 0 && (
                 <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow-md flex justify-between items-center z-10">
                     <span className="font-bold text-lg">Tổng: {total.toLocaleString()}Đ</span>
                     <button
