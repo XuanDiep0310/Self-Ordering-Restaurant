@@ -1,5 +1,9 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderItemRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.UpdateOrderStatusDTO;
@@ -18,8 +22,12 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.Resourc
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -159,5 +167,58 @@ public class OrderService {
 
     public List<BillItemDTO> getBillForTable(Integer tableNumber) {
         return orderItemRepository.getBillForTable(tableNumber);
+    }
+
+    public ResponseEntity<byte[]> exportBillPdf(Integer tableNumber) {
+        List<BillItemDTO> billItems = getBillForTable(tableNumber);
+
+        Document document = new Document();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            document.add(new Paragraph("Restaurant Bill"));
+            document.add(new Paragraph("Table Number: " + tableNumber));
+            document.add(new Paragraph(" "));
+
+            PdfPTable table = new PdfPTable(5);
+            table.addCell("Dish");
+            table.addCell("Quantity");
+            table.addCell("Unit Price");
+            table.addCell("Subtotal");
+            table.addCell("Order Date");
+
+            for (BillItemDTO item : billItems) {
+                table.addCell(item.getDishName());
+                table.addCell(String.valueOf(item.getQuantity()));
+                table.addCell(String.valueOf(item.getUnitPrice()));
+                table.addCell(String.valueOf(item.getSubTotal()));
+                table.addCell(item.getOrderDate().toString());
+            }
+
+            // Add total
+            if (!billItems.isEmpty()) {
+                table.addCell("");
+                table.addCell("");
+                table.addCell("");
+                table.addCell("Total:");
+                table.addCell(String.valueOf(billItems.get(0).getTotalAmount()));
+            }
+
+            document.add(table);
+            document.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "bill_table_" + tableNumber + ".pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(out.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
     }
 }

@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from "react";
 import Logo from '../../assets/images/logo.png';
-import { getBillByTable } from '../../services/orderService';
+import { getBillByTable, downloadBillPDF } from '../../services/orderService';
 
 const BillModal = ({ tableNumber, isOpen, onClose }) => {
   const [billItems, setBillItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handlePrintBill = async () => {
+    try {
+      setDownloading(true);
+      await downloadBillPDF(tableNumber);
+    } catch (error) {
+      console.error('Error printing bill:', error);
+      setError('Không thể tải hóa đơn PDF');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchBillData = async () => {
@@ -109,11 +122,23 @@ const BillModal = ({ tableNumber, isOpen, onClose }) => {
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            disabled={downloading}
           >
             Thoát
           </button>
-          <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-            In phiếu
+          <button
+            onClick={handlePrintBill}
+            disabled={downloading}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center gap-2"
+          >
+            {downloading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white"></div>
+                <span>Đang tải...</span>
+              </>
+            ) : (
+              <span>In phiếu</span>
+            )}
           </button>
         </div>
       </div>
