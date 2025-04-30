@@ -28,7 +28,8 @@ const OrderPage = () => {
     }, [tableNumber]);
 
     const handlePayment = () => {
-        navigate("/invoice", {
+        // Điều hướng đến trang hóa đơn
+        navigate(`/invoice/customer?tableNumber=${tableNumber}`, {
             state: {
                 pendingItems,
                 total,
@@ -39,6 +40,7 @@ const OrderPage = () => {
 
     return (
         <div className="bg-gray-100 h-screen overflow-y-auto">
+            {/* Header */}
             <div className="sticky top-0 h-[10%] flex items-center justify-between p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg shadow-md">
                 <button
                     className="text-white text-lg"
@@ -49,6 +51,7 @@ const OrderPage = () => {
                 <h1 className="font-bold text-lg">Món ăn bàn {tableNumber}</h1>
             </div>
 
+            {/* Content */}
             <div className="p-4 pb-25">
                 {pendingItems.length === 0 ? (
                     <p className="text-center text-gray-500">Không có món ăn nào đang chờ xử lý</p>
@@ -76,6 +79,7 @@ const OrderPage = () => {
                 )}
             </div>
 
+            {/* Footer */}
             {pendingItems.length > 0 && (
                 <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow-md flex justify-between items-center z-10">
                     <span className="font-bold text-lg">Tổng: {total.toLocaleString()}Đ</span>
