@@ -11,3 +11,4 @@ public interface DishRepository extends JpaRepository<Dishes, Integer> {
 
     List<Dishes> findByCategory_CategoryId(Integer categoryId);
 }
+
