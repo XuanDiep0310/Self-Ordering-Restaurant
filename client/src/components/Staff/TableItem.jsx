@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../config/axios";
 import OrderModal from "./OrderModal";
-import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
+import BillModal from "./BillModal";
+import { subscribeTopic } from "../../config/websocket";
 
 const TableItem = ({ table }) => {
     const [showOrderModal, setShowOrderModal] = useState(false);
+    const [showBillModal, setShowBillModal] = useState(false);
     const [pendingItems, setPendingItems] = useState([]); // Đảm bảo giá trị mặc định là mảng
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -27,41 +29,51 @@ const TableItem = ({ table }) => {
     };
 
     useEffect(() => {
-        // Initial fetch
         fetchPendingItems();
+        let subscriptions = [];
+        let mounted = true;
 
-        // WebSocket setup
-        let wsClient;
-        let subscription;
+        const setupSubscriptions = async () => {
+            try {
+                console.log(`Setting up subscriptions for table ${table.tableNumber}`);
 
-        const setupWebSocket = () => {
-            const onConnect = () => {
-                console.log(`Subscribing to table ${table.tableNumber} updates...`);
-                subscription = subscribeTopic(
+                // Subscribe to table-specific dish updates
+                const dishSubscription = await subscribeTopic(
                     `/topic/table-dishes/${table.tableNumber}`,
                     (data) => {
-                        console.log(`Received update for table ${table.tableNumber}:`, data);
+                        if (!mounted) return;
+                        console.log(`Received dish update for table ${table.tableNumber}:`, data);
                         if (Array.isArray(data)) {
                             setPendingItems(data);
                         }
                     }
                 );
-            };
 
-            wsClient = connectWebSocket(onConnect);
+                // Subscribe to table status updates
+                const tableSubscription = await subscribeTopic(
+                    `/topic/tables`,
+                    (data) => {
+                        if (!mounted) return;
+                        console.log(`Received tables update:`, data);
+                    }
+                );
+
+                if (dishSubscription) subscriptions.push(dishSubscription);
+                if (tableSubscription) subscriptions.push(tableSubscription);
+            } catch (error) {
+                console.error('Error setting up subscriptions:', error);
+            }
         };
 
-        setupWebSocket();
+        setupSubscriptions();
 
-        // Cleanup
         return () => {
+            mounted = false;
             console.log(`Cleaning up WebSocket for table ${table.tableNumber}`);
-            if (subscription) {
-                subscription.unsubscribe();
-            }
-            if (wsClient) {
-                disconnectWebSocket();
-            }
+            subscriptions.forEach(sub => {
+                if (sub) sub.unsubscribe();
+            });
+            // Don't disconnect here as other components might be using the connection
         };
     }, [table.tableNumber]);
 
@@ -77,6 +89,10 @@ const TableItem = ({ table }) => {
     const pendingItemCount = Array.isArray(pendingItems)
         ? pendingItems.reduce((sum, item) => sum + item.quantity, 0)
         : 0;
+
+    const handleReceiptClick = () => {
+        setShowBillModal(true);
+    };
 
     return (
         <div className="text-white flex flex-col">
@@ -96,7 +112,7 @@ const TableItem = ({ table }) => {
                         )}
                     </i>
                 </button>
-                <button className="cursor-pointer">
+                <button className="cursor-pointer" onClick={handleReceiptClick}>
                     <i className="fa-solid fa-receipt text-4xl"></i>
                 </button>
             </div>
@@ -114,6 +130,13 @@ const TableItem = ({ table }) => {
                     closeModal={closeModal}
                 />
             )}
+
+            {/* Add BillModal */}
+            <BillModal
+                tableNumber={table.tableNumber}
+                isOpen={showBillModal}
+                onClose={() => setShowBillModal(false)}
+            />
         </div>
     );
 };

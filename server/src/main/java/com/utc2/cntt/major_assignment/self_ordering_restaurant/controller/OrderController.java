@@ -2,11 +2,11 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.controller;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.UpdateOrderStatusDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.OrderResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +54,11 @@ public class OrderController {
     public ResponseEntity<List<PendingDishItemDTO>> getPendingOrderItems() {
         List<PendingDishItemDTO> pendingItems = orderService.getPendingOrderItems();
         return new ResponseEntity<>(pendingItems, HttpStatus.OK);
+    }
+
+    @GetMapping("/bill/{tableNumber}")
+    public ResponseEntity<List<BillItemDTO>> getBill(@PathVariable Integer tableNumber) {
+        List<BillItemDTO> bill = orderService.getBillForTable(tableNumber);
+        return ResponseEntity.ok(bill);
     }
 }

@@ -6,9 +6,8 @@ import axiosInstance from "../config/axios";
 export const createOrder = async (orderData) => {
     try {
         const response = await axiosInstance.post("/api/orders", orderData);
-        console.log("sdfjấdf: ", response.data);
         return response.data; // Trả về dữ liệu đơn hàng vừa tạo
-   
+
     } catch (error) {
         console.error("Error creating order:", error);
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm
@@ -61,5 +60,15 @@ export const getPendingItemsByTable = async (tableId) => {
     } catch (error) {
         console.error(`Error fetching pending items for table ${tableId}:`, error);
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+    }
+};
+
+export const getBillByTable = async (tableNumber) => {
+    try {
+        const response = await axiosInstance.get(`/api/orders/bill/${tableNumber}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching bill for table ${tableNumber}:`, error);
+        throw error;
     }
 };
