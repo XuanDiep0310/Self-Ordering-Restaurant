@@ -62,19 +62,24 @@ const Inventory = () => {
                 <th className="p-4">Cập nhật lần cuối</th>
               </tr>
             </thead>
-            <tbody>
-              {inventoryItems.map((item) => (
-                <tr key={item.inventoryId} className="border-b">
-                  <td className="p-4">{item.inventoryId}</td>
-                  <td className="p-4">{item.ingredientName}</td>
-                  <td className="p-4">{item.supplierName}</td>
-                  <td className="p-4">{item.quantity}</td>
-                  <td className="p-4">{item.unit}</td>
-                  <td className="p-4">{new Date(item.lastUpdated).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
           </table>
+          {/* Thêm thanh cuộn cho nội dung */}
+          <div className="max-h-96 overflow-y-auto">
+            <table className="w-full text-left border-collapse">
+              <tbody>
+                {inventoryItems.map((item) => (
+                  <tr key={item.inventoryId} className="border-b">
+                    <td className="p-4">{item.inventoryId}</td>
+                    <td className="p-4">{item.ingredientName}</td>
+                    <td className="p-4">{item.supplierName}</td>
+                    <td className="p-4">{item.quantity}</td>
+                    <td className="p-4">{item.unit}</td>
+                    <td className="p-4">{new Date(item.lastUpdated).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
