@@ -1,5 +1,6 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.repository;
 
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.OrderItems;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus;
@@ -33,4 +34,15 @@ public interface OrderItemRepository extends JpaRepository<OrderItems, KeyOrderI
             "WHERE oi.status IN :statuses " +
             "GROUP BY d.name, d.image")
     List<PendingDishItemDTO> findPendingOrderItems(@Param("statuses") List<OrderItemStatus> statuses);
+
+    OrderItems findByOrderItemId(KeyOrderItem orderItemId);
+
+    // src/main/java/com/utc2/cntt/major_assignment/self_ordering_restaurant/repository/OrderItemRepository.java
+    @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO(" +
+            "o.table.tableNumber, o.orderId, d.name, oi.quantity, d.price, (oi.quantity * d.price), o.totalAmount, o.orderDate) " +
+            "FROM OrderItems oi " +
+            "JOIN oi.order o " +
+            "JOIN oi.dish d " +
+            "WHERE o.table.tableNumber = :tableNumber AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid")
+    List<BillItemDTO> getBillForTable(@Param("tableNumber") Integer tableNumber);
 }

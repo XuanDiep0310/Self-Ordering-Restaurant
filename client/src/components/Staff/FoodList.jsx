@@ -1,45 +1,80 @@
 import { useEffect, useState } from "react";
 import { getPendingFoodItems } from "../../services/foodService";
-import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
+import { subscribeTopic } from "../../config/websocket";
 
 const FoodList = () => {
-  const [foodItems, setFoodItems] = useState([]);
+  const [foodItems, setFoodItems] = useState([]); // Khởi tạo với mảng rỗng
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchFoodItems = async () => {
-        try {
-            const data = await getPendingFoodItems();
-            setFoodItems(data);
-        } catch (error) {
-            console.error("Error fetching food items:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    let mounted = true;
+    let subscription = null;
 
-    fetchFoodItems();
-
-    // WebSocket connection
-    let subscription;
-    const onConnect = () => {
-        subscription = subscribeTopic("/topic/pending-dishes", (data) => {
-            setFoodItems(data);
+    const setupWebSocket = async () => {
+      try {
+        subscription = await subscribeTopic("/topic/pending-dishes", (data) => {
+          if (mounted) {
+            console.log("Received food items update:", data);
+            setFoodItems(Array.isArray(data) ? data : []); // Đảm bảo luôn là array
+          }
         });
+      } catch (error) {
+        console.error("WebSocket setup error:", error);
+        if (mounted) {
+          setError("Không thể kết nối đến server");
+        }
+      }
     };
 
-    connectWebSocket(onConnect);
+    // Fetch initial data and setup WebSocket
+    const init = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getPendingFoodItems();
+        if (mounted) {
+          setFoodItems(Array.isArray(response) ? response : []); // Đảm bảo luôn là array
+        }
+        await setupWebSocket();
+      } catch (error) {
+        console.error("Error fetching food items:", error);
+        if (mounted) {
+          setError("Không thể tải dữ liệu món ăn");
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    init();
 
     return () => {
-        if (subscription) subscription.unsubscribe();
-        disconnectWebSocket();
+      mounted = false;
+      if (subscription) {
+        try {
+          subscription.unsubscribe();
+        } catch (error) {
+          console.error("Error unsubscribing:", error);
+        }
+      }
     };
-}, []);
+  }, []);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 py-8">
+        {error}
       </div>
     );
   }
