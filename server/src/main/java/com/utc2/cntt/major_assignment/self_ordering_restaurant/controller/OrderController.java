@@ -61,4 +61,10 @@ public class OrderController {
         List<BillItemDTO> bill = orderService.getBillForTable(tableNumber);
         return ResponseEntity.ok(bill);
     }
+
+    // In OrderController.java
+    @GetMapping("/bill/{tableNumber}/pdf")
+    public ResponseEntity<byte[]> exportBillPdf(@PathVariable Integer tableNumber) {
+        return orderService.exportBillPdf(tableNumber);
+    }
 }
