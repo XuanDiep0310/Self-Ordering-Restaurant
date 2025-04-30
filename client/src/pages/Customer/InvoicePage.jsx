@@ -1,69 +1,98 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.png"; // Import logo
-import { updateTableStatus } from "../../services/tableService"; // Import hàm cập nhật trạng thái bàn
-import { updateOrderPaymentStatus } from "../../services/orderService"; // Import hàm cập nhật trạng thái thanh toán
+import { getBillByTable } from "../../services/orderService"; // Import hàm lấy danh sách món
+import { sendNotification } from "../../services/notificationService"; // Import hàm gửi thông báo
 
 const InvoicePage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { orderList, total, tableNumber } = location.state || {}; // Lấy dữ liệu từ state khi chuyển hướng
-
+    const { tableNumber } = location.state || {}; // Lấy số bàn từ state khi chuyển hướng
+    const [billItems, setBillItems] = useState([]); // Danh sách món ăn
+    const [total, setTotal] = useState(0); // Tổng tiền
+    const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
+    const [error, setError] = useState(null); // Trạng thái lỗi
     const [showPaymentOptions, setShowPaymentOptions] = useState(false); // Hiển thị hộp thoại thanh toán
     const [paymentMethod, setPaymentMethod] = useState("VNPay"); // Phương thức thanh toán mặc định
-    const [mergedItems, setMergedItems] = useState([]); // Danh sách món đã gộp
+    const [vnpayCode, setVnpayCode] = useState(""); // Mã thanh toán VNPay
+    const [paymentMessage, setPaymentMessage] = useState(""); // Thông báo thanh toán
 
     useEffect(() => {
-        // Gộp các món từ nhiều đơn hàng thành một danh sách duy nhất
-        const merged = {};
-        orderList?.forEach((order) => {
-            order.items.forEach((item) => {
-                if (merged[item.dish_id]) {
-                    merged[item.dish_id].quantity += item.quantity;
-                } else {
-                    merged[item.dish_id] = { ...item };
-                }
-            });
-        });
-        setMergedItems(Object.values(merged)); // Chuyển từ object sang array
-    }, [orderList]);
+        const fetchBillItems = async () => {
+            try {
+                setLoading(true);
+                const data = await getBillByTable(tableNumber); // Gọi API lấy danh sách món
+                setBillItems(data);
+
+                // Tính tổng tiền
+                const totalAmount = data.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+                setTotal(totalAmount);
+            } catch (error) {
+                console.error(`Error fetching bill for table ${tableNumber}:`, error);
+                setError("Không thể tải thông tin hóa đơn. Vui lòng thử lại!");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (tableNumber) {
+            fetchBillItems();
+        } else {
+            setError("Không tìm thấy số bàn. Vui lòng thử lại!");
+            setLoading(false);
+        }
+    }, [tableNumber]);
 
     const handleCompletePayment = async () => {
         try {
-            if (!orderList || !tableNumber) {
-                alert("Dữ liệu không hợp lệ. Vui lòng thử lại!");
+            if (!tableNumber) {
+                setPaymentMessage("Dữ liệu không hợp lệ. Vui lòng thử lại!");
                 return;
             }
 
-            // Cập nhật trạng thái thanh toán cho tất cả các đơn hàng liên quan đến bàn
-            for (const order of orderList) {
-                await updateOrderPaymentStatus(order.id, "Paid"); // Gọi API cập nhật trạng thái thanh toán
-            }
+            // Gửi thông báo lên cơ sở dữ liệu
+            await sendNotification({
+                tableNumber: parseInt(tableNumber, 10), // Đảm bảo tableNumber là số
+                content: `Khách tại bàn ${tableNumber} đã yêu cầu thanh toán.`,
+            });
 
-            // Cập nhật trạng thái bàn về "Available"
-            await updateTableStatus(tableNumber, "Available");
-
-            // Hiển thị thông báo thanh toán thành công
+            // Xử lý thanh toán theo phương thức
             if (paymentMethod === "VNPay") {
-                alert("Thanh toán qua VNPay thành công!");
+                // Tạo URL thanh toán giả VNPay
+                const vnpayUrl = `https://sandbox.vnpayment.vn/tryitnow/Home/CreateOrder?amount=${total}&orderId=${tableNumber}&orderInfo=Thanh toán bàn ${tableNumber}`;
+                setPaymentMessage("Đang chuyển hướng đến VNPay...");
+                setTimeout(() => {
+                    window.location.href = vnpayUrl; // Chuyển hướng đến VNPay
+                }, 2000);
             } else {
-                alert("Thanh toán bằng tiền mặt thành công!");
+                setPaymentMessage("vui lòng chờ nhân viên trong giây lát...!");
             }
 
-            // Xóa giỏ hàng khỏi localStorage
-            localStorage.removeItem("cart");
-
-            // Chuyển về trang HomePage của bàn
-            if (tableNumber) {
-                navigate(`/customer/home?tableNumber=${tableNumber}`); // Cập nhật link về trang HomePage
-            } else {
-                alert("Số bàn không hợp lệ. Vui lòng thử lại!");
-            }
+            // Chuyển về trang HomePage của bàn sau 2 giây
+            setTimeout(() => {
+                navigate(`/customer?tableNumber=${tableNumber}`);
+            }, 10000);
         } catch (error) {
             console.error("Error completing payment:", error);
-            alert("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");
+            setPaymentMessage("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-gray-500">Đang tải dữ liệu...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-red-500">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-gray-100 h-screen">
@@ -85,7 +114,6 @@ const InvoicePage = () => {
                 <p className="text-center text-sm">SDT: 0389379012</p>
                 <hr className="my-2" />
                 <p className="text-sm">Bàn: {tableNumber || "N/A"}</p>
-                <p className="text-sm">Phiếu thanh toán: { }</p>
                 <hr className="my-2" />
 
                 {/* Danh sách món */}
@@ -99,13 +127,13 @@ const InvoicePage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {mergedItems.map((item, index) => (
-                            <tr key={item.dish_id}>
-                                <td>{item.dish_name}</td>
+                        {billItems.map((item, index) => (
+                            <tr key={index}>
+                                <td>{item.dishName}</td>
                                 <td className="text-center">{item.quantity}</td>
-                                <td className="text-right">{item.unit_price.toLocaleString()}Đ</td>
+                                <td className="text-right">{item.unitPrice.toLocaleString()}Đ</td>
                                 <td className="text-right">
-                                    {(item.unit_price * item.quantity).toLocaleString()}Đ
+                                    {(item.unitPrice * item.quantity).toLocaleString()}Đ
                                 </td>
                             </tr>
                         ))}
@@ -128,12 +156,18 @@ const InvoicePage = () => {
             {/* Hộp thoại tùy chọn thanh toán */}
             {showPaymentOptions && (
                 <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-80 relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                            onClick={() => setShowPaymentOptions(false)} // Đóng hộp thoại
+                        >
+                            ✖
+                        </button>
                         <h2 className="text-lg font-bold mb-4 text-center">Tùy chọn thanh toán</h2>
                         <div className="mb-4">
                             <p className="text-sm">Phương thức thanh toán:</p>
                             <select
-                                className="w-full border p-2 rounded-lg"
+                                className="w-50 border p-2 rounded-lg"
                                 value={paymentMethod}
                                 onChange={(e) => setPaymentMethod(e.target.value)}
                             >
@@ -150,6 +184,15 @@ const InvoicePage = () => {
                         >
                             Thanh toán
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Thông báo thanh toán */}
+            {paymentMessage && (
+                <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50">
+                    <div className="bg-white p-4 rounded-lg shadow-lg">
+                        <p className="text-center text-lg font-bold">{paymentMessage}</p>
                     </div>
                 </div>
             )}
