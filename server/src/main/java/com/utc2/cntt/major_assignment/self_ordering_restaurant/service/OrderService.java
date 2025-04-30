@@ -3,6 +3,7 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderItemRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.UpdateOrderStatusDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.OrderResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Dishes;
@@ -11,6 +12,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Orders;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Tables;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderStatus;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.key.KeyOrderItem;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.*;
@@ -18,10 +20,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,78 +33,81 @@ public class OrderService {
     private final TableRepository tableRepository;
     private final DishRepository dishRepository;
     private final OrderItemRepository orderItemRepository;
+        private final TableService tableService;
     private final WebSocketService webSocketService;
 
     private static final String PENDING_DISHES_TOPIC = "/topic/pending-dishes";
     private static final String TABLE_DISHES_TOPIC = "/topic/table-dishes/";
+    private static final String TABLES_TOPIC = "/topic/tables";
 
     @Transactional
     public void createOrder(OrderRequestDTO orderRequestDTO) {
-        // Kiểm tra đầu vào có null không
         if (orderRequestDTO == null) {
             throw new IllegalArgumentException("Order request cannot be null");
         }
 
-        System.out.println("Received OrderRequestDTO: " + orderRequestDTO);
-
-        // Kiểm tra repository đã được inject chưa
-        if (customerRepository == null || tableRepository == null || orderRepository == null || dishRepository == null || orderItemRepository == null) {
-            throw new IllegalStateException("One or more repositories are not initialized!");
-        }
-
-        // Kiểm tra bàn có tồn tại không
         Tables table = tableRepository.findById(orderRequestDTO.getTableId())
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + orderRequestDTO.getTableId()));
 
-        // Tạo đơn hàng mới
-        Orders order = new Orders();
-        order.setTable(table);
-        order.setStatus(OrderStatus.Pending);
+        // Find existing unpaid order for the table
+        Orders order = orderRepository.findFirstByTableAndPaymentStatusOrderByOrderIdDesc(
+                        table, PaymentOrderStatus.Unpaid)
+                .orElseGet(() -> {
+                    // Create new order if none exists
+                    Orders newOrder = new Orders();
+                    newOrder.setTable(table);
+                    newOrder.setStatus(OrderStatus.Pending);
+                    newOrder.setPaymentStatus(PaymentOrderStatus.Unpaid);
+                    newOrder.setOrderDate(LocalDateTime.now());
+                    return orderRepository.save(newOrder);
+                });
 
-        // Lưu đơn hàng vào database
-        Orders savedOrder = orderRepository.save(order);
-        System.out.println("Created new order with ID: " + savedOrder.getOrderId());
-
-        // Kiểm tra danh sách món ăn có rỗng không
         if (orderRequestDTO.getItems() == null || orderRequestDTO.getItems().isEmpty()) {
             throw new IllegalArgumentException("Order must contain at least one item");
         }
 
-        // Lưu danh sách OrderItem
-        Set<OrderItems> orderItemsList = new HashSet<>();
+        Long additionalTotal = 0L;
+        // Process new items
         for (OrderItemRequestDTO itemDTO : orderRequestDTO.getItems()) {
             Dishes dish = dishRepository.findById(itemDTO.getDishId())
                     .orElseThrow(() -> new ResourceNotFoundException("Dish not found with id: " + itemDTO.getDishId()));
 
             KeyOrderItem orderItemId = new KeyOrderItem();
-            orderItemId.setOrderId(savedOrder.getOrderId());
+            orderItemId.setOrderId(order.getOrderId());
             orderItemId.setDishId(dish.getDishId());
 
-            OrderItems orderItem = new OrderItems();
-            orderItem.setOrderItemId(orderItemId);
-            orderItem.setOrder(order);
-            orderItem.setDish(dish);
-            orderItem.setQuantity(itemDTO.getQuantity());
-            orderItem.setNotes(itemDTO.getNote());
-            orderItem.setUnitPrice(dish.getPrice());
+            OrderItems existingItem = orderItemRepository.findByOrderItemId(orderItemId);
 
-            orderItemsList.add(orderItem);
+            if (existingItem != null) {
+                // Update existing item quantity
+                existingItem.setQuantity(existingItem.getQuantity() + itemDTO.getQuantity());
+                existingItem.setNotes(itemDTO.getNote());
+                orderItemRepository.save(existingItem);
+                additionalTotal += dish.getPrice() * itemDTO.getQuantity();
+            } else {
+                // Create new order item
+                OrderItems newOrderItem = new OrderItems();
+                newOrderItem.setOrderItemId(orderItemId);
+                newOrderItem.setOrder(order);
+                newOrderItem.setDish(dish);
+                newOrderItem.setQuantity(itemDTO.getQuantity());
+                newOrderItem.setNotes(itemDTO.getNote());
+                newOrderItem.setUnitPrice(dish.getPrice());
+                newOrderItem.setStatus(OrderItemStatus.Ordered);
+                orderItemRepository.save(newOrderItem);
+                additionalTotal += dish.getPrice() * itemDTO.getQuantity();
+            }
         }
 
-        // Lưu tất cả order items cùng một lúc
-        orderItemRepository.saveAll(orderItemsList);
-        System.out.println("Saved " + orderItemsList.size() + " order items.");
+        // Update total amount
+        order.setTotalAmount(order.getTotalAmount() + additionalTotal);
+        orderRepository.save(order);
 
-        // Trả về kết quả
-//        OrderResponseDTO response = new OrderResponseDTO();
-//        response.setOrderId(savedOrder.getOrderId());
-//        response.setStatus(savedOrder.getStatus());
-//
-//        return response;
-
-        webSocketService.sendMessage(TABLE_DISHES_TOPIC + orderRequestDTO.getTableId(),
-                getPendingItemsForTable(orderRequestDTO.getTableId()));
+        // Send WebSocket updates
+        webSocketService.sendMessage(TABLE_DISHES_TOPIC + table.getTableNumber(),
+                getPendingItemsForTable(table.getTableNumber()));
         webSocketService.sendMessage(PENDING_DISHES_TOPIC, getPendingOrderItems());
+        webSocketService.sendMessage(TABLES_TOPIC, tableService.getAllTables());
     }
 
 
@@ -143,7 +147,6 @@ public class OrderService {
     @Transactional
     public List<PendingDishItemDTO> getPendingItemsForTable(Integer tableNumber) {
         if (tableNumber == null || tableNumber <= 0) {
-            // Có thể throw exception hoặc trả về list rỗng tùy logic mong muốn
             throw new IllegalArgumentException("Table number must be positive.");
             // return Collections.emptyList();
         }
@@ -152,5 +155,9 @@ public class OrderService {
 
     public List<PendingDishItemDTO> getPendingOrderItems() {
         return orderItemRepository.findPendingOrderItems(PENDING_STATUSES);
+    }
+
+    public List<BillItemDTO> getBillForTable(Integer tableNumber) {
+        return orderItemRepository.getBillForTable(tableNumber);
     }
 }

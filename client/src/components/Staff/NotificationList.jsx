@@ -4,33 +4,57 @@ import {
   markAsRead,
   deleteNotification,
 } from "../../services/notificationService";
-import { connectWebSocket, subscribeTopic, disconnectWebSocket } from "../../config/websocket";
+import { subscribeTopic} from "../../config/websocket";
 
 const NotificationList = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchNotifications();
+    let mounted = true;
+    let subscription = null;
 
-    // WebSocket connection
-    let subscription;
-    const onConnect = () => {
-        subscription = subscribeTopic("/topic/notifications", (data) => {
+    const setupWebSocket = async () => {
+      try {
+        subscription = await subscribeTopic("/topic/notifications", (data) => {
+          if (mounted && Array.isArray(data)) {
+            console.log("Received notifications update:", data);
             const sortedData = data.sort(
-                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
             );
             setNotifications(sortedData);
+          }
         });
+      } catch (error) {
+        console.error("WebSocket setup error:", error);
+      }
     };
 
-    connectWebSocket(onConnect);
+    const init = async () => {
+      try {
+        setLoading(true);
+        await fetchNotifications();
+        await setupWebSocket();
+      } catch (error) {
+        console.error("Error initializing:", error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    init();
 
     return () => {
-        if (subscription) subscription.unsubscribe();
-        disconnectWebSocket();
+      mounted = false;
+      if (subscription) {
+        try {
+          subscription.unsubscribe();
+        } catch (error) {
+          console.error("Error unsubscribing:", error);
+        }
+      }
     };
-}, []);
+  }, []);
 
   const fetchNotifications = async () => {
     try {

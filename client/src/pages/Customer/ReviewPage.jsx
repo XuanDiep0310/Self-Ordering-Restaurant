@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "../../assets/images/logo.png";
 import { sendFeedback } from "../../services/feedbackService"; // Import hàm gửi đánh giá
 
 const ReviewPage = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const tableId = location.state?.tableId; // Lấy tableId từ state
+    const [searchParams] = useSearchParams();
+    const tableNumber = searchParams.get("tableNumber"); // Lấy tableNumber từ query parameters
     const [name, setName] = useState("");
     const [review, setReview] = useState("");
     const [rating, setRating] = useState(5); // Mặc định 5 sao
@@ -15,7 +15,7 @@ const ReviewPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!tableId) {
+        if (!tableNumber) {
             alert("Không tìm thấy thông tin bàn. Vui lòng thử lại!");
             return;
         }
@@ -23,9 +23,10 @@ const ReviewPage = () => {
         try {
             // Gửi đánh giá lên cơ sở dữ liệu
             await sendFeedback({
-                customer_id: 1, // ID khách hàng (cần thay bằng ID thực tế)
-                order_id: 1, // ID đơn hàng (cần thay bằng ID thực tế)
+                tableNumber: parseInt(tableNumber, 10), // Đảm bảo tableNumber là số
+                orderId: 20, // Thay bằng ID đơn hàng thực tế nếu có
                 rating,
+                name,
                 comment: review,
             });
 
@@ -35,7 +36,7 @@ const ReviewPage = () => {
             // Ẩn thông báo sau 2 giây và quay lại trang chủ
             setTimeout(() => {
                 setSuccess(false);
-                navigate(`/table/${tableId}`);
+                navigate(`/customer?tableNumber=${tableNumber}`); // Điều hướng về HomePage
             }, 2000);
         } catch (error) {
             console.error("Error submitting feedback:", error);

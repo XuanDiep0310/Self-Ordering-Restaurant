@@ -1,16 +1,16 @@
 import axiosInstance from "../config/axios";
 
 // Hàm gửi đánh giá
-export const sendFeedback = async (reviewData) => {
+
+export const sendFeedback = async (feedbackData) => {
     try {
-        const response = await axiosInstance.post("/api/feedback", reviewData);
-        return response.data; // Trả về đánh giá vừa thêm
+        const response = await axiosInstance.post("/api/feedback", feedbackData);
+        return response.data; // Trả về dữ liệu phản hồi từ API
     } catch (error) {
-        console.error("Error sending review:", error);
+        console.error("Error sending feedback:", error);
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm
     }
 };
-
 // Hàm lấy danh sách đánh giá
 export const getReviews = async () => {
     try {
