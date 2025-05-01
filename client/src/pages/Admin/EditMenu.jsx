@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCategories } from "../../services/categoriesService";
 import { getFoodItemsByCategory } from "../../services/foodService";
+import { deleteFoodItem } from "../../services/foodService";
 
 const EditMenu = () => {
   const [categories, setCategories] = useState([]);
@@ -175,29 +176,48 @@ const EditMenu = () => {
     }
   };
 
-  const handleDeleteDish = async (dishId, categoryId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
-      try {
-        await axiosInstance.delete(`api/dishes/${dishId}`);
+  // const handleDeleteDish = async (dishId, categoryId) => {
+  //   if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
+  //     try {
+  //       // await axiosInstance.delete(`api/dishes/${dishId}`);
+  //       cat.items.filter((item) => item.dishId !== dishId)
 
-        const updatedCategories = categories.map((cat) => {
-          if (cat.categoryId === categoryId) {
-            return {
-              ...cat,
-              items: cat.items.filter((item) => item.dishId !== dishId),
-            };
-          }
-          return cat;
-        });
+  //       const updatedCategories = categories.map((cat) => {
+  //         if (cat.categoryId === categoryId) {
+  //           return {
+  //             ...cat,
+  //             items: cat.items.filter((item) => item.dishId !== dishId),
+  //           };
+  //         }
+  //         return cat;
+  //       });
 
-        setCategories(updatedCategories);
-        alert("Món ăn đã được xóa thành công!");
-      } catch (error) {
-        console.error("Lỗi khi xóa món ăn:", error);
-        alert("Đã xảy ra lỗi khi xóa món ăn!");
-      }
+  //       setCategories(updatedCategories);
+  //       alert("Món ăn đã được xóa thành công!");
+  //     } catch (error) {
+  //       console.error("Lỗi khi xóa món ăn:", error);
+  //       alert("Đã xảy ra lỗi khi xóa món ăn!");
+  //     }
+  //   }
+  // };
+  const handleDeleteDish = async (dishId, cat) => {
+    try {
+      await deleteFoodItem(dishId);
+      const updatedCategories = categories.map((c) => {
+        if (c.id === cat.id) {
+          return {
+            ...c,
+            dishes: c.dishes.filter((d) => d.id !== dishId),
+          };
+        }
+        return c;
+      });
+      setCategories(updatedCategories);
+    } catch (error) {
+      console.error("Lỗi khi xóa món ăn:", error);
     }
   };
+  
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -305,7 +325,8 @@ const EditMenu = () => {
                     </button>
                     <button
                       className="focus:outline-none"
-                      onClick={() => handleDeleteDish(item.id, selectedCategory)}
+                      // onClick={() => handleDeleteDish(item.id, selectedCategory)}
+                      onClick={() => handleDeleteDish(item.dishId, selectedCategory)}
                     >
                       <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
                     </button>

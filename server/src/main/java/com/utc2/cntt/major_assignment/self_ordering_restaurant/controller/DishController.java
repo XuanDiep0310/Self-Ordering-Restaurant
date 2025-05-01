@@ -31,4 +31,10 @@ public class DishController {
         dishService.addDish(dishRequestDTO);
         return ResponseEntity.ok("Dish added successfully!");
     }
+
+    @DeleteMapping("/{dishId}")
+    public ResponseEntity<?> deleteDish(@PathVariable Integer dishId) {
+        dishService.deleteDishById(dishId);
+        return ResponseEntity.ok("Dish deleted successfully!");
+    }
 }

@@ -5,3 +5,4 @@ public class ResourceExistsException extends RuntimeException {
         super(message);
     }
 }
+

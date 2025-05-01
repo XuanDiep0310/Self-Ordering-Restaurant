@@ -67,9 +67,9 @@ export const markAllAsRead = async () => {
 };
 
 // Hàm nhận thông báo theo bàn
-export const getNotificationsByTable = async (tableNumber) => {
+export const getUnreadNotificationsByTable = async (tableNumber) => {
   try {
-    const response = await axiosInstance.get(`/api/notifications/table/${tableNumber}`);
+    const response = await axiosInstance.get(`/api/notifications/table/${tableNumber}/unread`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching notifications for table ${tableNumber}:`, error);

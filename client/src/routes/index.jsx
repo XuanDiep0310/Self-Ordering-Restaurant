@@ -17,6 +17,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import ForbiddenPage from "../pages/Forbidden";
 import Feedback from "../pages/Admin/Feedback";
 import Inventory from "../pages/Admin/Inventory";
+import AdminInfo from "../pages/Admin/AdminInfo";
+import Revenue from "../pages/Admin/Revenue";
 
 // Tạo helper function để làm ngắn gọn code
 const adminRoute = (element) => (
@@ -47,9 +49,10 @@ const routes = [
   { path: "/admin/menu", element: adminRoute(<EditMenu />) },
   { path: "/admin/tables", element: adminRoute(<ManagementTable />) },
   { path: "/admin/employees", element: adminRoute(<Employees />) },
-  { path: "/admin/account", element: adminRoute(<Account />) },
+  { path: "/admin/account", element: adminRoute(<AdminInfo />) },
   { path: "/admin/feedback", element: adminRoute(<Feedback />) },
   { path: "/admin/inventory", element: adminRoute(<Inventory />) },
+  { path: "/admin/revenue", element: adminRoute(<Revenue />) },
 
 ];
 

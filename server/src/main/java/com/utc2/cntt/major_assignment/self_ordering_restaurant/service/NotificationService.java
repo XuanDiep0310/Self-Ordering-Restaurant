@@ -23,6 +23,7 @@ public class NotificationService {
     private final WebSocketService webSocketService;
 
     private static final String NOTIFICATION_TOPIC = "/topic/notifications";
+    private static final String NOTIFICATION_TABLE_TOPIC = "/topic/notifications/table/";
 
     public List<NotificationResponseDTO> getAllNotifications() {
         List<Notifications> notifications = notificationRepository.findAll();
@@ -57,7 +58,7 @@ public class NotificationService {
                     savedNotification.getContent(),
                     savedNotification.getCreatedAt(),
                     savedNotification.isRead()));
-
+        webSocketService.sendMessage(NOTIFICATION_TABLE_TOPIC + table.getTableNumber(), getUnreadNotificationsByTableNumber(table.getTableNumber()));
         webSocketService.sendMessage(NOTIFICATION_TOPIC, getAllNotifications());
         return response;
     }
@@ -67,6 +68,7 @@ public class NotificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
         notification.setRead(isRead);
         notificationRepository.save(notification);
+        webSocketService.sendMessage(NOTIFICATION_TABLE_TOPIC + notification.getTable().getTableNumber(), getUnreadNotificationsByTableNumber(notification.getTable().getTableNumber()));
         webSocketService.sendMessage(NOTIFICATION_TOPIC, getAllNotifications());
     }
 
@@ -76,5 +78,18 @@ public class NotificationService {
         }
         notificationRepository.deleteById(notificationId);
         webSocketService.sendMessage(NOTIFICATION_TOPIC, getAllNotifications());
+    }
+
+    public List<NotificationResponseDTO> getUnreadNotificationsByTableNumber(Integer tableNumber) {
+        List<Notifications> notifications = notificationRepository.findByTable_TableNumberAndIsReadFalse(tableNumber);
+        return notifications.stream()
+                .map(notification -> new NotificationResponseDTO(
+                        notification.getNotificationId(),
+                        notification.getTable().getTableNumber(),
+                        notification.getTitle(),
+                        notification.getContent(),
+                        notification.getCreatedAt(),
+                        notification.isRead()))
+                .collect(Collectors.toList());
     }
 }
