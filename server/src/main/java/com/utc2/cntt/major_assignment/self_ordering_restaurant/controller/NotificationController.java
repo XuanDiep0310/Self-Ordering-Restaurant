@@ -46,4 +46,9 @@ public class NotificationController {
         notificationService.deleteNotification(notificationId);
         return ResponseEntity.ok("Notification deleted successfully");
     }
+
+    @GetMapping("/table/{tableNumber}/unread")
+    public ResponseEntity<List<NotificationResponseDTO>> getUnreadNotificationsByTableNumber(@PathVariable Integer tableNumber) {
+        return ResponseEntity.ok(notificationService.getUnreadNotificationsByTableNumber(tableNumber));
+    }
 }
