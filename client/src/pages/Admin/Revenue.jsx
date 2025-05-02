@@ -117,9 +117,6 @@ const Revenue = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Doanh thu nhà hàng</h3>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-                Download CSV
-              </button>
             </div>
             <div className="h-64">
               <Bar data={monthlyIncomeData} />

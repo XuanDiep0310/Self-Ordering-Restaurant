@@ -123,40 +123,27 @@ const EditMenu = () => {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-
+  
     const newDish = {
       name: newItem.name,
       price: parseFloat(newItem.price),
       categoryId: selectedCategory.categoryId,
       status: "Available",
     };
-
+  
     try {
       const response = await axiosInstance.post("api/dishes", newDish);
       const addedDish = response.data;
       console.log("Món ăn mới đã được thêm:", addedDish);
-
-      const updatedCategories = categories.map((cat) => {
-        if (cat.categoryId === selectedCategory.categoryId) {
-          return {
-            ...cat,
-            items: [...cat.items, addedDish],
-          };
-        }
-        return cat;
-      });
-
-      setCategories(updatedCategories);
-      setNewItem({ name: "", price: "" });
-      setNewItemImage(null);
-      setIsAddItemModalOpen(false);
+  
+      alert("Món ăn đã được thêm thành công!");
+      window.location.reload();  // <<< Reload lại trang sau khi thêm món
+  
     } catch (error) {
       console.error("Lỗi khi thêm món ăn:", error);
       alert("Đã xảy ra lỗi khi thêm món ăn!");
     }
   };
-
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -176,45 +163,17 @@ const EditMenu = () => {
     }
   };
 
-  // const handleDeleteDish = async (dishId, categoryId) => {
-  //   if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
-  //     try {
-  //       // await axiosInstance.delete(`api/dishes/${dishId}`);
-  //       cat.items.filter((item) => item.dishId !== dishId)
-
-  //       const updatedCategories = categories.map((cat) => {
-  //         if (cat.categoryId === categoryId) {
-  //           return {
-  //             ...cat,
-  //             items: cat.items.filter((item) => item.dishId !== dishId),
-  //           };
-  //         }
-  //         return cat;
-  //       });
-
-  //       setCategories(updatedCategories);
-  //       alert("Món ăn đã được xóa thành công!");
-  //     } catch (error) {
-  //       console.error("Lỗi khi xóa món ăn:", error);
-  //       alert("Đã xảy ra lỗi khi xóa món ăn!");
-  //     }
-  //   }
-  // };
-  const handleDeleteDish = async (dishId, cat) => {
-    try {
-      await deleteFoodItem(dishId);
-      const updatedCategories = categories.map((c) => {
-        if (c.id === cat.id) {
-          return {
-            ...c,
-            dishes: c.dishes.filter((d) => d.id !== dishId),
-          };
-        }
-        return c;
-      });
-      setCategories(updatedCategories);
-    } catch (error) {
-      console.error("Lỗi khi xóa món ăn:", error);
+  const handleDeleteDish = async (dishId, category) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
+      try {
+        await deleteFoodItem(dishId);
+        alert("Món ăn đã được xóa thành công!");
+        window.location.reload();  // <<< Reload lại trang sau khi xóa món
+  
+      } catch (error) {
+        console.error("Lỗi khi xóa món ăn:", error);
+        alert("Đã xảy ra lỗi khi xóa món ăn!");
+      }
     }
   };
   

@@ -53,6 +53,11 @@ public class DishService {
         dishRepository.save(dish);
     }
 
+    // public void deleteDishById(Integer dishId) {
+    //     Dishes dish = dishRepository.findById(dishId)
+    //             .orElseThrow(() -> new ResourceNotFoundException("Dish not found with id: " + dishId));
+    //     dishRepository.delete(dish);
+    // }
     public void deleteDishById(Integer dishId) {
         Dishes dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dish not found with id: " + dishId));
