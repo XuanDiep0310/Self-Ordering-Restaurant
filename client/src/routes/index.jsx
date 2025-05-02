@@ -4,7 +4,7 @@ import MenuPage from "../pages/Customer/MenuPage";
 import FoodDetailPage from "../pages/Customer/FoodDetailPage";
 import CartPage from "../pages/Customer/CartPage";
 import LoginPage from "../pages/LoginPage";
-import StaffDashboard from "../pages/StaffDashboard/index.jsx";
+import StaffDashboard from "../pages/StaffDashBoard/index.jsx";
 import OrderPage from "../pages/Customer/OrderPage";
 import InvoicePage from "../pages/Customer/InvoicePage";
 import ReviewPage from "../pages/Customer/ReviewPage";
