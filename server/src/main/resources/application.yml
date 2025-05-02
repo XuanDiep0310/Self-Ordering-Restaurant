@@ -13,6 +13,10 @@ spring:
   mvc:
     async:
       request-timeout: 30000
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   websocket:
     cors:
@@ -29,6 +33,15 @@ logging:
 
 jwt:
   privateKey: 5IM62UKQWiA6rAujwhuwn1XaWE6oXEI6wKKPMcVun9c=
+
+file:
+  upload-dir: uploads/images
+
+app:
+  base-url: http://localhost:8080
+
+
+
 
 
 

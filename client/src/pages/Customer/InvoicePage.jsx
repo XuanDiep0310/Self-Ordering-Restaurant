@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.png"; // Import logo
 import { getBillByTable } from "../../services/orderService"; // Import hàm lấy danh sách món
 import { sendNotification } from "../../services/notificationService"; // Import hàm gửi thông báo
+import { createVNPayPayment } from "../../services/paymentService"; // Import hàm gọi API
 
 const InvoicePage = () => {
     const navigate = useNavigate();
@@ -58,20 +59,34 @@ const InvoicePage = () => {
 
             // Xử lý thanh toán theo phương thức
             if (paymentMethod === "VNPay") {
-                // Tạo URL thanh toán giả VNPay
-                const vnpayUrl = `https://sandbox.vnpayment.vn/tryitnow/Home/CreateOrder?amount=${total}&orderId=${tableNumber}&orderInfo=Thanh toán bàn ${tableNumber}`;
-                setPaymentMessage("Đang chuyển hướng đến VNPay...");
-                setTimeout(() => {
-                    window.location.href = vnpayUrl; // Chuyển hướng đến VNPay
-                }, 2000);
+                // Gọi API backend để tạo thanh toán VNPay
+                const paymentData = {
+                    total,
+                    orderId: tableNumber,
+                    orderInfo: `Thanh toán bàn ${tableNumber}`,
+                    returnUrl: "http://localhost:3000/payment-success",
+                };
+                const response = await createVNPayPayment(paymentData);
+
+                // Kiểm tra phản hồi từ backend
+                if (response && response.paymentUrl) {
+                    setPaymentMessage("Đang chuyển hướng đến VNPay...");
+                    setTimeout(() => {
+                        window.location.href = response.paymentUrl; // Chuyển hướng đến VNPay
+                    }, 2000);
+                } else {
+                    setPaymentMessage("Không thể tạo thanh toán VNPay. Vui lòng thử lại!");
+                }
             } else {
-                setPaymentMessage("vui lòng chờ nhân viên trong giây lát...!");
+                setPaymentMessage("Vui lòng chờ nhân viên trong giây lát...!");
             }
 
-            // Chuyển về trang HomePage của bàn sau 2 giây
-            setTimeout(() => {
-                navigate(`/customer?tableNumber=${tableNumber}`);
-            }, 10000);
+            // Chuyển về trang HomePage của bàn sau 10 giây nếu không phải VNPay
+            if (paymentMethod !== "VNPay") {
+                setTimeout(() => {
+                    navigate(`/customer?tableNumber=${tableNumber}`);
+                }, 10000);
+            }
         } catch (error) {
             console.error("Error completing payment:", error);
             setPaymentMessage("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");

@@ -2,11 +2,13 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.controller;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.DishRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.DishResponseDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.DishStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.DishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,8 +28,24 @@ public class DishController {
         return ResponseEntity.ok(dishService.getDishById(dishId));
     }
 
-    @PostMapping
-    public ResponseEntity<?> addDish(@RequestBody DishRequestDTO dishRequestDTO) {
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<?> addDish(
+            @RequestParam("name") String name,
+            @RequestParam("price") Long price,
+            @RequestParam("categoryId") Integer categoryId,
+            @RequestParam(value = "status", required = false) DishStatus status,
+            @RequestParam("imageFile") MultipartFile imageFile) {
+
+        DishRequestDTO dishRequestDTO = new DishRequestDTO();
+        dishRequestDTO.setName(name);
+        dishRequestDTO.setPrice(price);
+        dishRequestDTO.setCategoryId(categoryId);
+        dishRequestDTO.setImageFile(imageFile);
+
+        if (status != null) {
+            dishRequestDTO.setStatus(status);
+        }
+
         dishService.addDish(dishRequestDTO);
         return ResponseEntity.ok("Dish added successfully!");
     }

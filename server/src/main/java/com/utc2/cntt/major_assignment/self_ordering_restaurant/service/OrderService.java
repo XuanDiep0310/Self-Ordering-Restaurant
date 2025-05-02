@@ -1,9 +1,11 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.Paragraph;
+import com.lowagie.text.Font;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.draw.LineSeparator;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderItemRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.OrderRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.UpdateOrderStatusDTO;
@@ -27,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -169,53 +172,112 @@ public class OrderService {
         return orderItemRepository.getBillForTable(tableNumber);
     }
 
+    // Java
     public ResponseEntity<byte[]> exportBillPdf(Integer tableNumber) {
         List<BillItemDTO> billItems = getBillForTable(tableNumber);
 
-        Document document = new Document();
+        Document document = new Document(PageSize.A6, 18, 18, 18, 18); // A6 size, smaller margins
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            document.add(new Paragraph("Restaurant Bill"));
-            document.add(new Paragraph("Table Number: " + tableNumber));
-            document.add(new Paragraph(" "));
+            // Fonts for A6: smaller but bold for headers
+            Font titleFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+            Font headerFont = new Font(Font.HELVETICA, 10, Font.BOLD);
+            Font boldFont = new Font(Font.HELVETICA, 9, Font.BOLD);
+            Font normalFont = new Font(Font.HELVETICA, 9, Font.NORMAL);
 
-            PdfPTable table = new PdfPTable(5);
-            table.addCell("Dish");
-            table.addCell("Quantity");
-            table.addCell("Unit Price");
-            table.addCell("Subtotal");
-            table.addCell("Order Date");
+            // Title and info
+            Paragraph title = new Paragraph("DAILY FOOD", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
 
+            Paragraph address = new Paragraph("Số 450 Lê Văn Việt - TP Thủ Đức, Hồ Chí Minh\nSĐT: 0389379012", normalFont);
+            address.setAlignment(Element.ALIGN_CENTER);
+            document.add(address);
+
+            document.add(Chunk.NEWLINE);
+
+            Paragraph billTitle = new Paragraph("HOÁ ĐƠN THANH TOÁN", headerFont);
+            billTitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(billTitle);
+
+            // Use the first orderId if available
+            String orderId = billItems.isEmpty() ? "N/A" : String.valueOf(billItems.get(0).getOrderId());
+            Paragraph billNo = new Paragraph("Số HĐ: " + orderId, boldFont);
+            billNo.setAlignment(Element.ALIGN_CENTER);
+            document.add(billNo);
+
+            document.add(Chunk.NEWLINE);
+
+            // Table and time
+            Paragraph tableInfo = new Paragraph("Bàn " + tableNumber, boldFont);
+            document.add(tableInfo);
+
+            String orderTime = billItems.isEmpty() ? "" : billItems.get(0).getOrderDate().toString();
+            Paragraph timeInfo = new Paragraph("Thời gian: " + orderTime, boldFont);
+            document.add(timeInfo);
+
+            document.add(Chunk.NEWLINE);
+
+            // Table with 5 columns
+            PdfPTable pdfTable = new PdfPTable(new float[]{1, 4, 1, 2, 2});
+            pdfTable.setWidthPercentage(100);
+
+            // Table headers
+            String[] headers = {"STT", "Tên món", "SL", "Đơn giá", "Thành tiền"};
+            for (String h : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(h, boldFont));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setBackgroundColor(Color.LIGHT_GRAY);
+                pdfTable.addCell(cell);
+            }
+
+            // Table rows
+            int idx = 1;
             for (BillItemDTO item : billItems) {
-                table.addCell(item.getDishName());
-                table.addCell(String.valueOf(item.getQuantity()));
-                table.addCell(String.valueOf(item.getUnitPrice()));
-                table.addCell(String.valueOf(item.getSubTotal()));
-                table.addCell(item.getOrderDate().toString());
+                pdfTable.addCell(new PdfPCell(new Phrase(String.valueOf(idx++), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(item.getDishName(), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(String.format("%,d", item.getUnitPrice()), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(String.format("%,d", item.getSubTotal()), normalFont)));
             }
 
-            // Add total
-            if (!billItems.isEmpty()) {
-                table.addCell("");
-                table.addCell("");
-                table.addCell("");
-                table.addCell("Total:");
-                table.addCell(String.valueOf(billItems.get(0).getTotalAmount()));
+            // Fill empty rows if less than 7
+            for (int i = billItems.size(); i < 7; i++) {
+                for (int j = 0; j < 5; j++) {
+                    pdfTable.addCell(new PdfPCell(new Phrase(" ")));
+                }
             }
 
-            document.add(table);
+            document.add(pdfTable);
+
+            document.add(Chunk.NEWLINE);
+
+            // Total
+            long total = billItems.isEmpty() ? 0 : billItems.get(0).getTotalAmount();
+            Paragraph totalLine = new Paragraph("Tổng tiền: " + String.format("%,d", total) + "đ", boldFont);
+            totalLine.setAlignment(Element.ALIGN_LEFT);
+            document.add(totalLine);
+
+            document.add(Chunk.NEWLINE);
+            document.add(new LineSeparator());
+
+            // Thank you
+            Paragraph thanks = new Paragraph("Cảm ơn Quý khách !", headerFont);
+            thanks.setAlignment(Element.ALIGN_CENTER);
+            document.add(thanks);
+
             document.close();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "bill_table_" + tableNumber + ".pdf");
+            HttpHeaders headersHttp = new HttpHeaders();
+            headersHttp.setContentType(MediaType.APPLICATION_PDF);
+            headersHttp.setContentDispositionFormData("attachment", "bill_table_" + tableNumber + ".pdf");
 
             return ResponseEntity.ok()
-                    .headers(headers)
+                    .headers(headersHttp)
                     .body(out.toByteArray());
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate PDF", e);

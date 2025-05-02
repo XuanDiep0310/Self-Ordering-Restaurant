@@ -11,11 +11,43 @@ export const getFoodItems = async () => {
   }
 };
 
-// Hàm thêm món ăn mới
+// Hàm service đã được sửa đổi cho phù hợp
 export const addFoodItem = async (foodData) => {
   try {
-    const response = await axiosInstance.post("/api/dishes", foodData);
-    return response.data; // Trả về dữ liệu món ăn vừa thêm
+    const formData = new FormData();
+
+    // Nếu foodData là đối tượng JSON
+    if (!(foodData instanceof FormData)) {
+      // Thêm từng trường vào FormData
+      formData.append('name', foodData.name);
+      formData.append('price', foodData.price);
+      formData.append('categoryId', foodData.categoryId);
+
+      if (foodData.status) {
+        formData.append('status', foodData.status);
+      }
+
+      // Thêm file hình ảnh nếu có
+      if (foodData.imageFile) {
+        formData.append('imageFile', foodData.imageFile);
+      }
+
+      // Sử dụng formData thay vì dữ liệu gốc
+      const response = await axiosInstance.post("/api/dishes", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } else {
+      // Nếu foodData đã là FormData
+      const response = await axiosInstance.post("/api/dishes", foodData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    }
   } catch (error) {
     console.error("Error adding food item:", error);
     throw error; // Ném lỗi để xử lý ở nơi gọi hàm

@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/tables/**").permitAll()
                         .requestMatchers("/api/feedback/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/ws/**").permitAll()
 

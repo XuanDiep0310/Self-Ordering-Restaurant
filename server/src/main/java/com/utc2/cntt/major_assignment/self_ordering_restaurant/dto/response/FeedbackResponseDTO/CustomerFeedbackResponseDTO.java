@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerFeedbackResponseDTO {
-    private Integer orderId;
-    private Integer tableNumber;
     private int rating;
     private String name;
     private String comment;

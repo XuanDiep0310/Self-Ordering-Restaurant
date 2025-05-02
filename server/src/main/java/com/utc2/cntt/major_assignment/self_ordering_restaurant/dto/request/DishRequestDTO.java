@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ import lombok.Setter;
 public class DishRequestDTO {
     private String name;
     private Long price;
-    private String image;
+    private MultipartFile imageFile; // Thay đổi từ String thành MultipartFile
     private Integer categoryId;
     private DishStatus status = DishStatus.Available;
 }
