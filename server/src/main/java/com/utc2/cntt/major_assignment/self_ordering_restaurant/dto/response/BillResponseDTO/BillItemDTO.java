@@ -11,6 +11,7 @@ public class BillItemDTO {
     private Integer tableNumber;
     private Integer orderId;
     private String dishName;
+    private String image;
     private Integer quantity;
     private Long unitPrice;
     private Long subTotal;
