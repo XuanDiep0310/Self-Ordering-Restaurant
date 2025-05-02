@@ -13,25 +13,35 @@ import { deleteFoodItem } from "../../services/foodService";
 
 const EditMenu = () => {
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null); // Will be set to first category ID
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [newItem, setNewItem] = useState({ name: "", price: "" });
-  const [newItemImage, setNewItemImage] = useState(null); // Thêm trạng thái cho hình ảnh
+  const [newItemImage, setNewItemImage] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const categoryList = await getCategories();
-      const categoriesWithItems = await Promise.all(
-        categoryList.map(async (cat) => {
-          const items = await getFoodItemsByCategory(cat.categoryId);
-          return { ...cat, items };
-        })
-      );
-      setCategories(categoriesWithItems);
+      try {
+        const categoryList = await getCategories();
+        const categoriesWithItems = await Promise.all(
+          categoryList.map(async (cat) => {
+            const items = await getFoodItemsByCategory(cat.categoryId);
+            return { ...cat, items };
+          })
+        );
+        setCategories(categoriesWithItems);
+
+        // Set default selected category to the first one if available
+        if (categoriesWithItems.length > 0) {
+          setSelectedCategory(categoriesWithItems[0].categoryId);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
     };
     fetchData();
   }, []);
@@ -53,16 +63,18 @@ const EditMenu = () => {
 
   const handleAddItemModalClose = () => {
     setIsAddItemModalOpen(false);
+    setNewItem({ name: "", price: "" });
+    setNewItemImage(null);
   };
 
   const handleAddItem = () => {
     setIsAddItemModalOpen(true);
   };
 
-  const handleSelectCategory = (category) => {
-    setSelectedCategory(category); // Lưu toàn bộ đối tượng danh mục
-    console.log("Selected Category:", category);
+  const handleSelectCategory = (categoryId) => {
+    setSelectedCategory(categoryId);
   };
+
   const handleUpdateCategory = async () => {
     if (!editingCategory?.name) {
       alert("Vui lòng nhập tên danh mục!");
@@ -92,14 +104,6 @@ const EditMenu = () => {
       const updatedCategory = response.data;
       console.log("Danh mục đã được cập nhật:", updatedCategory);
 
-      const updatedCategories = editingCategory.categoryId
-        ? categories.map((cat) =>
-            cat.categoryId === updatedCategory.categoryId ? updatedCategory : cat
-          )
-        : [...categories, updatedCategory];
-
-      setCategories(updatedCategories);
-
       // Reload categories
       const categoryList = await getCategories();
       const categoriesWithItems = await Promise.all(
@@ -119,55 +123,102 @@ const EditMenu = () => {
   };
 
   const handleAddNewItem = async () => {
-    if (!selectedCategory || !newItem.name || !newItem.price) {
-      alert("Vui lòng điền đầy đủ thông tin!");
+    // Validation
+    if (!selectedCategory || isNaN(parseInt(selectedCategory, 10))) {
+      alert("Vui lòng chọn một danh mục hợp lệ!");
+      return;
+    }
+    if (!newItem.name || !newItem.price || !newItemImage) {
+      alert("Vui lòng điền đầy đủ thông tin và chọn hình ảnh!");
       return;
     }
 
-    const newDish = {
-      name: newItem.name,
-      price: parseFloat(newItem.price),
-      categoryId: selectedCategory.categoryId,
-      status: "Available",
-    };
-
     try {
-      const response = await axiosInstance.post("api/dishes", newDish);
-      const addedDish = response.data;
-      console.log("Món ăn mới đã được thêm:", addedDish);
+      const formData = new FormData();
 
-      const updatedCategories = categories.map((cat) => {
-        if (cat.categoryId === selectedCategory.categoryId) {
-          return {
-            ...cat,
-            items: [...cat.items, addedDish],
-          };
-        }
-        return cat;
+      // Ensure selectedCategory is a number
+      const categoryIdValue = parseInt(selectedCategory, 10);
+
+      // Thêm từng trường riêng biệt vào FormData
+      formData.append("name", newItem.name);
+      formData.append("price", parseFloat(newItem.price));
+      formData.append("categoryId", categoryIdValue); // Use parsed integer
+      formData.append("status", "Available");
+
+      // Thêm file hình ảnh với key là 'imageFile' để khớp với API
+      formData.append("imageFile", newItemImage);
+
+      // Log data trước khi gửi
+      console.log("Sending dish data:", {
+        name: newItem.name,
+        price: parseFloat(newItem.price),
+        categoryId: categoryIdValue,
+        status: "Available",
+      });
+      console.log("Image file:", newItemImage);
+
+      const response = await axiosInstance.post("/api/dishes", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      setCategories(updatedCategories);
+      console.log("Kết quả từ API:", response.data);
+
+      // Lấy danh sách món ăn mới của danh mục hiện tại
+      const updatedDishes = await getFoodItemsByCategory(categoryIdValue);
+
+      // Cập nhật state categories với món ăn mới
+      setCategories((prevCategories) =>
+        prevCategories.map((cat) => {
+          if (cat.categoryId === categoryIdValue) {
+            return {
+              ...cat,
+              items: updatedDishes, // Cập nhật toàn bộ danh sách món ăn
+            };
+          }
+          return cat;
+        })
+      );
+
+      // Reset form và đóng modal
       setNewItem({ name: "", price: "" });
       setNewItemImage(null);
       setIsAddItemModalOpen(false);
+
+      // Thông báo thành công
+      alert("Thêm món ăn mới thành công!");
     } catch (error) {
-      console.error("Lỗi khi thêm món ăn:", error);
-      alert("Đã xảy ra lỗi khi thêm món ăn!");
+      console.error("Lỗi chi tiết:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Đã xảy ra lỗi khi thêm món ăn!");
     }
   };
 
-
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setNewItemImage(file); // Lưu trữ file hình ảnh được chọn
+    setNewItemImage(file);
   };
 
   const handleDeleteCategory = async (categoryId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
       try {
         await axiosInstance.delete(`api/categories/${categoryId}`);
-        setCategories(categories.filter((cat) => cat.categoryId !== categoryId));
+
+        // Remove category from state
+        const updatedCategories = categories.filter(
+          (cat) => cat.categoryId != categoryId
+        );
+        setCategories(updatedCategories);
+
+        // If the deleted category was selected, select another one if available
+        if (selectedCategory == categoryId) {
+          if (updatedCategories.length > 0) {
+            setSelectedCategory(updatedCategories[0].categoryId);
+          } else {
+            setSelectedCategory(null);
+          }
+        }
+
         alert("Danh mục đã được xóa thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa danh mục:", error);
@@ -176,196 +227,223 @@ const EditMenu = () => {
     }
   };
 
-  // const handleDeleteDish = async (dishId, categoryId) => {
-  //   if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
-  //     try {
-  //       // await axiosInstance.delete(`api/dishes/${dishId}`);
-  //       cat.items.filter((item) => item.dishId !== dishId)
+  const handleDeleteDish = async (dishId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
+      try {
+        await deleteFoodItem(dishId);
 
-  //       const updatedCategories = categories.map((cat) => {
-  //         if (cat.categoryId === categoryId) {
-  //           return {
-  //             ...cat,
-  //             items: cat.items.filter((item) => item.dishId !== dishId),
-  //           };
-  //         }
-  //         return cat;
-  //       });
+        // Update the categories state by removing the deleted dish
+        const updatedCategories = categories.map((cat) => {
+          if (cat.categoryId == selectedCategory) {
+            return {
+              ...cat,
+              items: cat.items.filter((item) => item.dishId != dishId),
+            };
+          }
+          return cat;
+        });
 
-  //       setCategories(updatedCategories);
-  //       alert("Món ăn đã được xóa thành công!");
-  //     } catch (error) {
-  //       console.error("Lỗi khi xóa món ăn:", error);
-  //       alert("Đã xảy ra lỗi khi xóa món ăn!");
-  //     }
-  //   }
-  // };
-  const handleDeleteDish = async (dishId, cat) => {
-    try {
-      await deleteFoodItem(dishId);
-      const updatedCategories = categories.map((c) => {
-        if (c.id === cat.id) {
-          return {
-            ...c,
-            dishes: c.dishes.filter((d) => d.id !== dishId),
-          };
-        }
-        return c;
-      });
-      setCategories(updatedCategories);
-    } catch (error) {
-      console.error("Lỗi khi xóa món ăn:", error);
+        setCategories(updatedCategories);
+        alert("Món ăn đã được xóa thành công!");
+      } catch (error) {
+        console.error("Lỗi khi xóa món ăn:", error);
+        alert("Đã xảy ra lỗi khi xóa món ăn!");
+      }
     }
   };
-  
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Get current category's items
+  const currentCategoryItems =
+    categories.find((cat) => cat.categoryId == selectedCategory)?.items || [];
 
   return (
     <div className="min-h-screen background-image">
-      {/* <AdminHeader title="QUẢN LÝ MENU" /> */}
-      <AdminHeader title="QUẢN LÝ MENU" onToggleSidebar={() => setIsSidebarOpen(true)} />
+      <AdminHeader
+        title="QUẢN LÝ MENU"
+        onToggleSidebar={() => setIsSidebarOpen(true)}
+      />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <div className="px-15">
-        <div className="flex justify-end mb-2">
+      <div className="px-8 py-4">
+        <div className="flex justify-end mb-4">
           <button
-            className="bg-white text-[#124035] px-6 py-3 rounded-md mr-4 flex items-center text-md shadow-md"
+            className="bg-white text-[#124035] px-6 py-3 rounded-lg mr-4 flex items-center text-md shadow-md hover:bg-gray-100 transition-all"
             onClick={handleAddItem}
           >
-            <span className="cursor-pointer">Thêm món</span>
+            <span className="cursor-pointer font-medium">Thêm món</span>
             <span className="ml-2 text-2xl">
               <i className="fa-solid fa-circle-plus"></i>
             </span>
           </button>
           <button
-            className="bg-white text-[#124035] px-8 py-2 rounded-md flex items-center text-xl shadow-md"
+            className="bg-white text-[#124035] px-8 py-3 rounded-lg flex items-center text-md shadow-md hover:bg-gray-100 transition-all"
             onClick={handleAddCategoryClick}
           >
-            <span className="cursor-pointer">Thêm danh mục</span>
+            <span className="cursor-pointer font-medium">Thêm danh mục</span>
             <span className="ml-2 text-2xl">
               <i className="fa-solid fa-circle-plus"></i>
             </span>
           </button>
         </div>
 
-        <div className="bg-black/70 rounded-lg overflow-hidden w-[100%] h-[550px]">
-          <div className="flex bg-[#124035] text-white text-xl font-bold p-3">
-            <div className="w-29/100 text-center">Danh mục</div>
-            <div className="w-71/100 text-center">Món ăn</div>
+        <div className="bg-black/70 rounded-lg overflow-hidden w-full h-[600px] shadow-xl">
+          <div className="flex bg-[#124035] text-white text-xl font-bold p-4">
+            <div className="w-3/10 text-center">Danh mục</div>
+            <div className="w-7/10 text-center">Món ăn</div>
           </div>
 
-          <div className="flex">
-            <div className="w-3/10 border-r border-gray-300 p-3 overflow-y-auto max-h-[450px]">
-              {categories.map((category) => (
-                <div
-                  key={category.categoryId}
-                  className={`flex justify-between items-center p-4 mb-4 rounded-md cursor-pointer text-2xl ${
-                    selectedCategory === category.categoryId
-                      ? "bg-[#124035] text-white"
-                      : "bg-gray-100"
-                  }`}
-                  onClick={() => setSelectedCategory(category.categoryId)}
-                >
-                  <span>{category.name}</span>
-                  <div className="flex space-x-4">
-                    <button
-                      className="scale-125 focus:outline-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditClick(category);
-                      }}
-                    >
-                      <img
-                        src={editIcon}
-                        alt="Edit"
-                        className="w-10 h-10"
-                        style={{
-                          filter:
-                            selectedCategory === category.categoryId
-                              ? "brightness(0) invert(1)"
-                              : "none",
+          <div className="flex h-[calc(600px-64px)]">
+            {/* Categories column */}
+            <div className="w-3/10 border-r border-gray-700 p-4 overflow-y-auto max-h-[536px] bg-black/20">
+              {categories.length > 0 ? (
+                categories.map((category) => (
+                  <div
+                    key={category.categoryId}
+                    className={`flex justify-between items-center p-4 mb-4 rounded-lg cursor-pointer text-xl transition-all ${
+                      selectedCategory == category.categoryId
+                        ? "bg-[#124035] text-white shadow-md"
+                        : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedCategory(category.categoryId)}
+                  >
+                    <span className="font-medium">{category.name}</span>
+                    <div className="flex space-x-3">
+                      <button
+                        className="focus:outline-none hover:scale-110 transition-transform"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(category);
                         }}
-                      />
-                    </button>
-                    <button
-                      className="focus:outline-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteCategory(category.categoryId);
-                      }}
-                    >
-                      <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
-                    </button>
+                      >
+                        <img
+                          src={editIcon}
+                          alt="Edit"
+                          className="w-8 h-8"
+                          style={{
+                            filter:
+                              selectedCategory == category.categoryId
+                                ? "brightness(0) invert(1)"
+                                : "none",
+                          }}
+                        />
+                      </button>
+                      <button
+                        className="focus:outline-none hover:scale-110 transition-transform"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteCategory(category.categoryId);
+                        }}
+                      >
+                        <img
+                          src={deleteIcon}
+                          alt="Delete"
+                          className="w-8 h-8"
+                        />
+                      </button>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center text-white py-8">
+                  Không có danh mục nào. Hãy thêm danh mục mới!
                 </div>
-              ))}
+              )}
             </div>
 
-            <div className="w-7/10 p-3 overflow-y-auto max-h-[450px]">
-              {categories.find((cat) => cat.categoryId === selectedCategory)?.items.map((item, index) => (
-                <div
-                  key={item.dishId || index}
-                  className="flex items-center justify-between p-4 mb-4 bg-gray-100 rounded-md relative"
-                >
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={item.image || "https://via.placeholder.com/64"}
-                      alt={item.name}
-                      className="w-16 h-16 rounded-md object-cover"
-                    />
-                    <p className="font-bold text-lg">{item.name}</p>
-                  </div>
-                  <div className="absolute left-[500px] text-gray-600 text-base">
-                    {item.price} VND
-                  </div>
-                  <div className="flex items-center space-x-2 ml-auto">
-                    <button className="focus:outline-none">
-                      <img src={editIcon} alt="Edit" className="w-10 h-10" />
-                    </button>
-                    <button
-                      className="focus:outline-none"
-                      // onClick={() => handleDeleteDish(item.id, selectedCategory)}
-                      onClick={() => handleDeleteDish(item.dishId, selectedCategory)}
+            {/* Food items column */}
+            <div className="w-7/10 p-4 overflow-y-auto max-h-[536px] bg-black/10">
+              {selectedCategory ? (
+                currentCategoryItems.length > 0 ? (
+                  currentCategoryItems.map((item) => (
+                    <div
+                      key={item.dishId}
+                      className="flex items-center justify-between p-4 mb-4 bg-gray-100 rounded-lg shadow-md hover:shadow-lg transition-all"
                     >
-                      <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
-                    </button>
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={item.image || "https://via.placeholder.com/64"}
+                          alt={item.name}
+                          className="w-16 h-16 rounded-lg object-cover shadow-sm"
+                        />
+                        <p className="font-bold text-lg text-gray-800">
+                          {item.name}
+                        </p>
+                      </div>
+                      <div className="text-gray-700 font-medium mx-8">
+                        {new Intl.NumberFormat("vi-VN").format(item.price)} VND
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <button
+                          className="focus:outline-none hover:scale-110 transition-transform"
+                          title="Sửa món ăn"
+                        >
+                          <img src={editIcon} alt="Edit" className="w-8 h-8" />
+                        </button>
+                        <button
+                          className="focus:outline-none hover:scale-110 transition-transform"
+                          onClick={() => handleDeleteDish(item.dishId)}
+                          title="Xóa món ăn"
+                        >
+                          <img
+                            src={deleteIcon}
+                            alt="Delete"
+                            className="w-8 h-8"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-white py-12 text-lg">
+                    Chưa có món ăn nào trong danh mục này. Hãy thêm món mới!
                   </div>
+                )
+              ) : (
+                <div className="text-center text-white py-12 text-lg">
+                  Vui lòng chọn một danh mục
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Edit/Add Category Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-[#124035] rounded-lg p-8 w-2/3">
-            <h2 className="text-3xl font-bold text-center text-white py-5">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#124035] rounded-lg p-6 w-1/2 shadow-2xl">
+            <h2 className="text-2xl font-bold text-center text-white py-4">
               {editingCategory?.categoryId ? "SỬA DANH MỤC" : "THÊM DANH MỤC"}
             </h2>
-            <div className="bg-white p-2 rounded-lg">
-              <div className="mb-4 text-2xl">
-                <label className="text-2xl block mb-2">Tên danh mục:</label>
+            <div className="bg-white p-6 rounded-lg">
+              <div className="mb-6">
+                <label className="text-xl block mb-2 font-medium">
+                  Tên danh mục:
+                </label>
                 <input
                   placeholder="Nhập tên danh mục"
                   type="text"
                   value={editingCategory?.name || ""}
                   onChange={(e) =>
-                    setEditingCategory({ ...editingCategory, name: e.target.value })
+                    setEditingCategory({
+                      ...editingCategory,
+                      name: e.target.value,
+                    })
                   }
-                  className="w-full border bg-gray-300 border-gray-300 rounded-md p-2"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
                 />
               </div>
-              <div className="flex justify-end space-x-4 text-xl">
+              <div className="flex justify-end space-x-4">
                 <button
-                  className="bg-gray-300 text-gray-700 px-8 py-6 rounded-md"
+                  className="bg-[#124035] text-white px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all"
                   onClick={handleUpdateCategory}
                 >
-                  {editingCategory?.categoryId ? "Sửa" : "Thêm"}
+                  {editingCategory?.categoryId
+                    ? "Lưu thay đổi"
+                    : "Thêm danh mục"}
                 </button>
                 <button
-                  className="bg-gray-300 text-gray-700 px-8 py-6 rounded-md"
+                  className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-all"
                   onClick={handleModalClose}
                 >
                   Hủy bỏ
@@ -376,70 +454,93 @@ const EditMenu = () => {
         </div>
       )}
 
+      {/* Add Item Modal */}
       {isAddItemModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-[#124035] rounded-lg p-8 w-2/3">
-            <h2 className="text-2xl font-bold text-center text-white mb-4">THÊM MÓN</h2>
-            <div className="bg-white p-4 rounded-lg">
-              <div className="flex flex-wrap">
-                {/* Danh mục */}
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#124035] rounded-lg p-6 w-2/3 shadow-2xl">
+            <h2 className="text-2xl font-bold text-center text-white py-3">
+              THÊM MÓN ĂN MỚI
+            </h2>
+            <div className="bg-white p-6 rounded-lg">
+              <div className="flex flex-wrap -mx-2">
+                {/* Left column */}
                 <div className="w-1/2 px-2 mb-4">
-                  <label className="block text-lg font-bold mb-2">Danh mục:</label>
-                  <CategoryList
-                    categories={categories}
-                    onSelectCategory={handleSelectCategory}
-                    selectedCategory={selectedCategory}
-                  />
-                  <label className="block text-lg p-2 font-bold mb-2">Tên món:</label>
-                  <input
-                    type="text"
-                    value={newItem.name}
-                    onChange={(e) =>
-                      setNewItem({ ...newItem, name: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-md p-4"
-                  />
-                  <label className="block text-lg p-2 font-bold mb-2">Giá:</label>
-                  <input
-                    type="number"
-                    value={newItem.price}
-                    onChange={(e) =>
-                      setNewItem({ ...newItem, price: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-md p-4"
-                  />
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">
+                      Tên món:
+                    </label>
+                    <input
+                      type="text"
+                      value={newItem.name}
+                      onChange={(e) =>
+                        setNewItem({ ...newItem, name: e.target.value })
+                      }
+                      placeholder="Nhập tên món ăn"
+                      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">
+                      Giá (VND):
+                    </label>
+                    <input
+                      type="number"
+                      value={newItem.price}
+                      onChange={(e) =>
+                        setNewItem({ ...newItem, price: e.target.value })
+                      }
+                      placeholder="Nhập giá món ăn"
+                      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
+                    />
+                  </div>
                 </div>
 
-                {/* Hình ảnh */}
+                {/* Right column - Image upload */}
                 <div className="w-1/2 px-2 mb-4">
-                  <label className="block text-lg font-bold mb-2">Hình ảnh:</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="w-full border border-gray-300 rounded-md p-2"
-                  />
-                  {newItemImage && (
-                    <div className="mt-2">
-                      <img
-                        src={URL.createObjectURL(newItemImage)}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-md"
-                      />
-                    </div>
-                  )}
+                  <label className="block text-lg font-medium mb-2">
+                    Hình ảnh món ăn:
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                      id="food-image-upload"
+                    />
+                    <label
+                      htmlFor="food-image-upload"
+                      className="cursor-pointer text-[#124035] hover:text-opacity-80"
+                    >
+                      {newItemImage ? (
+                        <div className="flex flex-col items-center">
+                          <img
+                            src={URL.createObjectURL(newItemImage)}
+                            alt="Preview"
+                            className="max-w-full h-48 object-contain mb-2 rounded-md"
+                          />
+                          <span className="text-sm">Nhấn để thay đổi</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <i className="fa-solid fa-cloud-arrow-up text-5xl mb-3"></i>
+                          <span>Nhấn để tải lên hình ảnh</span>
+                        </div>
+                      )}
+                    </label>
+                  </div>
                 </div>
               </div>
 
               <div className="flex justify-end space-x-4 mt-4">
                 <button
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
+                  className="bg-[#124035] text-white px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all"
                   onClick={handleAddNewItem}
                 >
-                  Thêm
+                  Thêm món
                 </button>
                 <button
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
+                  className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-all"
                   onClick={handleAddItemModalClose}
                 >
                   Hủy bỏ

@@ -10,8 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerFeedbackRequestDTO {
-    private Integer orderId;
-    private Integer tableNumber;
     private int rating;
     private String name;
     private String comment;

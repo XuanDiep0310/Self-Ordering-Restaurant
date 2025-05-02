@@ -9,6 +9,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.Catego
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.DishRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.io.IOException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class DishService {
     private final DishRepository dishRepository;
     private final CategoryRepository categoryRepository;
+    private final FileStorageService fileStorageService;
 
     public List<DishResponseDTO> getAllDishes(Integer categoryId) {
         List<Dishes> dishes;
@@ -49,6 +51,17 @@ public class DishService {
         dish.setPrice(dishRequestDTO.getPrice());
         dish.setCategory(category);
         dish.setStatus(dishRequestDTO.getStatus());
+
+        // Xử lý upload hình ảnh - bây giờ lưu URL đầy đủ
+        if (dishRequestDTO.getImageFile() != null && !dishRequestDTO.getImageFile().isEmpty()) {
+            try {
+                // FileStorageService bây giờ sẽ trả về URL đầy đủ
+                String imageUrl = fileStorageService.storeFile(dishRequestDTO.getImageFile());
+                dish.setImage(imageUrl); // Lưu URL đầy đủ vào cơ sở dữ liệu
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to store image file", e);
+            }
+        }
 
         dishRepository.save(dish);
     }

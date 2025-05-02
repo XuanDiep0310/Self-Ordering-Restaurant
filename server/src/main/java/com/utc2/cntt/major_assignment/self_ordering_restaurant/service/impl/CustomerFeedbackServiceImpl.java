@@ -3,16 +3,12 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.service.impl;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.FeedbackRequestDTO.CustomerFeedbackRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.FeedbackResponseDTO.CustomerFeedbackResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.CustomerFeedback;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Orders;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Tables;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.FeedbackStatus;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.CustomerFeedbackRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.OrderRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.TableRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.ICustomerFeedbackService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,17 +26,10 @@ public class CustomerFeedbackServiceImpl implements ICustomerFeedbackService {
 
     @Override
     public void createFeedback(CustomerFeedbackRequestDTO request) {
-        Tables table = tableRepository.findByTableNumber(request.getTableNumber())
-                .orElseThrow(() -> new ResourceNotFoundException("Table not found"));
-
-        Orders order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-
         CustomerFeedback feedback = new CustomerFeedback();
         feedback.setRating(request.getRating());
         feedback.setComment(request.getComment());
         feedback.setStatus(FeedbackStatus.New); // Default status
-        // Map other fields if necessary (e.g., customer, order)
 
         feedbackRepository.save(feedback);
     }
@@ -49,9 +38,24 @@ public class CustomerFeedbackServiceImpl implements ICustomerFeedbackService {
     public List<CustomerFeedbackResponseDTO> getAllFeedbacks() {
         return feedbackRepository.findAll().stream().map(feedback -> {
             CustomerFeedbackResponseDTO response = new CustomerFeedbackResponseDTO();
-//            response.setOrderId(feedback.getOrder().getOrderId());
             response.setRating(feedback.getRating());
-            response.setComment(feedback.getComment());
+
+            // Tách name và comment
+            String comment = feedback.getComment();
+            String name = "Khách hàng ẩn danh";
+            String actualComment = comment;
+
+            // Check for name pattern [Name: xxx]
+            if (comment.startsWith("[Name:")) {
+                int endBracket = comment.indexOf("]");
+                if (endBracket != -1) {
+                    name = comment.substring(7, endBracket).trim();
+                    actualComment = comment.substring(endBracket + 1).trim();
+                }
+            }
+
+            response.setName(name);
+            response.setComment(actualComment);
             response.setCreateAt(feedback.getFeedbackDate());
             return response;
         }).collect(Collectors.toList());

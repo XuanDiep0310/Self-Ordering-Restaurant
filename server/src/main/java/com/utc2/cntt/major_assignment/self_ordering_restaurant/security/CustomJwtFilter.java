@@ -37,6 +37,7 @@ public class CustomJwtFilter extends OncePerRequestFilter {
             "/api/categories/**",
             "/api/tables/**",
             "/api/feedback/**",
+            "/images/**",
             "/error"
     );
 
