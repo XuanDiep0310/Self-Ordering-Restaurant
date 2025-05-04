@@ -20,7 +20,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItems, KeyOrderI
             "JOIN oi.dish d " +
             "JOIN o.table t " +
             "WHERE t.tableNumber = :tableNumber " +
-            "AND oi.status IN :statuses")
+            "AND oi.status IN :statuses " +
+            "AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid")
     List<PendingDishItemDTO> findPendingItemsByTableNumber(
             @Param("tableNumber") Integer tableNumber,
             @Param("statuses") List<OrderItemStatus> statuses

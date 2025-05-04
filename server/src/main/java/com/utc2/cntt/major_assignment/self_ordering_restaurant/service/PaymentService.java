@@ -209,8 +209,12 @@ public class PaymentService {
                 if (isSuccessful && payment.getOrder() != null) {
                     Orders order = payment.getOrder();
                     order.setPaymentStatus(PaymentOrderStatus.Paid);
+                    // Update table status to Available
+                    if (order.getTable() != null) {
+                        order.getTable().setStatus(com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.TableStatus.Available);
+                    }
                     orderRepository.save(order);
-                    log.info("Order {} payment status updated to PAID", order.getOrderId());
+                    log.info("Order {} payment status updated to PAID and table status updated to Available", order.getOrderId());
                 }
 
                 // Prepare result
