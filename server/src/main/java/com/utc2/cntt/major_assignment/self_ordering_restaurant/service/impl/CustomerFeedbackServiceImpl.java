@@ -5,8 +5,6 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.Feed
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.CustomerFeedback;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.FeedbackStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.CustomerFeedbackRepository;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.OrderRepository;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.TableRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.ICustomerFeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +19,6 @@ import java.util.stream.Collectors;
 public class CustomerFeedbackServiceImpl implements ICustomerFeedbackService {
 
     private final CustomerFeedbackRepository feedbackRepository;
-    private final TableRepository tableRepository;
-    private final OrderRepository orderRepository;
 
     @Override
     public void createFeedback(CustomerFeedbackRequestDTO request) {

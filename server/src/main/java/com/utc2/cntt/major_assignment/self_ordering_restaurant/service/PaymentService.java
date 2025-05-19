@@ -1,14 +1,15 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.config.VNPayConfig;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.TableRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Orders;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Payments;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentMethod;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentStatus;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.TableStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.OrderRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.PaymentRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class PaymentService {
     final Logger log = LoggerFactory.getLogger(PaymentService.class);
     final OrderRepository orderRepository;
     final PaymentRepository paymentRepository;
+    final TableService tableService;
 
     @Transactional
     public String createOrder(int total, String orderInfo, String urlReturn) throws Exception {
@@ -236,5 +238,34 @@ public class PaymentService {
             log.error("Comprehensive Error in VNPay Response Processing", e);
             return result;
         }
+    }
+
+    @Transactional
+    public void createCashPayment(int orderId) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        if (order.getPaymentStatus() == PaymentOrderStatus.Paid) {
+            log.warn("Order ID {} has already been paid. No new payment record created.", orderId);
+            return;
+        }
+
+        Payments payment = new Payments();
+        payment.setOrder(order);
+        payment.setAmount(order.getTotalAmount());
+        payment.setPaymentMethod(PaymentMethod.Cash);
+        payment.setStatus(PaymentStatus.Success);
+        String uniqueTransactionId = "Cash-" + UUID.randomUUID();
+        payment.setTransactionId(uniqueTransactionId);
+        payment.setPaymentDate(LocalDateTime.now());
+
+        paymentRepository.save(payment);
+
+        if (order.getTable() != null) {
+            tableService.updateTableStatus(order.getTable().getTableNumber(), new TableRequestDTO(TableStatus.Available));
+        }
+        order.setPaymentStatus(PaymentOrderStatus.Paid);
+        orderRepository.save(order);
+
+        log.info("Created cash payment record for order ID: {}", orderId);
     }
 }

@@ -3,7 +3,6 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.controller;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.LoginRequestDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.LoginResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.AuthService;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.impl.AuthServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

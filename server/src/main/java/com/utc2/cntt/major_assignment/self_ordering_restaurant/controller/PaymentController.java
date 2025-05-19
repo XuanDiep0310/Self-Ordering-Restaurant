@@ -100,5 +100,17 @@ public class PaymentController {
         }
         return result;
     }
+
+    @PostMapping("/cash/{orderId}")
+    public ResponseEntity<?> createCashPayment(@PathVariable int orderId) {
+        try {
+            paymentService.createCashPayment(orderId);
+            return ResponseEntity.ok("Cash payment processed successfully for Order ID: " + orderId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing cash payment: " + e.getMessage());
+        }
+    }
 }
 

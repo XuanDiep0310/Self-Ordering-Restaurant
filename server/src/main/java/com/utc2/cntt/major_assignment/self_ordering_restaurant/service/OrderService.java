@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final CustomerRepository customerRepository;
     private final TableRepository tableRepository;
     private final DishRepository dishRepository;
     private final OrderItemRepository orderItemRepository;

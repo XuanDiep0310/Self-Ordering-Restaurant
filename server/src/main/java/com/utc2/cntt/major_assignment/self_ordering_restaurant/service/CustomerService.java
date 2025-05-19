@@ -5,15 +5,11 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.Cust
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.*;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.CustomerRepository;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.OrderRepository;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.PaymentRepository;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;

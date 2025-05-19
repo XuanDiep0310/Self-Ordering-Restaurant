@@ -4,7 +4,6 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.Custo
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.CustomerResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.CustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
