@@ -1,34 +1,96 @@
 import React, { useEffect, useState } from "react";
 import AdminHeader from "../../components/Admin/Admin_header";
 import Sidebar from "./Sidebar";
-import { getInventoryItems, addInventoryItem } from "../../services/InventoryService";
+import {
+  getInventoryItems,
+  addInventoryItem,
+  getIngredients,
+  addIngredient,
+  getSuppliers,
+} from "../../services/InventoryService";
 
 const Inventory = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [inventoryItems, setInventoryItems] = useState([]);
-  const [newItem, setNewItem] = useState({ ingredientName: "", supplierName: "", quantity: "", unit: "" });
+  const [ingredients, setIngredients] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [newItem, setNewItem] = useState({
+    ingredientId: "",
+    supplierId: "",
+    quantity: "",
+    unit: "",
+  });
+  const [newIngredient, setNewIngredient] = useState("");
+  const [newSupplier, setNewSupplier] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchInventory = async () => {
+    const fetchData = async () => {
       const items = await getInventoryItems();
+      const ingredientsList = await getIngredients();
+      const suppliersList = await getSuppliers();
       setInventoryItems(items);
+      setIngredients(ingredientsList);
+      setSuppliers(suppliersList);
     };
-    fetchInventory();
+    fetchData();
   }, []);
 
   const handleAddItem = async () => {
-    if (!newItem.ingredientName || !newItem.supplierName || !newItem.quantity || !newItem.unit) {
+    // Kiểm tra các trường bắt buộc
+    if (!newItem.ingredientId || !newItem.supplierId || !newItem.quantity || !newItem.unit) {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
+
     try {
-      const addedItem = await addInventoryItem(newItem);
+      // Chuẩn bị dữ liệu theo đúng định dạng yêu cầu
+      const payload = {
+        ingredientId: parseInt(newItem.ingredientId, 10), // Đảm bảo `ingredientId` là số
+        supplierId: parseInt(newItem.supplierId, 10),    // Đảm bảo `supplierId` là số
+        quantity: parseFloat(newItem.quantity),          // Đảm bảo `quantity` là số
+        unit: newItem.unit.trim(),                       // Loại bỏ khoảng trắng thừa
+      };
+
+      // Gửi dữ liệu đến API
+      const addedItem = await addInventoryItem(payload);
+
+      // Cập nhật danh sách sản phẩm trong kho
       setInventoryItems([...inventoryItems, addedItem]);
-      setNewItem({ ingredientName: "", supplierName: "", quantity: "", unit: "" });
+
+      // Reset form nhập liệu
+      setNewItem({ ingredientId: "", supplierId: "", quantity: "", unit: "" });
       setIsModalOpen(false);
     } catch (error) {
-      alert("Đã xảy ra lỗi khi thêm sản phẩm!");
+      alert("Đã xảy ra lỗi khi thêm sản phẩm vào kho!");
+    }
+  };
+
+  const handleAddIngredient = async () => {
+    if (!newIngredient) {
+      alert("Vui lòng nhập tên nguyên liệu mới!");
+      return;
+    }
+    try {
+      const addedIngredient = await addIngredient({ name: newIngredient });
+      setIngredients([...ingredients, addedIngredient]);
+      setNewIngredient("");
+    } catch (error) {
+      alert("Đã xảy ra lỗi khi thêm nguyên liệu mới!");
+    }
+  };
+
+  const handleAddSupplier = async () => {
+    if (!newSupplier) {
+      alert("Vui lòng nhập tên nhà cung cấp mới!");
+      return;
+    }
+    try {
+      const addedSupplier = await addSupplier({ name: newSupplier });
+      setSuppliers([...suppliers, addedSupplier]);
+      setNewSupplier("");
+    } catch (error) {
+      alert("Đã xảy ra lỗi khi thêm nhà cung cấp mới!");
     }
   };
 
@@ -63,7 +125,6 @@ const Inventory = () => {
               </tr>
             </thead>
           </table>
-          {/* Thêm thanh cuộn cho nội dung */}
           <div className="max-h-96 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <tbody>
@@ -88,29 +149,71 @@ const Inventory = () => {
           <div className="bg-white rounded-lg p-8 w-1/3">
             <h2 className="text-2xl font-bold mb-4">Nhập sản phẩm</h2>
             <div className="mb-4">
-              <label className="block text-lg font-bold mb-2">Tên nguyên liệu:</label>
-              <input
-                type="text"
-                value={newItem.ingredientName}
-                onChange={(e) => setNewItem({ ...newItem, ingredientName: e.target.value })}
+              <label className="block text-lg font-bold mb-2">Nguyên liệu:</label>
+              <select
+                value={newItem.ingredientId || ""} // Đảm bảo giá trị không phải NaN
+                onChange={(e) => setNewItem({ ...newItem, ingredientId: parseInt(e.target.value, 10) || "" })}
                 className="w-full border border-gray-300 rounded-md p-2"
-              />
+              >
+                <option value="">Chọn nguyên liệu</option>
+                {ingredients.map((ingredient) => (
+                  <option key={ingredient.id} value={ingredient.id}>
+                    {ingredient.name}
+                  </option>
+                ))}
+              </select>
+              <div className="flex mt-2">
+                <input
+                  type="text"
+                  placeholder="Thêm nguyên liệu mới"
+                  value={newIngredient}
+                  onChange={(e) => setNewIngredient(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-md p-2"
+                />
+                <button
+                  className="ml-2 bg-green-500 text-white px-4 py-2 rounded-md"
+                  onClick={handleAddIngredient}
+                >
+                  Thêm
+                </button>
+              </div>
             </div>
             <div className="mb-4">
               <label className="block text-lg font-bold mb-2">Nhà cung cấp:</label>
-              <input
-                type="text"
-                value={newItem.supplierName}
-                onChange={(e) => setNewItem({ ...newItem, supplierName: e.target.value })}
+              <select
+                value={newItem.supplierId || ""} // Đảm bảo giá trị không phải NaN
+                onChange={(e) => setNewItem({ ...newItem, supplierId: parseInt(e.target.value, 10) || "" })}
                 className="w-full border border-gray-300 rounded-md p-2"
-              />
+              >
+                <option value="">Chọn nhà cung cấp</option>
+                {suppliers.map((supplier) => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.name}
+                  </option>
+                ))}
+              </select>
+              <div className="flex mt-2">
+                <input
+                  type="text"
+                  placeholder="Thêm nhà cung cấp mới"
+                  value={newSupplier}
+                  onChange={(e) => setNewSupplier(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-md p-2"
+                />
+                <button
+                  className="ml-2 bg-green-500 text-white px-4 py-2 rounded-md"
+                  onClick={handleAddSupplier}
+                >
+                  Thêm
+                </button>
+              </div>
             </div>
             <div className="mb-4">
               <label className="block text-lg font-bold mb-2">Số lượng:</label>
               <input
                 type="number"
-                value={newItem.quantity}
-                onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
+                value={newItem.quantity || ""} // Đảm bảo giá trị không phải NaN
+                onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || "" })}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
             </div>
@@ -125,7 +228,7 @@ const Inventory = () => {
             </div>
             <div className="flex justify-end space-x-4">
               <button
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
+                className="bg-green-500 text-white px-4 py-2 rounded-md"
                 onClick={handleAddItem}
               >
                 Thêm

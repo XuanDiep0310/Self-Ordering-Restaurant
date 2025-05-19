@@ -122,35 +122,39 @@ const EditMenu = () => {
     }
   };
 
+  const handleEditDish = (dish) => {
+    setNewItem({
+      name: dish.name,
+      price: dish.price,
+    });
+    setNewItemImage(null); // Reset image
+    setIsAddItemModalOpen(true);
+  };
+
   const handleAddNewItem = async () => {
-    // Validation
-    if (!selectedCategory || isNaN(parseInt(selectedCategory, 10))) {
-      alert("Vui lòng chọn một danh mục hợp lệ!");
-      return;
-    }
-    if (!newItem.name || !newItem.price || !newItemImage) {
-      alert("Vui lòng điền đầy đủ thông tin và chọn hình ảnh!");
+    if (!selectedCategory || !newItem.name || !newItem.price) {
+      alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
 
-    const newDish = {
-      name: newItem.name,
-      price: parseFloat(newItem.price),
-      categoryId: selectedCategory.categoryId,
-      status: "Available",
-    };
+    const formData = new FormData();
+    formData.append("name", newItem.name);
+    formData.append("price", newItem.price);
+    formData.append("categoryId", selectedCategory);
+    if (newItemImage) {
+      formData.append("imageFile", newItemImage);
+    }
 
     try {
-      const response = await axiosInstance.post("api/dishes", newDish);
-      const addedDish = response.data;
-      console.log("Món ăn mới đã được thêm:", addedDish);
+      await axiosInstance.post("/api/dishes", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
+      // Làm mới danh sách món ăn sau khi thêm
+      const updatedDishes = await getFoodItemsByCategory(selectedCategory);
       const updatedCategories = categories.map((cat) => {
-        if (cat.categoryId === selectedCategory.categoryId) {
-          return {
-            ...cat,
-            items: [...cat.items, addedDish],
-          };
+        if (cat.categoryId === selectedCategory) {
+          return { ...cat, items: updatedDishes };
         }
         return cat;
       });
@@ -160,8 +164,8 @@ const EditMenu = () => {
       setNewItemImage(null);
       setIsAddItemModalOpen(false);
     } catch (error) {
-      console.error("Lỗi chi tiết:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Đã xảy ra lỗi khi thêm món ăn!");
+      console.error("Error adding dish:", error);
+      alert("Đã xảy ra lỗi khi thêm món ăn!");
     }
   };
 
@@ -198,45 +202,27 @@ const EditMenu = () => {
     }
   };
 
-  // const handleDeleteDish = async (dishId, categoryId) => {
-  //   if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
-  //     try {
-  //       // await axiosInstance.delete(`api/dishes/${dishId}`);
-  //       cat.items.filter((item) => item.dishId !== dishId)
+  const handleDeleteDish = async (dishId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
+      try {
+        await deleteFoodItem(dishId);
 
-  //       const updatedCategories = categories.map((cat) => {
-  //         if (cat.categoryId === categoryId) {
-  //           return {
-  //             ...cat,
-  //             items: cat.items.filter((item) => item.dishId !== dishId),
-  //           };
-  //         }
-  //         return cat;
-  //       });
+        const updatedCategories = categories.map((cat) => {
+          if (cat.categoryId === selectedCategory) {
+            return {
+              ...cat,
+              items: cat.items.filter((item) => item.dishId !== dishId),
+            };
+          }
+          return cat;
+        });
 
-  //       setCategories(updatedCategories);
-  //       alert("Món ăn đã được xóa thành công!");
-  //     } catch (error) {
-  //       console.error("Lỗi khi xóa món ăn:", error);
-  //       alert("Đã xảy ra lỗi khi xóa món ăn!");
-  //     }
-  //   }
-  // };
-  const handleDeleteDish = async (dishId, cat) => {
-    try {
-      await deleteFoodItem(dishId);
-      const updatedCategories = categories.map((c) => {
-        if (c.id === cat.id) {
-          return {
-            ...c,
-            dishes: c.dishes.filter((d) => d.id !== dishId),
-          };
-        }
-        return c;
-      });
-      setCategories(updatedCategories);
-    } catch (error) {
-      console.error("Lỗi khi xóa món ăn:", error);
+        setCategories(updatedCategories);
+        alert("Món ăn đã được xóa thành công!");
+      } catch (error) {
+        console.error("Error deleting dish:", error);
+        alert("Đã xảy ra lỗi khi xóa món ăn!");
+      }
     }
   };
 
@@ -363,6 +349,7 @@ const EditMenu = () => {
                       <div className="flex items-center space-x-3">
                         <button
                           className="focus:outline-none hover:scale-110 transition-transform"
+                          onClick={() => handleEditDish(item)}
                           title="Sửa món ăn"
                         >
                           <img src={editIcon} alt="Edit" className="w-8 h-8" />

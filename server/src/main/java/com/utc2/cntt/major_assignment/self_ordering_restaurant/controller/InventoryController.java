@@ -6,6 +6,7 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.Inventory
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -25,9 +26,23 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.getInventoryById(inventoryId));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<InventoryResponseDTO>> searchInventory(@RequestParam("name") String name) {
+        return ResponseEntity.ok(inventoryService.searchInventoryByName(name));
+    }
+
     @PostMapping
-    public ResponseEntity<InventoryResponseDTO> createInventory(@RequestBody InventoryRequestDTO requestDTO) {
-        return ResponseEntity.ok(inventoryService.createInventory(requestDTO));
+    public ResponseEntity<?> createInventory(@RequestBody InventoryRequestDTO requestDTO) {
+        try {
+            InventoryResponseDTO responseDTO = inventoryService.createInventory(requestDTO);
+            return ResponseEntity.ok(responseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{inventory_id}")

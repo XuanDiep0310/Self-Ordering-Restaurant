@@ -33,10 +33,13 @@ export const updateTableStatus = async (tableId, status) => {
 // Hàm thêm bàn mới
 export const addTable = async (tableData) => {
   try {
-    const response = await axiosInstance.post("/api/tables", tableData);
-    return response.data; // Trả về dữ liệu sau khi thêm bàn
+    const response = await axiosInstance.post("/api/tables", {
+      ...tableData,
+      status: tableData.status || "Available", // Đảm bảo giá trị status được gửi đúng
+    });
+    return response.data;
   } catch (error) {
-    console.error("Error adding new table:", error);
+    console.error("Error adding new table:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -48,6 +51,16 @@ export const deleteTable = async (tableNumber) => {
     return response.data; // Trả về dữ liệu sau khi xóa bàn
   } catch (error) {
     console.error(`Error deleting table ${tableNumber}:`, error);
+    throw error;
+  }
+};
+
+export const updateTable = async (tableNumber, tableData) => {
+  try {
+    const response = await axiosInstance.put(`/api/tables/${tableNumber}`, tableData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating table ${tableNumber}:`, error);
     throw error;
   }
 };

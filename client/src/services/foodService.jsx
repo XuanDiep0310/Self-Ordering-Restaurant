@@ -55,13 +55,22 @@ export const addFoodItem = async (foodData) => {
 };
 
 // Hàm cập nhật món ăn
-export const updateFoodItem = async (foodId, foodData) => {
+export const updateFoodItem = async (dishId, foodData) => {
   try {
-    const response = await axiosInstance.put(`/api/dishes/${foodId}`, foodData);
-    return response.data; // Trả về dữ liệu món ăn sau khi cập nhật
+    const formData = new FormData();
+    formData.append("name", foodData.name);
+    formData.append("price", foodData.price);
+    if (foodData.imageFile) {
+      formData.append("imageFile", foodData.imageFile);
+    }
+
+    const response = await axiosInstance.put(`/api/dishes/${dishId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
   } catch (error) {
-    console.error(`Error updating food item ${foodId}:`, error);
-    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+    console.error(`Error updating food item ${dishId}:`, error);
+    throw error;
   }
 };
 

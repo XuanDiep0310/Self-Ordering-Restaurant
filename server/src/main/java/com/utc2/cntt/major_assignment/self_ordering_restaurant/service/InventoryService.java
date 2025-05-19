@@ -57,17 +57,34 @@ public class InventoryService {
     }
 
     public InventoryResponseDTO createInventory(InventoryRequestDTO requestDTO) {
+        if (requestDTO.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        if (requestDTO.getUnit() == null || requestDTO.getUnit().isEmpty()) {
+            throw new IllegalArgumentException("Unit cannot be null or empty");
+        }
+
         Ingredients ingredient = ingredientRepository.findById(requestDTO.getIngredientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found!"));
 
         Suppliers supplier = supplierRepository.findById(requestDTO.getSupplierId())
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found!"));
 
-        Inventory inventory = new Inventory();
-        inventory.setIngredient(ingredient);
-        inventory.setSupplier(supplier);
-        inventory.setQuantity(requestDTO.getQuantity());
-        inventory.setUnit(requestDTO.getUnit());
+        Inventory existingInventory = inventoryRepository.findByIngredientIdAndSupplierId(
+                requestDTO.getIngredientId(), requestDTO.getSupplierId());
+
+        Inventory inventory;
+        if (existingInventory != null) {
+            inventory = existingInventory;
+            inventory.setQuantity(inventory.getQuantity() + requestDTO.getQuantity());
+            inventory.setUnit(requestDTO.getUnit());
+        } else {
+            inventory = new Inventory();
+            inventory.setIngredient(ingredient);
+            inventory.setSupplier(supplier);
+            inventory.setQuantity(requestDTO.getQuantity());
+            inventory.setUnit(requestDTO.getUnit());
+        }
 
         Inventory savedInventory = inventoryRepository.save(inventory);
 
@@ -114,5 +131,18 @@ public class InventoryService {
             throw new ResourceNotFoundException("Inventory not found with ID: " + inventoryId);
         }
         inventoryRepository.deleteById(inventoryId);
+    }
+
+    public List<InventoryResponseDTO> searchInventoryByName(String name) {
+        return inventoryRepository.findByIngredientNameContainingIgnoreCase(name).stream()
+                .map(inventory -> new InventoryResponseDTO(
+                        inventory.getInventoryId(),
+                        inventory.getIngredient().getName(),
+                        inventory.getSupplier().getName(),
+                        inventory.getQuantity(),
+                        inventory.getUnit(),
+                        inventory.getLastUpdated()
+                ))
+                .collect(Collectors.toList());
     }
 }

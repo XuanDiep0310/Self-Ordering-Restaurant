@@ -26,9 +26,23 @@ public class TableController {
         return ResponseEntity.ok(tableResponseDTO);
     }
 
-    @PutMapping("/{table_id}")
-    public ResponseEntity<?> updateTableStatus(@PathVariable("table_id") Integer tableNumber, @RequestBody TableRequestDTO tableRequestDTO) {
-        tableService.updateTableStatus(tableNumber, tableRequestDTO);
-        return ResponseEntity.ok("Table status updated successfully!");
+    @PostMapping
+    public ResponseEntity<?> addTable(@RequestBody TableRequestDTO tableRequestDTO) {
+        TableResponseDTO newTable = tableService.addTable(tableRequestDTO);
+        return ResponseEntity.ok(newTable);
+    }
+
+    @PutMapping("/{tableNumber}")
+    public ResponseEntity<Void> updateTable(
+            @PathVariable Integer tableNumber,
+            @RequestBody TableRequestDTO tableRequestDTO) {
+        tableService.updateTable(tableNumber, tableRequestDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{tableNumber}")
+    public ResponseEntity<?> deleteTable(@PathVariable("tableNumber") Integer tableNumber) {
+        tableService.deleteTable(tableNumber);
+        return ResponseEntity.ok("Table deleted successfully!");
     }
 }

@@ -8,18 +8,28 @@ import {
   getTableData,
   updateTableStatus,
   deleteTable,
+  addTable,
 } from "../../services/tableService";
 
 const TableManagement = () => {
   const [tables, setTables] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
+  const [newTable, setNewTable] = useState({ capacity: "", location: "" });
 
   useEffect(() => {
-    getTableData()
-      .then((data) => setTables(data))
-      .catch((error) => console.error("Error fetching tables:", error));
+    fetchTables();
   }, []);
+
+  const fetchTables = async () => {
+    try {
+      const data = await getTableData();
+      setTables(data);
+    } catch (error) {
+      console.error("Error fetching tables:", error);
+    }
+  };
 
   const handleEditClick = (table) => {
     setEditingTable(table);
@@ -31,40 +41,75 @@ const TableManagement = () => {
     setEditingTable(null);
   };
 
-  const handleDeleteTable = (tableNumber) => {
+  const handleAddModalClose = () => {
+    setIsAddModalOpen(false);
+    setNewTable({ capacity: "", location: "" });
+  };
+
+  const handleDeleteTable = async (tableNumber) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa bàn này?")) {
-      deleteTable(tableNumber)
-        .then(() => {
-          setTables((prevTables) =>
-            prevTables.filter((table) => table.tableNumber !== tableNumber)
-          );
-          alert("Xóa bàn thành công!");
-        })
-        .catch((error) => console.error("Error deleting table:", error));
+      try {
+        await deleteTable(tableNumber);
+        setTables((prevTables) =>
+          prevTables.filter((table) => table.tableNumber !== tableNumber)
+        );
+        alert("Xóa bàn thành công!");
+      } catch (error) {
+        console.error("Error deleting table:", error);
+      }
     }
   };
 
-  const handleSaveTable = () => {
+  const handleSaveTable = async () => {
     if (editingTable) {
-      updateTableStatus(editingTable.tableNumber, editingTable.status)
-        .then((updatedTable) => {
-          setTables((prevTables) =>
-            prevTables.map((table) =>
-              table.tableNumber === updatedTable.tableNumber
-                ? updatedTable
-                : table
-            )
-          );
-          alert("Cập nhật trạng thái bàn thành công!");
-          handleModalClose();
-        })
-        .catch((error) => console.error("Error updating table status:", error));
+      try {
+        await updateTableStatus(editingTable.tableNumber, {
+          capacity: editingTable.capacity,
+          location: editingTable.location,
+          status: editingTable.status,
+        });
+        setTables((prevTables) =>
+          prevTables.map((table) =>
+            table.tableNumber === editingTable.tableNumber ? editingTable : table
+          )
+        );
+        alert("Cập nhật bàn thành công!");
+        handleModalClose();
+      } catch (error) {
+        console.error("Error updating table:", error);
+      }
+    }
+  };
+
+  const handleAddTable = async () => {
+    if (!newTable.capacity || !newTable.location) {
+      alert("Vui lòng nhập đầy đủ thông tin bàn!");
+      return;
+    }
+
+    try {
+      const tableData = {
+        capacity: parseInt(newTable.capacity, 10),
+        location: newTable.location,
+        status: "Available", // Đảm bảo giá trị status được gửi đúng
+      };
+      const addedTable = await addTable(tableData);
+      setTables((prevTables) => [...prevTables, addedTable]);
+      alert("Thêm bàn mới thành công!");
+      handleAddModalClose();
+    } catch (error) {
+      console.error("Error adding new table:", error.response?.data || error.message);
+      alert("Đã xảy ra lỗi khi thêm bàn!");
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditingTable((prev) => ({ ...prev, [name]: value }));
+    if (editingTable) {
+      setEditingTable((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setNewTable((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -85,7 +130,7 @@ const TableManagement = () => {
         <div className="flex justify-end mb-6">
           <button
             className="bg-white text-[#124035] px-6 py-3 rounded-md flex items-center text-md shadow-md"
-            onClick={() => alert("Chỉ có thể chỉnh sửa trạng thái bàn.")}
+            onClick={() => setIsAddModalOpen(true)}
           >
             <span className="cursor-pointer">Thêm</span>
             <span className="ml-2 text-2xl">
@@ -94,33 +139,33 @@ const TableManagement = () => {
           </button>
         </div>
 
-        <div className="bg-black/50 p-4  h-[400px]">
-        <div className="grid grid-cols-3 gap-4">
-        {allTables.map((table) => (
-            <div
-              key={table.tableNumber}
-              className={`flex items-center justify-between p-6 rounded-md shadow-md border border-white h-[100px] ${
-                table.status === "Available" ? "bg-[#7bb7e0]" : "bg-white"
-              }`}
-            >
-              <p className="font-bold text-lg">{table.name || `Bàn ${table.tableNumber}`}</p>
-              <p className="font-bold text-lg">Sức chứa: {table.capacity}</p>
-              <div className="flex space-x-2">
-                <button
-                  className="text-blue-500 focus:outline-none"
-                  onClick={() => handleEditClick(table)}
-                >
-                  <img src={editIcon} alt="Edit" className="w-10 h-10" />
-                </button>
-                <button
-                  className="text-red-500 focus:outline-none"
-                  onClick={() => handleDeleteTable(table.tableNumber)}
-                >
-                  <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
-                </button>
+        <div className="bg-black/50 p-4 h-[400px]">
+          <div className="grid grid-cols-3 gap-4">
+            {allTables.map((table) => (
+              <div
+                key={table.tableNumber}
+                className={`flex items-center justify-between p-6 rounded-md shadow-md border border-white h-[100px] ${
+                  table.status === "Available" ? "bg-[#7bb7e0]" : "bg-white"
+                }`}
+              >
+                <p className="font-bold text-lg">{table.name || `Bàn ${table.tableNumber}`}</p>
+                <p className="font-bold text-lg">Sức chứa: {table.capacity}</p>
+                <div className="flex space-x-2">
+                  <button
+                    className="text-blue-500 focus:outline-none"
+                    onClick={() => handleEditClick(table)}
+                  >
+                    <img src={editIcon} alt="Edit" className="w-10 h-10" />
+                  </button>
+                  <button
+                    className="text-red-500 focus:outline-none"
+                    onClick={() => handleDeleteTable(table.tableNumber)}
+                  >
+                    <img src={deleteIcon} alt="Delete" className="w-10 h-9" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
 
@@ -140,6 +185,15 @@ const TableManagement = () => {
         onClose={handleModalClose}
         onSave={handleSaveTable}
         onChange={handleInputChange}
+      />
+
+      <TableModal
+        isOpen={isAddModalOpen}
+        table={newTable}
+        onClose={handleAddModalClose}
+        onSave={handleAddTable}
+        onChange={handleInputChange}
+        isNew
       />
     </div>
   );

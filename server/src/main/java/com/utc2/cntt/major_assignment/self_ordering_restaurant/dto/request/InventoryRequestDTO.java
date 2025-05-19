@@ -10,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InventoryRequestDTO {
-    private Integer ingredientId;
-    private Integer supplierId;
-    private Long quantity;
-    private String unit;
+    private Integer ingredientId; // ID của nguyên liệu
+    private Integer supplierId;   // ID của nhà cung cấp
+    private Long quantity;        // Số lượng
+    private String unit;          // Đơn vị
 }
