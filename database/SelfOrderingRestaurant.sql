@@ -352,10 +352,10 @@ BEGIN
         -- Cập nhật bản ghi hiện có
         UPDATE Revenue r
         SET 
-            TotalRevenue = (SELECT COALESCE(SUM(TotalAmount), 0) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
-            TotalOrders = (SELECT COUNT(*) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
-            TotalCustomers = (SELECT COUNT(DISTINCT Customer_ID) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
-            TotalDiscount = (SELECT COALESCE(SUM(Discount), 0) FROM orders WHERE DATE(OrderDate) = input_date AND Status = 'Completed'),
+            TotalRevenue = (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE DATE(order_date) = input_date AND Status = 'Completed'),
+            TotalOrders = (SELECT COUNT(*) FROM orders WHERE DATE(order_date) = input_date AND Status = 'Completed'),
+            TotalCustomers = (SELECT COUNT(DISTINCT Customer_ID) FROM orders WHERE DATE(order_date) = input_date AND Status = 'Completed'),
+            TotalDiscount = (SELECT COALESCE(SUM(Discount), 0) FROM orders WHERE DATE(order_date) = input_date AND Status = 'Completed'),
             FoodRevenue = (
                 SELECT COALESCE(SUM(oi.sub_total), 0)
                 FROM orders o

@@ -33,6 +33,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItems, KeyOrderI
             "JOIN oi.dish d " +
             "JOIN oi.order o " +
             "WHERE oi.status IN :statuses " +
+            "AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid " +
             "GROUP BY d.name, d.image")
     List<PendingDishItemDTO> findPendingOrderItems(@Param("statuses") List<OrderItemStatus> statuses);
 

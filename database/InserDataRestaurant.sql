@@ -3,11 +3,7 @@ INSERT INTO users (username, password, user_type, email, phone, status) VALUES
 ('Admin', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'ADMIN', 'admin@nhahang.com', '0901234567', 'Active'),
 ('nhanvien01', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'STAFF', 'nhanvien01@nhahang.com', '0912345678', 'Active'),
 ('nhanvien02', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'STAFF', 'nhanvien02@nhahang.com', '0923456789', 'Active'),
-('nhanvien03', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'STAFF', 'nhanvien03@nhahang.com', '0934567890', 'Active'),
-('khach01', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'CUSTOMER', 'khach01@gmail.com', '0945678901', 'Active'),
-('khach02', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'CUSTOMER', 'khach02@gmail.com', '0956789012', 'Active'),
-('khach03', NULL, 'CUSTOMER', 'khach03@gmail.com', '0967890123', 'Active'),
-('khach04', NULL, 'CUSTOMER', 'khach04@gmail.com', '0978901234', 'Active');
+('nhanvien03', '$2a$12$Dz3UiHncevyiMFQEZjGOYetjoo.YbAvqciGlvWErIAfI2upuBqngW', 'STAFF', 'nhanvien03@nhahang.com', '0934567890', 'Active');
 
 -- Chèn dữ liệu vào bảng staff
 INSERT INTO staff (user_id, fullname, position, salary, hire_date, status) VALUES
@@ -15,13 +11,6 @@ INSERT INTO staff (user_id, fullname, position, salary, hire_date, status) VALUE
 (2, 'Trần Thị Nhân Viên', 'Nhân viên phục vụ', 8000000, '2023-02-15', 'Active'),
 (3, 'Lê Văn Đầu Bếp', 'Đầu bếp', 12000000, '2023-01-10', 'Active'),
 (4, 'Phạm Thị Thu Ngân', 'Thu ngân', 9000000, '2023-03-01', 'Active');
-
--- Chèn dữ liệu vào bảng customers
-INSERT INTO customers (user_id, fullname, points) VALUES
-(5, 'Hoàng Văn Khách', 100),
-(6, 'Đỗ Thị Hằng', 150),
-(7, 'Ngô Minh Tuấn', 50),
-(8, 'Vũ Thùy Trang', 80);
 
 -- Chèn dữ liệu vào bảng shifts
 INSERT INTO shifts (name, start_time, end_time) VALUES
@@ -42,9 +31,14 @@ INSERT INTO staff_shifts (shift_id, staff_id, date, status) VALUES
 INSERT INTO tables (capacity, status, location, qrcode) VALUES
 (2, 'Available', 'Tầng 1 - Góc cửa sổ', 'https://nhahang.com/qr/table1'),
 (4, 'Available', 'Tầng 1 - Giữa', 'https://nhahang.com/qr/table2'),
-(6, 'Occupied', 'Tầng 1 - Gần quầy bar', 'https://nhahang.com/qr/table3'),
+(6, 'Available', 'Tầng 1 - Gần quầy bar', 'https://nhahang.com/qr/table3'),
 (8, 'Available', 'Tầng 2 - Ban công', 'https://nhahang.com/qr/table4'),
-(2, 'Occupied', 'Tầng 2 - Góc lãng mạn', 'https://nhahang.com/qr/table5');
+(4, 'Available', '', ''),
+(4, 'Available', '', ''),
+(4, 'Available', '', ''),
+(4, 'Available', '', ''),
+(4, 'Available', '', ''),
+(2, 'Available', 'Tầng 2 - Góc lãng mạn', 'https://nhahang.com/qr/table5');
 
 -- Chèn dữ liệu vào bảng categories
 INSERT INTO categories (name, description, image, status) VALUES
@@ -56,45 +50,19 @@ INSERT INTO categories (name, description, image, status) VALUES
 
 -- Chèn dữ liệu vào bảng dishes
 INSERT INTO dishes (category_id, name, description, price, image, status) VALUES
-(1, 'Gỏi cuốn tôm thịt', 'Gỏi cuốn tươi với tôm, thịt heo và rau thơm', 65000, 'goicuon.jpg', 'Available'),
-(1, 'Chả giò hải sản', 'Chả giò giòn với nhân hải sản', 75000, 'chagio.jpg', 'Available'),
-(1, 'Salad trộn kiểu Thái', 'Salad chua cay kiểu Thái', 85000, 'salad.jpg', 'Available'),
-(2, 'Cơm tấm sườn bì chả', 'Cơm tấm với sườn nướng, bì và chả', 95000, 'comtam.jpg', 'Available'),
-(2, 'Bún bò Huế', 'Bún bò Huế đặc biệt cay nồng', 89000, 'bunbo.jpg', 'Available'),
-(2, 'Phở bò tái nạm', 'Phở bò với thịt tái và nạm', 79000, 'pho.jpg', 'Available'),
-(3, 'Chè hạt sen long nhãn', 'Chè hạt sen với long nhãn và thạch', 45000, 'che.jpg', 'Available'),
-(3, 'Bánh flan caramel', 'Bánh flan mềm mịn với caramel', 35000, 'flan.jpg', 'Available'),
-(4, 'Nước ép cam tươi', 'Nước ép từ cam tươi nguyên chất', 45000, 'nuoccam.jpg', 'Available'),
-(4, 'Sinh tố bơ', 'Sinh tố bơ đặc creamy', 55000, 'sinhtobo.jpg', 'Available'),
-(4, 'Trà đào cam sả', 'Trà đào thơm mát với cam và sả', 49000, 'tradao.jpg', 'Available'),
-(5, 'Lẩu Thái hải sản', 'Lẩu Thái chua cay với hải sản tươi (phục vụ 2-4 người)', 350000, 'lauthai.jpg', 'Available'),
-(5, 'Bò nướng lá lốt', 'Bò cuộn lá lốt nướng than hoa', 165000, 'bonuong.jpg', 'Available');
-
--- Chèn dữ liệu vào bảng orders
-INSERT INTO orders (staff_id, table_number, customer_id, order_date, status, notes, payment_status) VALUES
-(2, 3, 1, '2025-04-05 12:30:00', 'Completed', 'Khách yêu cầu ít cay', 'Paid'),
-(3, 5, 2, '2025-04-05 13:15:00', 'Processing', 'Khách dị ứng hải sản', 'Unpaid'),
-(4, 3, 3, '2025-04-04 19:20:00', 'Completed', NULL, 'Paid'),
-(2, 1, 4, '2025-04-04 20:10:00', 'Completed', 'Khách muốn thêm đá', 'Paid');
-
--- Chèn dữ liệu vào bảng order_items (lưu ý cần chỉnh sửa order_id và dish_id phù hợp)
-INSERT INTO order_items (order_id, dish_id, quantity, unit_price, notes, status) VALUES
-(1, 1, 2, 65000, NULL, 'Served'),
-(1, 5, 1, 89000, 'Ít cay', 'Served'),
-(1, 10, 2, 55000, NULL, 'Served'),
-(2, 4, 1, 95000, NULL, 'Processing'),
-(2, 7, 1, 45000, NULL, 'Processing'),
-(2, 11, 2, 49000, 'Thêm đá', 'Ordered'),
-(3, 12, 1, 350000, NULL, 'Served'),
-(3, 9, 4, 45000, NULL, 'Served'),
-(4, 6, 2, 79000, NULL, 'Served'),
-(4, 8, 2, 35000, NULL, 'Served');
-
--- Chèn dữ liệu vào bảng payments
-INSERT INTO payments (order_id, customer_id, amount, payment_method, transaction_id, status) VALUES
-(1, 1, 329000, 'Cash', NULL, 'Success'),
-(3, 3, 530000, 'Card', 'TXN12345678', 'Success'),
-(4, 4, 228000, 'Online', 'TXN23456789', 'Success');
+(1, 'Gỏi cuốn tôm thịt', 'Gỏi cuốn tươi với tôm, thịt heo và rau thơm', 65000, 'https://naucohungthinh.com/files/media/202109/5519_4.jpg', 'Available'),
+(1, 'Chả giò hải sản', 'Chả giò giòn với nhân hải sản', 75000, 'https://giochabobich.com/wp-content/uploads/2023/03/cha-gio-hai-san-1000x565.jpg', 'Available'),
+(1, 'Salad trộn kiểu Thái', 'Salad chua cay kiểu Thái', 85000, 'https://cdn.tgdd.vn/2021/07/CookProduct/Tom-tron-mien-kieu-Thai-1080x608.jpg', 'Available'),
+(2, 'Cơm tấm sườn bì chả', 'Cơm tấm với sườn nướng, bì và chả', 95000, 'https://cdn.tgdd.vn/Files/2021/08/16/1375565/cach-nau-com-tam-suon-bi-cha-tai-nha-ngon-nhu-ngoai-tiem-202108162244282026.jpg', 'Available'),
+(2, 'Bún bò Huế', 'Bún bò Huế đặc biệt cay nồng', 89000, 'https://www.hungryhuy.com/wp-content/uploads/bun-bo-hue-bowl.jpg', 'Available'),
+(2, 'Phở bò tái nạm', 'Phở bò với thịt tái và nạm', 79000, 'https://hotel84.com/userfiles/image/amthuc/hanoi/pho-bo-tai-30k.jpg', 'Available'),
+(3, 'Chè hạt sen long nhãn', 'Chè hạt sen với long nhãn và thạch', 45000, 'https://bepmina.vn/wp-content/uploads/2021/08/che-hat-sen-long-nhankho-2048x1449.jpeg', 'Available'),
+(3, 'Bánh flan caramel', 'Bánh flan mềm mịn với caramel', 35000, 'https://fullofplants.com/wp-content/uploads/2019/05/how-to-make-vegan-creme-caramel-dairy-free-flan-eggless-thumb.jpg', 'Available'),
+(4, 'Nước ép cam tươi', 'Nước ép từ cam tươi nguyên chất', 45000, 'https://cdn.tgdd.vn/Files/2018/11/27/1134029/cong-dung-cua-nuoc-cam-tuoi-va-cach-bao-quan-nuoc-cam-tot-nhat-6.jpg', 'Available'),
+(4, 'Sinh tố bơ', 'Sinh tố bơ đặc creamy', 55000, 'https://phunugioi.com/wp-content/uploads/2020/11/cach-lam-sinh-to-bo-xoai.jpg', 'Available'),
+(4, 'Trà đào cam sả', 'Trà đào thơm mát với cam và sả', 49000, 'https://cdn.dealtoday.vn/1b720191a9c543999ed82e6fe2b71f5f.jpg', 'Available'),
+(5, 'Lẩu Thái hải sản', 'Lẩu Thái chua cay với hải sản tươi (phục vụ 2-4 người)', 350000, 'https://cdn.nguyenkimmall.com/images/companies/_1/tin-tuc/kinh-nghiem-meo-hay/n%E1%BA%A5u%20%C4%83n/nau-lau-thai-chuan-vi-ngon-nhu-the-nao.jpg', 'Available'),
+(5, 'Bò nướng lá lốt', 'Bò cuộn lá lốt nướng than hoa', 165000, 'https://fujifoods.vn/wp-content/uploads/2021/05/bo-nuong-la-lot-3.jpg', 'Available');
 
 -- Chèn dữ liệu vào bảng notifications
 INSERT INTO notifications (table_number, title, content, type) VALUES
@@ -103,12 +71,6 @@ INSERT INTO notifications (table_number, title, content, type) VALUES
 (1, 'Yêu cầu thanh toán', 'Khách hàng ở bàn 1 muốn thanh toán', 'TableRequest'),
 (2, 'Yêu cầu khăn giấy', 'Khách hàng ở bàn 2 cần thêm khăn giấy', 'TableRequest'),
 (4, 'Yêu cầu đổi món', 'Khách hàng ở bàn 4 muốn đổi món vì quá mặn', 'TableRequest');
-
--- Chèn dữ liệu vào bảng customer_feedback
-INSERT INTO customer_feedback (customer_id, order_id, rating, comment, status) VALUES
-(1, 1, 5, 'Thức ăn rất ngon và nhân viên phục vụ tận tình', 'New'),
-(3, 3, 4, 'Món ăn ngon nhưng phục vụ hơi chậm', 'New'),
-(4, 4, 5, 'Tuyệt vời! Sẽ quay lại lần sau', 'New');
 
 -- Chèn dữ liệu vào bảng suppliers
 INSERT INTO suppliers (name, contact_person, phone, email, address) VALUES
@@ -147,5 +109,5 @@ INSERT INTO inventory (ingredient_id, quantity, unit, supplier_id) VALUES
 (6, 50, 'bó', 3);
 
 -- Gọi procedure cập nhật doanh thu cho các ngày đã có đơn hàng
-CALL UpdateDailyRevenue('2025-04-04');
-CALL UpdateDailyRevenue('2025-04-05');
+CALL UpdateDailyRevenue('2025-05-19');
+CALL UpdateDailyRevenue('2025-05-20');
