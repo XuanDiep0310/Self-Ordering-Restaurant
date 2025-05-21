@@ -12,7 +12,7 @@ public class BillItemDTO {
     private Integer orderId;
     private String dishName;
     private String image;
-    private Integer quantity;
+    private Long quantity;
     private Long unitPrice;
     private Long subTotal;
     private Long totalAmount;

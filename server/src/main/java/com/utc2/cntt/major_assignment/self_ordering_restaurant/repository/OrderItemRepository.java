@@ -37,12 +37,12 @@ public interface OrderItemRepository extends JpaRepository<OrderItems, Integer> 
 
     OrderItems findByOrderItemId(Integer orderItemId);
 
-    // src/main/java/com/utc2/cntt/major_assignment/self_ordering_restaurant/repository/OrderItemRepository.java
     @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO(" +
-            "o.table.tableNumber, o.orderId, d.name, d.image, oi.quantity, d.price, (oi.quantity * d.price), o.totalAmount, o.orderDate) " +
+            "o.table.tableNumber, o.orderId, d.name, d.image, SUM(oi.quantity), d.price, SUM(oi.quantity * d.price), o.totalAmount, o.orderDate) " +
             "FROM OrderItems oi " +
             "JOIN oi.order o " +
             "JOIN oi.dish d " +
-            "WHERE o.table.tableNumber = :tableNumber AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid")
+            "WHERE o.table.tableNumber = :tableNumber AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid " +
+            "GROUP BY o.table.tableNumber, o.orderId, d.name, d.image, d.price, o.totalAmount, o.orderDate")
     List<BillItemDTO> getBillForTable(@Param("tableNumber") Integer tableNumber);
 }
