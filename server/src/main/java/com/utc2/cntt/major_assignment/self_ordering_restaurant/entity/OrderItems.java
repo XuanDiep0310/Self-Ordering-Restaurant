@@ -1,7 +1,6 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.entity;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.key.KeyOrderItem;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,16 +12,16 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class OrderItems {
-    @EmbeddedId
-    private KeyOrderItem orderItemId;  // Composite Key
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_item_id")
+    private Integer orderItemId;
 
     @ManyToOne
-    @MapsId("orderId") // Mapping với Order_ID trong composite key
     @JoinColumn(name = "order_id")
     private Orders order;
 
     @ManyToOne
-    @MapsId("dishId") // Mapping với Dish_ID trong composite key
     @JoinColumn(name = "dish_id")
     private Dishes dish;
 

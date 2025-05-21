@@ -19,7 +19,6 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Tables;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderStatus;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.key.KeyOrderItem;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.exception.ResourceNotFoundException;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.*;
 import jakarta.transaction.Transactional;
@@ -82,31 +81,16 @@ public class OrderService {
             Dishes dish = dishRepository.findById(itemDTO.getDishId())
                     .orElseThrow(() -> new ResourceNotFoundException("Dish not found with id: " + itemDTO.getDishId()));
 
-            KeyOrderItem orderItemId = new KeyOrderItem();
-            orderItemId.setOrderId(order.getOrderId());
-            orderItemId.setDishId(dish.getDishId());
-
-            OrderItems existingItem = orderItemRepository.findByOrderItemId(orderItemId);
-
-            if (existingItem != null) {
-                // Update existing item quantity
-                existingItem.setQuantity(existingItem.getQuantity() + itemDTO.getQuantity());
-                existingItem.setNotes(itemDTO.getNote());
-                orderItemRepository.save(existingItem);
-                additionalTotal += dish.getPrice() * itemDTO.getQuantity();
-            } else {
-                // Create new order item
-                OrderItems newOrderItem = new OrderItems();
-                newOrderItem.setOrderItemId(orderItemId);
-                newOrderItem.setOrder(order);
-                newOrderItem.setDish(dish);
-                newOrderItem.setQuantity(itemDTO.getQuantity());
-                newOrderItem.setNotes(itemDTO.getNote());
-                newOrderItem.setUnitPrice(dish.getPrice());
-                newOrderItem.setStatus(OrderItemStatus.Ordered);
-                orderItemRepository.save(newOrderItem);
-                additionalTotal += dish.getPrice() * itemDTO.getQuantity();
-            }
+            // Always create new order item
+            OrderItems newOrderItem = new OrderItems();
+            newOrderItem.setOrder(order);
+            newOrderItem.setDish(dish);
+            newOrderItem.setQuantity(itemDTO.getQuantity());
+            newOrderItem.setNotes(itemDTO.getNote());
+            newOrderItem.setUnitPrice(dish.getPrice());
+            newOrderItem.setStatus(OrderItemStatus.Ordered);
+            orderItemRepository.save(newOrderItem);
+            additionalTotal += dish.getPrice() * itemDTO.getQuantity();
         }
 
         // Update total amount
@@ -160,7 +144,7 @@ public class OrderService {
             throw new IllegalArgumentException("Table number must be positive.");
             // return Collections.emptyList();
         }
-        return orderItemRepository.findPendingItemsByTableNumber(tableNumber, PENDING_STATUSES);
+        return orderItemRepository.findPendingItemsByTableNumber(tableNumber);
     }
 
     public List<PendingDishItemDTO> getPendingOrderItems() {

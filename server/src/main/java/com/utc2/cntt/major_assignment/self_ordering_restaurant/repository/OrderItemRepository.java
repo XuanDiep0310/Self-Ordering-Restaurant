@@ -4,7 +4,6 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.Bill
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.OrderItems;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus;
-import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.key.KeyOrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,31 +12,31 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderItemRepository extends JpaRepository<OrderItems, KeyOrderItem> {
-    @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO(d.name, oi.quantity, oi.notes, d.image) " +
+public interface OrderItemRepository extends JpaRepository<OrderItems, Integer> {
+    @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO(" +
+            "d.name, oi.quantity, oi.notes, d.image, oi.status) " +
             "FROM OrderItems oi " +
             "JOIN oi.order o " +
             "JOIN oi.dish d " +
             "JOIN o.table t " +
             "WHERE t.tableNumber = :tableNumber " +
-            "AND oi.status IN :statuses " +
+            "AND oi.status <> com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus.Served " +
             "AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid")
     List<PendingDishItemDTO> findPendingItemsByTableNumber(
-            @Param("tableNumber") Integer tableNumber,
-            @Param("statuses") List<OrderItemStatus> statuses
+            @Param("tableNumber") Integer tableNumber
     );
 
     @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO(" +
-            "d.name, d.image, CAST(SUM(oi.quantity) AS int)) " +
+            "d.name, CAST(SUM(oi.quantity) AS int), oi.notes, d.image, oi.status) " +
             "FROM OrderItems oi " +
             "JOIN oi.dish d " +
             "JOIN oi.order o " +
             "WHERE oi.status IN :statuses " +
             "AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid " +
-            "GROUP BY d.name, d.image")
+            "GROUP BY d.name, d.image, oi.notes, oi.status")
     List<PendingDishItemDTO> findPendingOrderItems(@Param("statuses") List<OrderItemStatus> statuses);
 
-    OrderItems findByOrderItemId(KeyOrderItem orderItemId);
+    OrderItems findByOrderItemId(Integer orderItemId);
 
     // src/main/java/com/utc2/cntt/major_assignment/self_ordering_restaurant/repository/OrderItemRepository.java
     @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO(" +

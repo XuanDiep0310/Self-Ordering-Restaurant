@@ -37,7 +37,7 @@ const StaffInfo = ({ user, onClose }) => {
       alert(message);
       setIsEditing(false);
     } catch (error) {
-      // Phần xử lý lỗi giữ nguyên
+      console.error("Error updating staff info:", error);
     } finally {
       setIsLoading(false);
     }
