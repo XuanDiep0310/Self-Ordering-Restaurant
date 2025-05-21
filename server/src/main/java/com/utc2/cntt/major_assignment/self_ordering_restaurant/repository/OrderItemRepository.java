@@ -14,26 +14,25 @@ import java.util.List;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItems, Integer> {
     @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO(" +
-            "d.name, oi.quantity, oi.notes, d.image, oi.status) " +
+            "oi.orderItemId, d.name, oi.quantity, oi.notes, d.image, oi.status) " +
             "FROM OrderItems oi " +
             "JOIN oi.order o " +
             "JOIN oi.dish d " +
             "JOIN o.table t " +
             "WHERE t.tableNumber = :tableNumber " +
-            "AND oi.status <> com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.OrderItemStatus.Served " +
             "AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid")
     List<PendingDishItemDTO> findPendingItemsByTableNumber(
             @Param("tableNumber") Integer tableNumber
     );
 
     @Query("SELECT new com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PendingDishItemDTO(" +
-            "d.name, CAST(SUM(oi.quantity) AS int), oi.notes, d.image, oi.status) " +
+            "oi.orderItemId, d.name, CAST(SUM(oi.quantity) AS int), oi.notes, d.image, oi.status) " +
             "FROM OrderItems oi " +
             "JOIN oi.dish d " +
             "JOIN oi.order o " +
             "WHERE oi.status IN :statuses " +
             "AND o.paymentStatus = com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentOrderStatus.Unpaid " +
-            "GROUP BY d.name, d.image, oi.notes, oi.status")
+            "GROUP BY oi.orderItemId, d.name, d.image, oi.notes, oi.status")
     List<PendingDishItemDTO> findPendingOrderItems(@Param("statuses") List<OrderItemStatus> statuses);
 
     OrderItems findByOrderItemId(Integer orderItemId);

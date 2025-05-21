@@ -102,3 +102,15 @@ export const downloadBillPDF = async (tableNumber) => {
       throw error;
     }
   };
+
+export const updateOrderItemStatus = async (orderItemId, status) => {
+    try {
+        const response = await axiosInstance.put(`/api/order-items/update-status/${orderItemId}`, {
+            status: status
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Error updating order item status:`, error);
+        throw error;
+    }
+};
