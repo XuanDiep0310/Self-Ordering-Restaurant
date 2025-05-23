@@ -24,6 +24,8 @@ const AdminDashboard = () => {
       navigate("/admin/feedback");
     } else if (tab === "TÀI KHOẢN") {
       navigate("/admin/account");
+    } else if (tab === "LỊCH SỬ HOÁ ĐƠN") {
+      navigate("/admin/payment-history");
     }
   };
 
@@ -40,7 +42,7 @@ const AdminDashboard = () => {
         />
         </div>
         <ul>
-          {["MENU", "NHÂN VIÊN", "BÀN", "KHO", "DOANH THU", "PHẢN HỒI", "TÀI KHOẢN"].map((tab) => (
+          {["MENU", "NHÂN VIÊN", "BÀN", "KHO", "DOANH THU", "LỊCH SỬ HOÁ ĐƠN", "PHẢN HỒI", "TÀI KHOẢN"].map((tab) => (
             <li
               key={tab}
               className={`p-5 my-2 rounded-lg text-center cursor-pointer text-2xl ${

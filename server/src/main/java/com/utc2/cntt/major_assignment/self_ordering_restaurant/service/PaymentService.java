@@ -2,6 +2,7 @@ package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.config.VNPayConfig;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.TableRequestDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.HistoryBillDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Orders;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Payments;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.enums.PaymentMethod;
@@ -267,5 +268,22 @@ public class PaymentService {
         orderRepository.save(order);
 
         log.info("Created cash payment record for order ID: {}", orderId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<HistoryBillDTO> getPaymentHistory() {
+        return paymentRepository.getPaymentHistory().stream()
+                .map(record -> new HistoryBillDTO(
+                        record.getOrderId(),
+                        record.getTableNumber(),
+                        record.getAmount(),
+                        record.getPaymentMethod(),
+                        record.getPaymentDate(),
+                        record.getDishName(),
+                        record.getQuantity(),
+                        record.getUnitPrice(),
+                        record.getSubTotal()
+                ))
+                .collect(Collectors.toList());
     }
 }

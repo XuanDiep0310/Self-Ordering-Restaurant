@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import AdminHeader from "../../components/Admin/Admin_header";
 import { Bar, Pie } from "react-chartjs-2";
@@ -25,6 +26,7 @@ ChartJS.register(
 );
 
 const Revenue = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Dữ liệu cứng (mock data)
@@ -32,7 +34,9 @@ const Revenue = () => {
     completedOrders: 120,
     todayExpense: 500,
     yesterdayExpense: 450,
-    monthlyIncome: [1000, 1200, 1500, 2000, 1800, 2200, 2500, 2700, 3000, 3200, 3500, 4000],
+    monthlyIncome: [
+      1000, 1200, 1500, 2000, 1800, 2200, 2500, 2700, 3000, 3200, 3500, 4000,
+    ],
     monthlyRevenue: 35000,
   };
 
@@ -84,10 +88,22 @@ const Revenue = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="px-10 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Tổng quan doanh thu</h2>
+          <button
+            onClick={() => navigate("/admin/payment-history")}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+          >
+            Xem lịch sử hóa đơn
+          </button>
+        </div>
+
         <div className="grid grid-cols-3 gap-6 mb-6">
           {/* Completed Orders */}
           <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-            <h2 className="text-4xl font-bold">{revenueData.completedOrders}</h2>
+            <h2 className="text-4xl font-bold">
+              {revenueData.completedOrders}
+            </h2>
             <p className="text-lg text-gray-600">Đơn hàng đã hoàn thành</p>
           </div>
 
@@ -99,7 +115,9 @@ const Revenue = () => {
 
           {/* Yesterday's Expense */}
           <div className="bg-green-500 text-white shadow-md rounded-lg p-6 flex flex-col items-center">
-            <h2 className="text-4xl font-bold">${revenueData.yesterdayExpense}</h2>
+            <h2 className="text-4xl font-bold">
+              ${revenueData.yesterdayExpense}
+            </h2>
             <p className="text-lg">Chi tiêu hôm qua</p>
           </div>
         </div>
@@ -107,7 +125,9 @@ const Revenue = () => {
         <div className="grid grid-cols-2 gap-6">
           {/* Monthly Income vs Expense */}
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-4">Tổng quan thu chi tháng này</h3>
+            <h3 className="text-xl font-bold mb-4">
+              Tổng quan thu chi tháng này
+            </h3>
             <div className="h-64">
               <Pie data={incomeExpenseData} />
             </div>

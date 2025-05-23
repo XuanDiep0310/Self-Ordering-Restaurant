@@ -1,6 +1,7 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.controller;
 
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.PaymentRequestDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.HistoryBillDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.PaymentResponseDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -111,6 +113,12 @@ public class PaymentController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing cash payment: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<HistoryBillDTO>> getPaymentHistory() {
+        List<HistoryBillDTO> paymentHistory = paymentService.getPaymentHistory();
+        return ResponseEntity.ok(paymentHistory);
     }
 }
 

@@ -26,6 +26,9 @@ const Sidebar = ({ isOpen, onClose }) => {
       case "DOANH THU":
         navigate("/admin/revenue");
         break;
+      case "LỊCH SỬ HOÁ ĐƠN":
+        navigate("/admin/payment-history");
+        break;
       case "PHẢN HỒI":
         navigate("/admin/feedback");
         break;
@@ -59,7 +62,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           />
         </div>
         <ul>
-          {["MENU", "NHÂN VIÊN", "BÀN", "KHO", "DOANH THU", "PHẢN HỒI", "TÀI KHOẢN"].map((tab) => (
+          {["MENU", "NHÂN VIÊN", "BÀN", "KHO", "DOANH THU", "LỊCH SỬ HOÁ ĐƠN", "PHẢN HỒI", "TÀI KHOẢN"].map((tab) => (
             <li
               key={tab}
               className={`p-4 my-2 rounded-lg text-center cursor-pointer text-xl ${

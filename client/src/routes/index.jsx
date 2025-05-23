@@ -19,14 +19,15 @@ import Feedback from "../pages/Admin/Feedback";
 import Inventory from "../pages/Admin/Inventory";
 import AdminInfo from "../pages/Admin/AdminInfo";
 import Revenue from "../pages/Admin/Revenue";
+import PaymentHistory from "../pages/Admin/PaymentHistory";
 
 // Tạo helper function để làm ngắn gọn code
 const adminRoute = (element) => (
-  <ProtectedRoute allowedRoles={['ADMIN']}>{element}</ProtectedRoute>
+  <ProtectedRoute allowedRoles={["ADMIN"]}>{element}</ProtectedRoute>
 );
 
 const staffRoute = (element) => (
-  <ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}>{element}</ProtectedRoute>
+  <ProtectedRoute allowedRoles={["STAFF", "ADMIN"]}>{element}</ProtectedRoute>
 );
 
 const routes = [
@@ -53,7 +54,7 @@ const routes = [
   { path: "/admin/feedback", element: adminRoute(<Feedback />) },
   { path: "/admin/inventory", element: adminRoute(<Inventory />) },
   { path: "/admin/revenue", element: adminRoute(<Revenue />) },
-
+  { path: "/admin/payment-history", element: adminRoute(<PaymentHistory />) },
 ];
 
 export default routes;
