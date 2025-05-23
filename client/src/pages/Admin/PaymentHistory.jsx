@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getPaymentHistory } from "../../services/revenueService";
-import { downloadBillPDF } from "../../services/orderService";
+import { getPaymentHistory, downloadHistoryBillPDF } from "../../services/revenueService";
 import AdminHeader from "../../components/Admin/Admin_header";
 import Sidebar from "./Sidebar";
 
@@ -266,9 +265,8 @@ const PaymentHistory = () => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  downloadBillPDF(
-                                    order.orderId,
-                                    order.tableNumber
+                                  downloadHistoryBillPDF(
+                                    order.orderId
                                   );
                                 }}
                                 className="bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center space-x-1 text-sm"

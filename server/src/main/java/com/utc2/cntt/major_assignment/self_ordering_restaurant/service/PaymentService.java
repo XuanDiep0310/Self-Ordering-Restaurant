@@ -1,7 +1,14 @@
 package com.utc2.cntt.major_assignment.self_ordering_restaurant.service;
 
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.draw.LineSeparator;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.config.VNPayConfig;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.request.TableRequestDTO;
+import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.BillItemDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.dto.response.BillResponseDTO.HistoryBillDTO;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Orders;
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.entity.Payments;
@@ -15,14 +22,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -285,5 +298,114 @@ public class PaymentService {
                         record.getSubTotal()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<byte[]> exportHistoryBillPdf(Integer orderId) {
+        List<BillItemDTO> billItems = paymentRepository.getBillByOrderId(orderId);
+
+        Document document = new Document(PageSize.A6, 18, 18, 18, 18); // A6 size, smaller margins
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            // Fonts for A6: smaller but bold for headers
+            Font titleFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+            Font headerFont = new Font(Font.HELVETICA, 10, Font.BOLD);
+            Font boldFont = new Font(Font.HELVETICA, 9, Font.BOLD);
+            Font normalFont = new Font(Font.HELVETICA, 9, Font.NORMAL);
+
+            // Title and info
+            Paragraph title = new Paragraph("DAILY FOOD", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            Paragraph address = new Paragraph("Số 450 Lê Văn Việt - TP Thủ Đức, Hồ Chí Minh\nSĐT: 0389379012", normalFont);
+            address.setAlignment(Element.ALIGN_CENTER);
+            document.add(address);
+
+            document.add(Chunk.NEWLINE);
+
+            Paragraph billTitle = new Paragraph("HOÁ ĐƠN THANH TOÁN", headerFont);
+            billTitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(billTitle);
+
+            Paragraph billNo = new Paragraph("Số HĐ: " + orderId, boldFont);
+            billNo.setAlignment(Element.ALIGN_CENTER);
+            document.add(billNo);
+
+            document.add(Chunk.NEWLINE);
+
+            // Table and time
+            Paragraph tableInfo = new Paragraph("Bàn " + billItems.get(0).getTableNumber(), boldFont);
+            document.add(tableInfo);
+
+            String orderTime = billItems.isEmpty() ? "" : billItems.get(0).getOrderDate().toString();
+            Paragraph timeInfo = new Paragraph("Thời gian: " + orderTime, boldFont);
+            document.add(timeInfo);
+
+            document.add(Chunk.NEWLINE);
+
+            // Table with 5 columns
+            PdfPTable pdfTable = new PdfPTable(new float[]{1, 4, 1, 2, 2});
+            pdfTable.setWidthPercentage(100);
+
+            // Table headers
+            String[] headers = {"STT", "Tên món", "SL", "Đơn giá", "Thành tiền"};
+            for (String h : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(h, boldFont));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setBackgroundColor(Color.LIGHT_GRAY);
+                pdfTable.addCell(cell);
+            }
+
+            // Table rows
+            int idx = 1;
+            for (BillItemDTO item : billItems) {
+                pdfTable.addCell(new PdfPCell(new Phrase(String.valueOf(idx++), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(item.getDishName(), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(String.valueOf(item.getQuantity()), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(String.format("%,d", item.getUnitPrice()), normalFont)));
+                pdfTable.addCell(new PdfPCell(new Phrase(String.format("%,d", item.getSubTotal()), normalFont)));
+            }
+
+            // Fill empty rows if less than 7
+            for (int i = billItems.size(); i < 7; i++) {
+                for (int j = 0; j < 5; j++) {
+                    pdfTable.addCell(new PdfPCell(new Phrase(" ")));
+                }
+            }
+
+            document.add(pdfTable);
+
+            document.add(Chunk.NEWLINE);
+
+            // Total
+            long total = billItems.isEmpty() ? 0 : billItems.get(0).getTotalAmount();
+            Paragraph totalLine = new Paragraph("Tổng tiền: " + String.format("%,d", total) + "đ", boldFont);
+            totalLine.setAlignment(Element.ALIGN_LEFT);
+            document.add(totalLine);
+
+            document.add(Chunk.NEWLINE);
+            document.add(new LineSeparator());
+
+            // Thank you
+            Paragraph thanks = new Paragraph("Cảm ơn Quý khách !", headerFont);
+            thanks.setAlignment(Element.ALIGN_CENTER);
+            document.add(thanks);
+
+            document.close();
+
+            HttpHeaders headersHttp = new HttpHeaders();
+            headersHttp.setContentType(MediaType.APPLICATION_PDF);
+            headersHttp.setContentDispositionFormData("attachment", "bill_table_" + billItems.get(0).getTableNumber() + ".pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headersHttp)
+                    .body(out.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
     }
 }

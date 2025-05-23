@@ -120,5 +120,10 @@ public class PaymentController {
         List<HistoryBillDTO> paymentHistory = paymentService.getPaymentHistory();
         return ResponseEntity.ok(paymentHistory);
     }
+
+    @GetMapping("/bill/history/{orderId}/pdf")
+    public ResponseEntity<byte[]> exportBillPdf(@PathVariable Integer orderId) {
+        return paymentService.exportHistoryBillPdf(orderId);
+    }
 }
 
