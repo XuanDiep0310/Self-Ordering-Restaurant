@@ -146,6 +146,7 @@ CREATE TABLE dishes (
 
 -- OrderItems table
 CREATE TABLE order_items (
+	order_item_id INT AUTO_INCREMENT,
     order_id INT,
     dish_id INT,
     quantity INT NOT NULL,
@@ -153,7 +154,7 @@ CREATE TABLE order_items (
     notes TEXT,
     status ENUM('Ordered', 'Processing', 'Served', 'Cancelled'),
     sub_total BIGINT GENERATED ALWAYS AS (COALESCE(quantity * unit_price, 0)) STORED,
-    PRIMARY KEY (order_id, dish_id),
+    PRIMARY KEY (order_item_id),
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (dish_id) REFERENCES dishes(dish_id) ON DELETE CASCADE
 );
