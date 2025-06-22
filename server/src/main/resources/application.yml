@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/selforderingrestaurant
-    username: root
-    password: Diepdiep@0310
+    username: ngan123
+    password: ngan123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

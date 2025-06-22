@@ -20,6 +20,8 @@ import Inventory from "../pages/Admin/Inventory";
 import AdminInfo from "../pages/Admin/AdminInfo";
 import Revenue from "../pages/Admin/Revenue";
 import PaymentHistory from "../pages/Admin/PaymentHistory";
+import PaymentSuccess from "../pages/Customer/PaymentSuccess";
+import VnpayRedirect from "../pages/Customer/VnpayRedirect";
 
 // Tạo helper function để làm ngắn gọn code
 const adminRoute = (element) => (
@@ -41,6 +43,8 @@ const routes = [
   { path: "/review", element: <ReviewPage /> },
   { path: "/forbidden", element: <ForbiddenPage /> },
   { path: "/login", element: <LoginPage /> },
+  { path: "/payment-success", element: <PaymentSuccess /> },
+  { path: "/vnpay-redirect", element: <VnpayRedirect /> },
 
   // Staff routes (cho phép cả STAFF và ADMIN truy cập)
   { path: "/staff", element: staffRoute(<StaffDashboard />) },
