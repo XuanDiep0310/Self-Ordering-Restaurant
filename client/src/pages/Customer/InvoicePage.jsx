@@ -1,37 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Logo from "../../assets/images/logo.png"; // Import logo
-import { getBillByTable } from "../../services/orderService"; // Import hàm lấy danh sách món
-import { sendNotification } from "../../services/notificationService"; // Import hàm gửi thông báo
-import { createVNPayPayment } from "../../services/paymentService"; // Import hàm gọi API
+import Logo from "../../assets/images/logo.png";
+import { getBillByTable } from "../../services/orderService";
+import { sendNotification } from "../../services/notificationService";
+import { createVNPayPayment } from "../../services/paymentService";
 
 const InvoicePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { tableNumber } = location.state || {}; // Lấy số bàn từ state khi chuyển hướng
-  const [billItems, setBillItems] = useState([]); // Danh sách món ăn
-  const [total, setTotal] = useState(0); // Tổng tiền
-  const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
-  const [error, setError] = useState(null); // Trạng thái lỗi
-  const [showPaymentOptions, setShowPaymentOptions] = useState(false); // Hiển thị hộp thoại thanh toán
-  const [paymentMethod, setPaymentMethod] = useState("VNPay"); // Phương thức thanh toán mặc định
-  const [paymentMessage, setPaymentMessage] = useState(""); // Thông báo thanh toán
+  const { tableNumber } = location.state || {};
+  const [billItems, setBillItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("VNPay");
+  const [paymentMessage, setPaymentMessage] = useState("");
 
   useEffect(() => {
     const fetchBillItems = async () => {
       try {
         setLoading(true);
-        const data = await getBillByTable(tableNumber); // Gọi API lấy danh sách món
+        const data = await getBillByTable(tableNumber);
         setBillItems(data);
-
-        // Tính tổng tiền
         const totalAmount = data.reduce(
           (sum, item) => sum + item.quantity * item.unitPrice,
           0
         );
         setTotal(totalAmount);
       } catch (error) {
-        console.error(`Error fetching bill for table ${tableNumber}:`, error);
         setError("Không thể tải thông tin hóa đơn. Vui lòng thử lại!");
       } finally {
         setLoading(false);
@@ -53,50 +50,34 @@ const InvoicePage = () => {
         return;
       }
 
-      // Gửi thông báo lên cơ sở dữ liệu
       await sendNotification({
-        tableNumber: parseInt(tableNumber, 10), // Đảm bảo tableNumber là số
+        tableNumber: parseInt(tableNumber, 10),
         content: `Khách tại bàn ${tableNumber} đã yêu cầu thanh toán.`,
       });
 
-      // Xử lý thanh toán theo phương thức
       if (paymentMethod === "VNPay") {
-        // Gọi API backend để tạo thanh toán VNPay
         const paymentData = {
           total,
-          orderId: billItems[0]?.orderId, // Sử dụng orderId từ billItems
+          orderId: billItems[0]?.orderId,
           orderInfo: `Thanh toán bàn ${tableNumber}`,
-          returnUrl: "http://localhost:3000/payment-success",
-        };
+          returnUrl: `http://localhost:3000/vnpay-redirect?tableNumber=${tableNumber}&...`        };
         const response = await createVNPayPayment(paymentData);
-        console.log(response);
-
-        // Kiểm tra phản hồi từ backend
         if (response && response.paymentUrl) {
           setPaymentMessage("Đang chuyển hướng đến VNPay...");
           setTimeout(() => {
-            window.location.href = response.paymentUrl; // Chuyển hướng đến VNPay
+            window.location.href = response.paymentUrl;
           }, 2000);
         } else {
-          setPaymentMessage(
-            "Không thể tạo thanh toán VNPay. Vui lòng thử lại!"
-          );
+          setPaymentMessage("Không thể tạo thanh toán VNPay. Vui lòng thử lại!");
         }
       } else {
-        setPaymentMessage("Vui lòng chờ nhân viên trong giây lát...!");
-      }
-
-      // Chuyển về trang HomePage của bàn sau 10 giây nếu không phải VNPay
-      if (paymentMethod !== "VNPay") {
+        setPaymentMessage("Vui lòng chờ nhân viên xác nhận thanh toán...");
         setTimeout(() => {
           navigate(`/customer?tableNumber=${tableNumber}`);
         }, 10000);
       }
     } catch (error) {
-      console.error("Error completing payment:", error);
-      setPaymentMessage(
-        "Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!"
-      );
+      setPaymentMessage("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");
     }
   };
 
@@ -122,7 +103,7 @@ const InvoicePage = () => {
       <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg shadow-md">
         <button
           className="text-white text-lg"
-          onClick={() => navigate(-1)} // Quay lại trang trước
+          onClick={() => navigate(-1)}
         >
           &#8592; Quay lại
         </button>
@@ -173,7 +154,7 @@ const InvoicePage = () => {
       <div className="mt-4">
         <button
           className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-2 rounded-lg"
-          onClick={() => setShowPaymentOptions(true)} // Hiển thị tùy chọn thanh toán
+          onClick={() => setShowPaymentOptions(true)}
         >
           Hoàn tất thanh toán
         </button>
@@ -185,7 +166,7 @@ const InvoicePage = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg w-80 relative">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => setShowPaymentOptions(false)} // Đóng hộp thoại
+              onClick={() => setShowPaymentOptions(false)}
             >
               ✖
             </button>
@@ -208,7 +189,7 @@ const InvoicePage = () => {
             </p>
             <button
               className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-2 rounded-lg"
-              onClick={handleCompletePayment} // Xử lý thanh toán
+              onClick={handleCompletePayment}
             >
               Thanh toán
             </button>

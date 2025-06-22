@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { createOrder } from "../../services/orderService"; // Import hàm tạo đơn hàng
-import { updateTableStatus } from "../../services/tableService"; // Import hàm cập nhật trạng thái bàn
+import { createOrder } from "../../services/orderService";
+import { updateTableStatus } from "../../services/tableService";
+import { getFoodById } from "../../services/foodService"; // Đảm bảo có hàm này
 
 const CartPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const tableNumber = searchParams.get("tableNumber"); // Lấy tableNumber từ URL
+    const tableNumber = searchParams.get("tableNumber");
     const [cart, setCart] = useState([]);
     const [total, setTotal] = useState(0);
     const [showConfirmClear, setShowConfirmClear] = useState(false);
@@ -19,6 +20,27 @@ const CartPage = () => {
         setTotal(storedCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
     }, []);
 
+    // Bổ sung: Lấy lại ảnh từ API nếu thiếu
+    useEffect(() => {
+        const fetchImages = async () => {
+            const updatedCart = await Promise.all(
+                cart.map(async (item) => {
+                    if (!item.image || item.image.trim() === "") {
+                        try {
+                            const food = await getFoodById(item.dishId);
+                            return { ...item, image: food.image || "" };
+                        } catch {
+                            return item;
+                        }
+                    }
+                    return item;
+                })
+            );
+            setCart(updatedCart);
+        };
+        if (cart.length > 0) fetchImages();
+        // eslint-disable-next-line
+    }, [cart.length]);
     // Xử lý tăng/giảm số lượng món ăn
     const handleQuantityChange = (dishId, type) => {
         const updatedCart = cart.map((item) => {
@@ -135,9 +157,19 @@ const CartPage = () => {
                             className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-4"
                         >
                             <img
-                                src={item.image}
+                                src={
+                                    item.image && typeof item.image === "string" && item.image.trim() !== ""
+                                        ? (item.image.startsWith("http")
+                                            ? item.image
+                                            : "/images/" + item.image)
+                                        : "/images/no-image.png"
+                                }
                                 alt={item.name}
                                 className="w-16 h-16 rounded-lg"
+                                onError={e => {
+                                    e.target.onerror = null;
+                                    e.target.src = "/images/no-image.png";
+                                }}
                             />
                             <div className="flex-1 mx-4">
                                 <h3 className="font-semibold">{item.name}</h3>
