@@ -9,8 +9,8 @@ import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.Catego
 import com.utc2.cntt.major_assignment.self_ordering_restaurant.repository.DishRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.io.IOException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,5 +72,25 @@ public class DishService {
         dishRepository.delete(dish);
     }
 
+    public void updateDish(Integer dishId, DishRequestDTO request) {
+        Dishes dish = dishRepository.findById(dishId)
+                .orElseThrow(() -> new ResourceNotFoundException("Dish not found with id: " + dishId));
+        dish.setDishId(dishId);
+        dish.setName(request.getName());
+        dish.setPrice(request.getPrice());
+        dish.setStatus(request.getStatus());
+        dish.setCategory(categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + request.getCategoryId())));
+        // Xử lý upload hình ảnh
+        if (request.getImageFile() != null && !request.getImageFile().isEmpty()) {
+            try {
+                String imageUrl = fileStorageService.storeFile(request.getImageFile());
+                dish.setImage(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to store image file", e);
+            }
+        }
+        dishRepository.save(dish);
+    }
 }
 

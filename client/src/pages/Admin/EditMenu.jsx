@@ -6,10 +6,9 @@ import editIcon from "../../assets/images/Change_Icon.png";
 import deleteIcon from "../../assets/images/Delete_Icon.png";
 import axiosInstance from "../../config/axios";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { getCategories } from "../../services/categoriesService";
 import { getFoodItemsByCategory } from "../../services/foodService";
-import { deleteFoodItem } from "../../services/foodService";
+import { deleteFoodItem, updateFoodItem } from "../../services/foodService";
 
 const EditMenu = () => {
   const [categories, setCategories] = useState([]);
@@ -20,8 +19,9 @@ const EditMenu = () => {
   const [newItem, setNewItem] = useState({ name: "", price: "" });
   const [newItemImage, setNewItemImage] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const navigate = useNavigate();
+  const [isEditItemModalOpen, setIsEditItemModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editingItemImage, setEditingItemImage] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,10 +69,6 @@ const EditMenu = () => {
 
   const handleAddItem = () => {
     setIsAddItemModalOpen(true);
-  };
-
-  const handleSelectCategory = (categoryId) => {
-    setSelectedCategory(categoryId);
   };
 
   const handleUpdateCategory = async () => {
@@ -252,6 +248,64 @@ const EditMenu = () => {
     }
   };
 
+  const handleEditItemClick = (item) => {
+    setEditingItem({ ...item });
+    setEditingItemImage(null);
+    setIsEditItemModalOpen(true);
+  };
+
+  const handleEditItemModalClose = () => {
+    setIsEditItemModalOpen(false);
+    setEditingItem(null);
+    setEditingItemImage(null);
+  };
+
+  const handleEditItemImageChange = (e) => {
+    const file = e.target.files[0];
+    setEditingItemImage(file);
+  };
+
+  const handleUpdateItem = async () => {
+    if (
+      !editingItem.name ||
+      !editingItem.price ||
+      !editingItem.categoryId ||
+      !editingItem.status
+    ) {
+      alert("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("name", editingItem.name);
+      formData.append("price", parseFloat(editingItem.price));
+      formData.append("categoryId", parseInt(editingItem.categoryId));
+      formData.append("status", editingItem.status);
+      if (editingItemImage) {
+        formData.append("imageFile", editingItemImage);
+      }
+      await updateFoodItem(editingItem.dishId, formData);
+      // Cập nhật lại danh sách món ăn
+      const updatedDishes = await getFoodItemsByCategory(
+        editingItem.categoryId
+      );
+      setCategories((prevCategories) =>
+        prevCategories.map((cat) => {
+          if (cat.categoryId === editingItem.categoryId) {
+            return { ...cat, items: updatedDishes };
+          }
+          return cat;
+        })
+      );
+      setIsEditItemModalOpen(false);
+      setEditingItem(null);
+      setEditingItemImage(null);
+      alert("Cập nhật món ăn thành công!");
+    } catch {
+      alert("Đã xảy ra lỗi khi cập nhật món ăn!");
+    }
+  };
+
   // Get current category's items
   const currentCategoryItems =
     categories.find((cat) => cat.categoryId == selectedCategory)?.items || [];
@@ -365,9 +419,22 @@ const EditMenu = () => {
                           alt={item.name}
                           className="w-16 h-16 rounded-lg object-cover shadow-sm"
                         />
-                        <p className="font-bold text-lg text-gray-800">
-                          {item.name}
-                        </p>
+                        <div>
+                          <p className="font-bold text-lg text-gray-800">
+                            {item.name}
+                          </p>
+                          <span
+                            className={`inline-block mt-1 px-3 py-1 text-xs font-semibold rounded-full ${
+                              item.status === "Available"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {item.status === "Available"
+                              ? "Đang kinh doanh"
+                              : "Ngừng kinh doanh"}
+                          </span>
+                        </div>
                       </div>
                       <div className="text-gray-700 font-medium mx-8">
                         {new Intl.NumberFormat("vi-VN").format(item.price)} VND
@@ -376,6 +443,7 @@ const EditMenu = () => {
                         <button
                           className="focus:outline-none hover:scale-110 transition-transform"
                           title="Sửa món ăn"
+                          onClick={() => handleEditItemClick(item)}
                         >
                           <img src={editIcon} alt="Edit" className="w-8 h-8" />
                         </button>
@@ -542,6 +610,148 @@ const EditMenu = () => {
                 <button
                   className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-all"
                   onClick={handleAddItemModalClose}
+                >
+                  Hủy bỏ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Item Modal */}
+      {isEditItemModalOpen && editingItem && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#124035] rounded-lg p-6 w-2/3 shadow-2xl">
+            <h2 className="text-2xl font-bold text-center text-white py-3">
+              SỬA MÓN ĂN
+            </h2>
+            <div className="bg-white p-6 rounded-lg">
+              <div className="flex flex-wrap -mx-2">
+                {/* Left column */}
+                <div className="w-1/2 px-2 mb-4">
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">
+                      Tên món:
+                    </label>
+                    <input
+                      type="text"
+                      value={editingItem.name}
+                      onChange={(e) =>
+                        setEditingItem({ ...editingItem, name: e.target.value })
+                      }
+                      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">
+                      Giá (VND):
+                    </label>
+                    <input
+                      type="number"
+                      value={editingItem.price}
+                      onChange={(e) =>
+                        setEditingItem({
+                          ...editingItem,
+                          price: e.target.value,
+                        })
+                      }
+                      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">
+                      Danh mục:
+                    </label>
+                    <select
+                      value={editingItem.categoryId}
+                      onChange={(e) =>
+                        setEditingItem({
+                          ...editingItem,
+                          categoryId: e.target.value,
+                        })
+                      }
+                      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat.categoryId} value={cat.categoryId}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">
+                      Trạng thái:
+                    </label>
+                    <select
+                      value={editingItem.status}
+                      onChange={(e) =>
+                        setEditingItem({
+                          ...editingItem,
+                          status: e.target.value,
+                        })
+                      }
+                      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#124035]"
+                    >
+                      <option value="Available">Đang kinh doanh</option>
+                      <option value="Unavailable">Ngừng kinh doanh</option>
+                    </select>
+                  </div>
+                </div>
+                {/* Right column - Image upload */}
+                <div className="w-1/2 px-2 mb-4">
+                  <label className="block text-lg font-medium mb-2">
+                    Hình ảnh món ăn:
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEditItemImageChange}
+                      className="hidden"
+                      id="edit-food-image-upload"
+                    />
+                    <label
+                      htmlFor="edit-food-image-upload"
+                      className="cursor-pointer text-[#124035] hover:text-opacity-80"
+                    >
+                      {editingItemImage ? (
+                        <div className="flex flex-col items-center">
+                          <img
+                            src={URL.createObjectURL(editingItemImage)}
+                            alt="Preview"
+                            className="max-w-full h-48 object-contain mb-2 rounded-md"
+                          />
+                          <span className="text-sm">Nhấn để thay đổi</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <img
+                            src={
+                              editingItem.image ||
+                              "https://via.placeholder.com/150"
+                            }
+                            alt="Preview"
+                            className="max-w-full h-48 object-contain mb-2 rounded-md"
+                          />
+                          <span className="text-sm">Nhấn để thay đổi</span>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-4 mt-4">
+                <button
+                  className="bg-[#124035] text-white px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all"
+                  onClick={handleUpdateItem}
+                >
+                  Lưu thay đổi
+                </button>
+                <button
+                  className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-all"
+                  onClick={handleEditItemModalClose}
                 >
                   Hủy bỏ
                 </button>

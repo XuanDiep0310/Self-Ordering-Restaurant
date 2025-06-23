@@ -19,32 +19,32 @@ export const addFoodItem = async (foodData) => {
     // Nếu foodData là đối tượng JSON
     if (!(foodData instanceof FormData)) {
       // Thêm từng trường vào FormData
-      formData.append('name', foodData.name);
-      formData.append('price', foodData.price);
-      formData.append('categoryId', foodData.categoryId);
+      formData.append("name", foodData.name);
+      formData.append("price", foodData.price);
+      formData.append("categoryId", foodData.categoryId);
 
       if (foodData.status) {
-        formData.append('status', foodData.status);
+        formData.append("status", foodData.status);
       }
 
       // Thêm file hình ảnh nếu có
       if (foodData.imageFile) {
-        formData.append('imageFile', foodData.imageFile);
+        formData.append("imageFile", foodData.imageFile);
       }
 
       // Sử dụng formData thay vì dữ liệu gốc
       const response = await axiosInstance.post("/api/dishes", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
       return response.data;
     } else {
       // Nếu foodData đã là FormData
       const response = await axiosInstance.post("/api/dishes", foodData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
       return response.data;
     }
@@ -55,13 +55,21 @@ export const addFoodItem = async (foodData) => {
 };
 
 // Hàm cập nhật món ăn
-export const updateFoodItem = async (foodId, foodData) => {
+export const updateFoodItem = async (foodId, formData) => {
   try {
-    const response = await axiosInstance.put(`/api/dishes/${foodId}`, foodData);
-    return response.data; // Trả về dữ liệu món ăn sau khi cập nhật
+    const response = await axiosInstance.put(
+      `/api/dishes/${foodId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
   } catch (error) {
     console.error(`Error updating food item ${foodId}:`, error);
-    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+    throw error;
   }
 };
 
@@ -90,7 +98,9 @@ export const getPendingFoodItems = async () => {
 // Hàm lấy danh sách món ăn theo danh mục
 export const getFoodItemsByCategory = async (categoryId) => {
   try {
-    const response = await axiosInstance.get(`/api/dishes?categoryId=${categoryId}`);
+    const response = await axiosInstance.get(
+      `/api/dishes?categoryId=${categoryId}`
+    );
     return response.data; // Trả về danh sách món ăn
   } catch (error) {
     console.error("Error fetching food items by category:", error);

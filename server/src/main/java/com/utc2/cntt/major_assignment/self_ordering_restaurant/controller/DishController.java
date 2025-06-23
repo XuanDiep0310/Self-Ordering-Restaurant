@@ -55,4 +55,13 @@ public class DishController {
         dishService.deleteDishById(dishId);
         return ResponseEntity.ok("Dish deleted successfully!");
     }
+
+    @PutMapping("/{dishId}")
+    public ResponseEntity<?> updateDish(
+            @PathVariable Integer dishId,
+            @ModelAttribute DishRequestDTO request
+    ) {
+        dishService.updateDish(dishId, request);
+        return ResponseEntity.ok("Dish updated successfully!");
+    }
 }
